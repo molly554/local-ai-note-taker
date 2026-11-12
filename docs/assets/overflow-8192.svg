@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="524" viewBox="0 0 860 524" role="img" aria-labelledby="t d">
+<title id="t">Meetings where the notes model is sent more than it can read</title>
+<desc id="d">Horizontal bars. Upstream sends a prompt that does not fit in AISHELL-4 test, call, names shown: 13 of 20; AISHELL-4 test, call, no names: 8 of 20; AISHELL-4 test, one microphone: 3 of 20; AISHELL-4 test, one microphone, no punctuation: 2 of 20; VCSum, call, names shown: 11 of 239; VCSum, call, no names: 30 of 239; VCSum, one microphone: 119 of 239; VCSum, one microphone, no punctuation: 112 of 239. This fork: 0.</desc>
+<style>
+  text { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
+  .surface { fill: #fcfcfb; stroke: rgba(11,11,11,0.10); }
+  .title { font-size: 17px; font-weight: 600; fill: #0b0b0b; }
+  .sub, .label { font-size: 12.5px; fill: #52514e; }
+  .group { font-size: 12.5px; font-weight: 600; fill: #0b0b0b; }
+  .head { font-size: 12px; font-weight: 600; fill: #52514e; }
+  .value { font-size: 12px; fill: #0b0b0b; font-variant-numeric: tabular-nums; }
+  .zero { font-size: 14px; font-weight: 600; fill: #0b0b0b; }
+  .tick, .foot { font-size: 11.5px; fill: #898781; }
+  .bar { fill: #2a78d6; }
+  .grid { stroke: #e1e0d9; stroke-width: 1; fill: none; }
+  .base { stroke: #c3c2b7; stroke-width: 1; fill: none; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; stroke: rgba(255,255,255,0.10); }
+    .title, .group, .value, .zero { fill: #f0efec; }
+    .sub, .label, .head { fill: #c3c2b7; }
+    .bar { fill: #3987e5; }
+    .grid { stroke: #2c2c2a; }
+    .base { stroke: #383835; }
+  }
+</style>
+<rect x="0.5" y="0.5" width="859" height="523" rx="12" class="surface"/>
+<path d="M262 146V266" class="base"/><path d="M262 304V424" class="base"/><text x="262" y="446" class="tick" text-anchor="middle">0%</text>
+<path d="M357 146V266" class="grid"/><path d="M357 304V424" class="grid"/><text x="357" y="446" class="tick" text-anchor="middle">25%</text>
+<path d="M452 146V266" class="grid"/><path d="M452 304V424" class="grid"/><text x="452" y="446" class="tick" text-anchor="middle">50%</text>
+<path d="M547 146V266" class="grid"/><path d="M547 304V424" class="grid"/><text x="547" y="446" class="tick" text-anchor="middle">75%</text>
+<path d="M642 146V266" class="grid"/><path d="M642 304V424" class="grid"/><text x="642" y="446" class="tick" text-anchor="middle">100%</text>
+<text x="452" y="464" class="tick" text-anchor="middle">share of the set’s meetings</text>
+<path d="M716 146V266" class="grid"/><path d="M716 304V424" class="grid"/>
+<text x="28" y="40" class="title">Meetings where the notes model is sent more than it can read</text>
+<text x="28" y="59" class="sub">Context of 8,192 tokens (what the app takes when memory is short) · counted with the Gemma 4 E4B tokenizer</text>
+<text x="28" y="78" class="sub">Upstream at db8aaf9 against this fork · English meetings (QMSum, 196): 0 in both</text>
+<text x="262" y="108" class="head">Upstream</text>
+<text x="776" y="108" class="head" text-anchor="middle">This fork</text>
+<text x="28" y="138" class="group">AISHELL-4 · 20 Mandarin meetings of 4 to 8 people</text>
+<text x="38" y="165" class="label">Call, names shown</text>
+<path d="M262 155h243a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-243z" class="bar"/>
+<text x="517" y="165" class="value">13 of 20</text>
+<text x="776" y="165" class="zero" text-anchor="middle">0</text>
+<text x="38" y="195" class="label">Call, no names</text>
+<path d="M262 185h148a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-148z" class="bar"/>
+<text x="422" y="195" class="value">8 of 20</text>
+<text x="776" y="195" class="zero" text-anchor="middle">0</text>
+<text x="38" y="225" class="label">One microphone</text>
+<path d="M262 215h53a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-53z" class="bar"/>
+<text x="327" y="225" class="value">3 of 20</text>
+<text x="776" y="225" class="zero" text-anchor="middle">0</text>
+<text x="38" y="255" class="label">One microphone, no punctuation*</text>
+<path d="M262 245h34a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-34z" class="bar"/>
+<text x="308" y="255" class="value">2 of 20</text>
+<text x="776" y="255" class="zero" text-anchor="middle">0</text>
+<text x="28" y="296" class="group">VCSum · 239 Mandarin round-table meetings</text>
+<text x="38" y="323" class="label">Call, names shown</text>
+<path d="M262 313h13.5a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-13.5z" class="bar"/>
+<text x="287.5" y="323" class="value">11 of 239</text>
+<text x="776" y="323" class="zero" text-anchor="middle">0</text>
+<text x="38" y="353" class="label">Call, no names</text>
+<path d="M262 343h43.7a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-43.7z" class="bar"/>
+<text x="317.7" y="353" class="value">30 of 239</text>
+<text x="776" y="353" class="zero" text-anchor="middle">0</text>
+<text x="38" y="383" class="label">One microphone</text>
+<path d="M262 373h185.2a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-185.2z" class="bar"/>
+<text x="459.2" y="383" class="value">119 of 239</text>
+<text x="776" y="383" class="zero" text-anchor="middle">0</text>
+<text x="38" y="413" class="label">One microphone, no punctuation*</text>
+<path d="M262 403h174.1a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-174.1z" class="bar"/>
+<text x="448.1" y="413" class="value">112 of 239</text>
+<text x="776" y="413" class="zero" text-anchor="middle">0</text>
+<text x="28" y="483" class="foot">* The same text with every punctuation mark removed, as speech to text may leave Chinese; not in the corpora.</text>
+<text x="28" y="502" class="foot">At the 32,768 tokens the app asks for, both builds fit every prompt. Method and all figures: bench/real-meetings.</text>
+</svg>
