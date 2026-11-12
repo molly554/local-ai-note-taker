@@ -155,15 +155,22 @@ export function summaryPrompt(part: string, n: number, language: string): string
  * A single turn longer than that is cut between sentences, each piece starting with who said it.
  */
 export function splitForContext(transcript: string, maxTokens: number, count: (s: string) => number): string[] {
-  if (count(transcript) <= maxTokens) return [transcript]
-  const turns = transcript.split('\n').flatMap((t) => (count(t) <= maxTokens ? [t] : cutTurn(t, maxTokens, count)))
+  const lines = transcript.split('\n')
+  // Does it fit whole? Added up turn by turn (+1 for each line break), as the pieces below are: the tokenizer has
+  // counted every turn, but never the whole text, and a guess at that is far off for Chinese
+  if (lines.reduce((n, t) => n + count(t) + 1, 0) <= maxTokens) return [transcript]
   const pieces: string[] = []
   let cur: string[] = [], size = 0
-  for (const t of turns) {
+  const add = (t: string, tokens: number) => {
     // +1 for the line break between turns
-    const n = count(t) + 1
-    if (cur.length && size + n > maxTokens) { pieces.push(cur.join('\n')); cur = []; size = 0 }
-    cur.push(t); size += n
+    if (cur.length && size + tokens + 1 > maxTokens) { pieces.push(cur.join('\n')); cur = []; size = 0 }
+    cur.push(t); size += tokens + 1
+  }
+  for (const t of lines) {
+    const n = count(t)
+    if (n <= maxTokens) add(t, n)
+    // a turn too long for a part: its start goes into what is left of the part being built
+    else for (const [piece, tokens] of cutSized(t, maxTokens, count, cur.length ? maxTokens - size - 1 : maxTokens)) add(piece, tokens)
   }
   if (cur.length) pieces.push(cur.join('\n'))
   return pieces
@@ -177,10 +184,37 @@ export function roughTokens(s: string): number {
   return cjk + Math.ceil((s.length - cjk) / 3)
 }
 
+const SENTENCE = /[^.!?。！？]+(?:[.!?。！？]+\s*)*|[.!?。！？]+\s*/g
 /**
- * A sentence too long for a part on its own: speech to text often leaves Chinese and Japanese without punctuation, so a
- * whole talk is one "sentence". It is cut between words, and a run with no spaces in it between characters.
+ * Who said a turn ("Name: ") and its words as sentences. A sentence takes every mark after it, spaced out or not
+ * ("so . . and the ? ?"), so every character of the turn is in exactly one of them.
  */
+export function sentencesOf(turn: string): { who: string; sentences: string[] } {
+  const m = /^([^:]{1,60}: )([\s\S]*)$/.exec(turn)
+  const who = m?.[1] ?? '', words = m?.[2] ?? turn
+  return { who, sentences: words.match(SENTENCE) ?? [words] }
+}
+
+/** a sentence too long for a part goes in as pieces of at most this many characters */
+const PIECE_CHARS = 400
+/**
+ * A sentence as smaller pieces, cut between words, and a word longer than a piece between characters. Speech to text
+ * often leaves Chinese and Japanese without punctuation, so a whole talk can be one "sentence".
+ */
+export function piecesOf(sentence: string): string[] {
+  const out: string[] = []
+  let cur = ''
+  for (const word of sentence.match(/\S+\s*/g) ?? [sentence]) {
+    if (cur && cur.length + word.length > PIECE_CHARS) { out.push(cur); cur = '' }
+    if (word.length <= PIECE_CHARS) { cur += word; continue }
+    const letters = Array.from(word)
+    for (let i = 0; i < letters.length; i += PIECE_CHARS) out.push(letters.slice(i, i + PIECE_CHARS).join(''))
+  }
+  if (cur) out.push(cur)
+  return out
+}
+
+/** the last resort, for a piece that is still too long for a part (a part of a few hundred tokens): cut by trying sizes */
 function breakLong(s: string, fits: (x: string) => boolean): string[] {
   if (fits(s)) return [s]
   const out: string[] = []
@@ -201,19 +235,34 @@ function breakLong(s: string, fits: (x: string) => boolean): string[] {
   return out
 }
 
+/**
+ * A turn too long for a part, cut between sentences into pieces that each start with who said it. A piece's size is
+ * its sentences' sizes added up: `count` gives the tokenizer's own figure for the texts it was asked about (enhance
+ * asks about these sentences) and a guess for the rest. A sentence too long on its own goes in as smaller pieces.
+ */
 export function cutTurn(turn: string, maxTokens: number, count: (s: string) => number): string[] {
-  const m = /^([^:]{1,60}: )([\s\S]*)$/.exec(turn)
-  const who = m?.[1] ?? '', words = m?.[2] ?? turn
-  const fits = (x: string) => count(who + x.trim()) <= maxTokens
-  // a sentence takes every mark after it, spaced out or not ("so . . and the ? ?"), so no character falls between two sentences
-  const sentences = (words.match(/[^.!?。！？]+(?:[.!?。！？]+\s*)*|[.!?。！？]+\s*/g) ?? [words]).flatMap((s) => breakLong(s, fits))
-  const out: string[] = []
-  let cur = ''
-  for (const s of sentences) {
-    const next = cur + s
-    if (cur && count(who + next.trim()) > maxTokens) { out.push(who + cur.trim()); cur = s } else cur = next
+  return cutSized(turn, maxTokens, count).map(([piece]) => piece)
+}
+
+/**
+ * cutTurn with each piece's size beside it. first: the room for the first piece, when the part it goes into is
+ * partly full. Under a quarter of a part is not worth a piece of its own, and the turn then starts a part.
+ */
+function cutSized(turn: string, maxTokens: number, count: (s: string) => number, first = maxTokens): Array<[string, number]> {
+  const { who, sentences } = sentencesOf(turn)
+  const whoTokens = count(who), room = maxTokens - whoTokens
+  const fits = (x: string) => count(x) <= room
+  const units = sentences.flatMap((s) => (fits(s) ? [s] : piecesOf(s).flatMap((p) => breakLong(p, fits))))
+  const out: Array<[string, number]> = []
+  let cur = '', size = 0
+  let limit = first - whoTokens >= room / 4 ? Math.min(room, first - whoTokens) : room
+  for (const u of units) {
+    const n = count(u)
+    // a first sentence bigger than what is left starts a part of its own, with a whole part's room
+    if (!cur && !out.length && n > limit) limit = room
+    if (cur && size + n > limit) { out.push([who + cur.trim(), whoTokens + size]); cur = u; size = n; limit = room } else { cur += u; size += n }
   }
-  if (cur.trim()) out.push(who + cur.trim())
+  if (cur.trim()) out.push([who + cur.trim(), whoTokens + size])
   return out
 }
 
@@ -406,8 +455,38 @@ export async function enhance(input: EnhanceInput, llm: Llm, onToken: (text: str
     // even parts read better than one full part and a scrap
     const target = Math.min(max, Math.ceil(rest / Math.ceil(rest / max)) + 256)
     const known = new Map(lines.map((l, i) => [l, lineTokens[i]]))
-    const count = (s: string) => known.get(s) ?? roughTokens(s)
-    const pieces = from < lines.length ? splitForContext(lines.slice(from).join('\n'), target, count) : []
+    // A turn too long for a part is cut between sentences. The tokenizer counts those sentences too, and the smaller
+    // pieces of a sentence that is itself too long, so a part is sized by what the model will read, not by a guess
+    const share = new Map<string, number>()
+    const long = lines.slice(from).filter((l) => (known.get(l) ?? 0) > target).map((line) => ({ line, ...sentencesOf(line) }))
+    if (long.length) {
+      const learn = async (texts: string[]) => {
+        const fresh = [...new Set(texts)].filter((t) => !known.has(t))
+        if (fresh.length) (await llm.count(fresh)).forEach((n, i) => known.set(fresh[i], n))
+      }
+      const unitsOf = (t: (typeof long)[number]) => t.sentences.flatMap((s) => (known.get(s)! > target - known.get(t.who)! ? piecesOf(s) : [s]))
+      await learn(long.flatMap((t) => [t.who, ...t.sentences]))
+      await learn(long.flatMap(unitsOf))
+      // Counted one at a time, the sentences do not add up to the turn: a tokenizer reads a space or a mark at the end
+      // of a text differently from one in the middle (short English sentences came to a third more than their turn,
+      // Chinese ones to a little less). So each sentence gets its share of what the turn really is.
+      for (const t of long) {
+        const units = unitsOf(t)
+        const sum = units.reduce((n, u) => n + known.get(u)!, 0)
+        const scale = sum > 0 ? (known.get(t.line)! - known.get(t.who)!) / sum : 1
+        for (const u of units) share.set(u, known.get(u)! * scale)
+      }
+    }
+    const count = (s: string) => share.get(s) ?? known.get(s) ?? roughTokens(s)
+    let pieces: string[] = []
+    // Sizes added up are still not the tokenizer's count of a finished piece, so that is asked for too: if a piece
+    // is bigger than a part may be, all of them are cut again with less room
+    for (let room = target, tries = 0; from < lines.length; tries++) {
+      pieces = splitForContext(lines.slice(from).join('\n'), room, count)
+      const worst = Math.max(...await llm.count(pieces))
+      if (worst <= max || tries === 3) break
+      room = Math.floor(room * (max / worst) * 0.98)
+    }
     const summaries = done.map((p) => p.summary)
     for (const piece of pieces) {
       const n = summaries.length + 1

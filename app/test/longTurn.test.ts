@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { cutTurn, roughTokens, splitForContext } from '../src/main/notes/enhance'
+import { cutTurn, enhance, partBudget, piecesOf, roughTokens, sentencesOf, splitForContext, transcriptText, type Llm } from '../src/main/notes/enhance'
+import type { Segment } from '../src/main/store'
 
 /** as enhance() counts: a whole transcript line has the tokenizer's own count, anything cut from it is a guess */
 const counter = (line: string, real: number) => (s: string) => (s === line ? real : roughTokens(s))
@@ -72,6 +73,77 @@ describe('a Chinese meeting of many short turns', () => {
     expect(pieces.length).toBeGreaterThan(2)
     for (const p of pieces) expect(p.split('\n').reduce((n, l) => n + count(l) + 1, 0)).toBeLessThanOrEqual(7000)
     expect(pieces.join('\n')).toBe(lines.join('\n'))
+  })
+})
+
+describe('a long turn after shorter ones', () => {
+  const words = (s: string) => s.split(/\s+/).filter(Boolean).length
+  it('starts in what is left of the part being built, so no part is left half empty', () => {
+    const short = Array.from({ length: 10 }, (_, i) => `You: short turn number ${i}.`)
+    const long = `Them: ${Array.from({ length: 56 }, (_, i) => `Sentence number ${i} here.`).join(' ')}`
+    const pieces = splitForContext([...short, long].join('\n'), 100, words)
+    // the short turns take 60 of the first part's 100: the long turn's first nine sentences go in after them
+    expect(pieces[0]).toContain('You: short turn number 9.\nThem: Sentence number 0 here.')
+    expect(pieces.length).toBe(3)
+    for (const p of pieces) { expect(words(p)).toBeLessThanOrEqual(100); expect(p.split('\n').every((l) => /^(You|Them): /.test(l))).toBe(true) }
+    expect(pieces.join(' ').match(/Sentence number \d+ here\./g)).toEqual(Array.from({ length: 56 }, (_, i) => `Sentence number ${i} here.`))
+  })
+
+  it('but not when only a sliver is left: the turn then starts a part of its own', () => {
+    const short = Array.from({ length: 15 }, (_, i) => `You: short turn number ${i}.`)
+    const long = `Them: ${Array.from({ length: 30 }, (_, i) => `Sentence number ${i} here.`).join(' ')}`
+    const pieces = splitForContext([...short, long].join('\n'), 100, words)
+    // 90 of 100 taken: under a quarter of a part is left
+    expect(pieces[0]).not.toContain('Them:')
+    expect(pieces[1].startsWith('Them: Sentence number 0 here.')).toBe(true)
+  })
+})
+
+describe('sentences and pieces', () => {
+  it('sentencesOf gives who spoke and the sentences, every character in one of them', () => {
+    const turn = 'Speaker A: First one. Second?  Third . . and more'
+    const { who, sentences } = sentencesOf(turn)
+    expect(who).toBe('Speaker A: ')
+    expect(sentences).toEqual(['First one. ', 'Second?  ', 'Third . . ', 'and more'])
+    expect(who + sentences.join('')).toBe(turn)
+  })
+
+  it('piecesOf cuts between words, and a word longer than a piece between characters', () => {
+    const s = Array.from({ length: 300 }, (_, i) => `word${i}`).join(' ')
+    const pieces = piecesOf(s)
+    expect(pieces.join('')).toBe(s)
+    for (const p of pieces) { expect(p.length).toBeLessThanOrEqual(400); expect(/^word\d+/.test(p)).toBe(true) }
+    expect(piecesOf('字'.repeat(1000)).map((p) => p.length)).toEqual([400, 400, 200])
+  })
+})
+
+describe('parts sized by the tokenizer, not by a guess', () => {
+  // about what the app's tokenizers give on real meetings: 0.6 of a token a Chinese letter, a token every four other characters
+  const tokens = (s: string) => { const c = s.match(/\p{Script=Han}/gu)?.length ?? 0; return Math.ceil(c * 0.6 + (s.length - c) / 4) }
+  /** a room heard on one microphone: every line is "You", so the whole meeting is one turn */
+  const room = (text: (i: number) => string): Segment[] => Array.from({ length: 2000 }, (_, i) => ({ id: i, meetingId: 'm', track: 'me' as const, startMs: i * 5000, endMs: i * 5000 + 5000, text: text(i), speaker: null }))
+  async function read(segments: Segment[]) {
+    const prompts: string[] = []
+    const llm: Llm = {
+      contextSize: 8192, count: async (xs) => xs.map(tokens),
+      chat: async (prompt, _onToken, o) => { if (o?.summary) { prompts.push(prompt); return '### 议题\n- 要点' } return '## 摘要\n- **You:** 跟进' },
+    }
+    await enhance({ meeting: { title: '', attendees: [] }, mine: '', segments, language: 'zh' }, llm, () => {})
+    const transcript = transcriptText(segments), budget = await partBudget(llm, 'Chinese')
+    return { prompts, fewest: Math.ceil(tokens(transcript) / budget), byGuess: Math.ceil(roughTokens(transcript) / budget) }
+  }
+
+  it('a Chinese meeting on one microphone is read in about as few parts as hold it, and every part fits', async () => {
+    const { prompts, fewest, byGuess } = await read(room((i) => `我们今天讨论第${i + 1}个议题主要是关于产品发布的时间安排和定价策略。`))
+    expect(byGuess).toBeGreaterThan(fewest + 2)
+    expect(prompts.length).toBeLessThanOrEqual(fewest + 1)
+    for (const p of prompts) expect(tokens(p) + 700).toBeLessThanOrEqual(8192)
+  })
+
+  it('the same with no punctuation at all, as speech to text may leave it', async () => {
+    const { prompts, fewest } = await read(room((i) => `我们今天讨论第${i + 1}个议题主要是关于产品发布的时间安排和定价策略`))
+    expect(prompts.length).toBeLessThanOrEqual(fewest + 1)
+    for (const p of prompts) expect(tokens(p) + 700).toBeLessThanOrEqual(8192)
   })
 })
 
