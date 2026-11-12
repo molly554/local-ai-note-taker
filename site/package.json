@@ -1,0 +1,24 @@
+{
+  "name": "yogurt-site",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "site:bundle": "node scripts/bundle.mjs",
+    "site:stills": "node scripts/stills.mjs",
+    "test": "node renderer/timeline.test.mjs && node scripts/theme.test.mjs"
+  },
+  "dependencies": {
+    "next": "16.4.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- V8 compiles JavaScript at run time -->
+  <key>com.apple.security.cs.allow-jit</key><true/>
+  <!-- The helpers below are Yogurt's children, so the Mac checks these on Yogurt itself and names Yogurt in its prompts -->
+  <!-- the microphone, while a meeting records -->
+  <key>com.apple.security.device.audio-input</key><true/>
+  <!-- the calendar: meeting names and who is in them -->
+  <key>com.apple.security.personal-information.calendars</key><true/>
+  <!-- the browser tab's name (call detection) and pausing Music or Spotify while recording -->
+  <key>com.apple.security.automation.apple-events</key><true/>
+</dict>
+</plist>

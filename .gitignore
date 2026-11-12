@@ -1,0 +1,52 @@
+node_modules
+out
+dist
+.vite
+test-results
+playwright-report
+*.log
+.DS_Store
+
+# local-only checks
+app/e2e/zz-*.spec.ts
+app/e2e/zz-fixtures/
+e2e/zz-*
+
+
+# built Mac helper
+app/resources/bin/
+app/resources/vad/
+app/resources/dict/
+
+# whisper.cpp clone and build (scripts/native.sh)
+app/native/.whisper-build/
+
+# local builds and profiles
+app/out-*/
+app/test-results-*/
+output/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.db-shm
+*.db-wal
+*.dmg
+
+# marketing site
+site/node_modules/
+site/.next/
+site/next-env.d.ts
+site/*.tsbuildinfo
+site/.vercel/
+
+# local credentials
+.env
+.env.local
+.env.*.local
+*.p12
+*.p8
+
+# written by next dev
+site/AGENTS.md
+site/CLAUDE.md

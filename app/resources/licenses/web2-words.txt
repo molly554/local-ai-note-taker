@@ -1,0 +1,7 @@
+resources/dict/words (Windows and Linux builds only)
+
+Webster's Second International Dictionary word list (web2), as shipped in FreeBSD's share/dict/web2
+(https://github.com/freebsd/freebsd-src, commit 72f0bc868bf00586cba1e50057d8f1998b4abe80) and as /usr/share/dict/words on macOS.
+
+From its README: "Welcome to web2 (Webster's Second International) all 234,936 words worth. The 1934 copyright has
+lapsed, according to the supplier." Public domain.

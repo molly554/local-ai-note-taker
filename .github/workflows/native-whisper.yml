@@ -1,0 +1,225 @@
+# whisper-server for Windows (x64) and Linux (x86_64), built by app/scripts/whisper-build.mjs from the pinned whisper.cpp
+# and patch that native.sh uses on the Mac. Each build is started by the app's own launcher and transcribes short English
+# clips (scripts/whisper-smoke.mjs). The realtime factor of each model on the runner's CPU goes in the run summary.
+# Linux builds on ubuntu-22.04, so it runs on glibc 2.35 and later; it is also run on ubuntu-24.04.
+# The models are downloaded here only, pinned by commit and sha256; the app never fetches anything for this at run time.
+name: whisper-server (Windows, Linux)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - app/scripts/whisper-build.mjs
+      - app/scripts/whisper-smoke.mjs
+      - app/native/whisper-server.patch
+      - app/native/whisper-vad-threads.patch
+      - app/src/main/asr/server.ts
+      - app/src/main/asr/speedCheck.ts
+      - app/src/main/asr/transcribe.ts
+      - app/scripts/speed-check-smoke.mjs
+      - app/resources/speed/**
+      - packages/picker/src/asr.ts
+      - app/src/shared/platform.ts
+      - .github/workflows/native-whisper.yml
+  workflow_dispatch:
+
+env:
+  VULKAN_SDK_VERSION: 1.4.341.1
+  VULKAN_SDK_SHA256_LINUX: 3bf0f762afb6c79bc6a9d9fb5998745ccff928800a29619b501ed9de7fd9789b
+  VULKAN_SDK_SHA256_WINDOWS: bcf2d75aa9556889ab974858666e20b3655b6055a0db704ccb47279ff33b5bfe
+  # ggerganov/whisper.cpp on Hugging Face at the commit the catalog uses
+  MODELS_URL: https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: native-whisper-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Vulkan SDK (cached)
+        id: vk-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/vulkansdk-dl
+          key: vulkansdk-${{ runner.os }}-${{ env.VULKAN_SDK_VERSION }}
+      - name: Vulkan SDK
+        run: |
+          mkdir -p "$RUNNER_TEMP/vulkansdk-dl" && cd "$RUNNER_TEMP/vulkansdk-dl"
+          v=$VULKAN_SDK_VERSION
+          if [ "$RUNNER_OS" = Windows ]; then f=vulkansdk-windows-X64-$v.exe; sum=$VULKAN_SDK_SHA256_WINDOWS; url=https://sdk.lunarg.com/sdk/download/$v/windows/$f
+          else f=vulkansdk-linux-x86_64-$v.tar.xz; sum=$VULKAN_SDK_SHA256_LINUX; url=https://sdk.lunarg.com/sdk/download/$v/linux/$f; fi
+          [ -f "$f" ] || curl -sSfL --retry 3 -o "$f" "$url"
+          echo "$sum  $f" | sha256sum -c -
+          if [ "$RUNNER_OS" = Windows ]; then
+            ./"$f" --root "C:\\VulkanSDK\\$v" --accept-licenses --default-answer --confirm-command install
+            echo "VULKAN_SDK=C:\\VulkanSDK\\$v" >> "$GITHUB_ENV"
+            echo "C:\\VulkanSDK\\$v\\Bin" >> "$GITHUB_PATH"
+          else
+            mkdir -p "$RUNNER_TEMP/vulkansdk" && tar -xJf "$f" -C "$RUNNER_TEMP/vulkansdk"
+            echo "VULKAN_SDK=$RUNNER_TEMP/vulkansdk/$v/x86_64" >> "$GITHUB_ENV"
+            echo "$RUNNER_TEMP/vulkansdk/$v/x86_64/bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: Build whisper-server
+        run: node app/scripts/whisper-build.mjs
+      - name: List what was built
+        run: ls -la app/resources/bin app/resources/vad
+
+      - name: Needs nothing that isn't on every computer
+        run: |
+          cd app/resources/bin
+          if [ "$RUNNER_OS" = Windows ]; then
+            dumpbin=$("/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -find 'VC/Tools/MSVC/**/bin/Hostx64/x64/dumpbin.exe' | head -1)
+            for f in *.exe *.dll; do echo "== $f"; "$dumpbin" -nologo -dependents "$f" | grep -i '\.dll' | grep -vi 'dump of'; done | tee deps.txt
+            # no Visual C++ runtime or OpenMP: those aren't on a fresh Windows
+            ! grep -iE 'vcruntime|msvcp|vcomp|libomp|ucrtbased' deps.txt
+            rm deps.txt
+            "$dumpbin" -nologo -headers whisper-server.exe | grep -i 'subsystem'
+          else
+            for f in whisper-server *.so; do echo "== $f"; readelf -d "$f" | grep -E 'NEEDED|RUNPATH|RPATH'; done | tee deps.txt
+            ! grep NEEDED deps.txt | grep -vE '\[(libc\.so\.6|libm\.so\.6|libstdc\+\+\.so\.6|libgcc_s\.so\.1|libpthread\.so\.0|libdl\.so\.2|ld-linux-x86-64\.so\.2|libvulkan\.so\.1|libwhisper\.so|libggml\.so|libggml-base\.so)\]'
+            grep -q 'RUNPATH.*\$ORIGIN' <(readelf -d whisper-server)
+            rm deps.txt
+            # the newest glibc any file asks for: 2.35 at most (Ubuntu 22.04)
+            newest=$(for f in whisper-server *.so; do objdump -T "$f"; done | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)
+            echo "newest glibc symbol: $newest"
+            [ "$(printf '%s\nGLIBC_2.35\n' "$newest" | sort -V | tail -1)" = GLIBC_2.35 ]
+          fi
+
+      - name: Backends load
+        run: |
+          exe=app/resources/bin/whisper-server; [ "$RUNNER_OS" = Windows ] && exe=$exe.exe
+          "$exe" --help > help.txt 2>&1 || true
+          grep -i 'load_backend\|vulkan\|ggml' help.txt | head -20
+          grep -qi 'loaded CPU backend' help.txt
+          rm help.txt
+
+      - name: Models (cached)
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/models
+          key: whisper-models-tiny.en-small-q5_1-turbo-q5_0-v1
+      - name: Models
+        run: |
+          mkdir -p "$RUNNER_TEMP/models" && cd "$RUNNER_TEMP/models"
+          get() { [ -f "$1" ] && echo "$2  $1" | sha256sum -c - >/dev/null 2>&1 || curl -sSfL --retry 3 -o "$1" "$MODELS_URL/$1"; echo "$2  $1" | sha256sum -c -; }
+          get ggml-tiny.en.bin 921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f
+          get ggml-small-q5_1.bin ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb
+          get ggml-large-v3-turbo-q5_0.bin 394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2
+
+      - name: Summary header
+        run: |
+          { echo "### whisper-server realtime factor on ${{ matrix.os }} (time to read a clip / its length; under 1 keeps up)"
+            echo "| os | model | clip | final (beam 5) | partial (greedy) | start | threads | cpu |"
+            echo "|---|---|---|---|---|---|---|---|"; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Transcribes English, VAD on, survives silence
+        run: |
+          exe=app/resources/bin/whisper-server; [ "$RUNNER_OS" = Windows ] && exe=$exe.exe
+          node app/scripts/whisper-smoke.mjs --bin "$exe" --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" \
+            --vad app/resources/vad/ggml-silero-v6.2.0.bin --wav app/native/.whisper-build/samples/jfk.wav,app/e2e/fixtures/meeting-me.wav \
+            --expect country,ask --silence --runs 3 --label tiny.en
+      # setup's speed check for real (app/src/main/asr/speedCheck.ts): times tiny.en on the bundled clip and stores the result
+      - name: Setup speed check stores a result
+        run: |
+          exe=app/resources/bin/whisper-server; [ "$RUNNER_OS" = Windows ] && exe=$exe.exe
+          node app/scripts/speed-check-smoke.mjs --bin "$exe" --vad app/resources/vad/ggml-silero-v6.2.0.bin \
+            --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" --store "$RUNNER_TEMP/speech-speed.json"
+          cat "$RUNNER_TEMP/speech-speed.json"
+      - name: Model and program under a folder named José
+        run: |
+          exe=app/resources/bin/whisper-server; [ "$RUNNER_OS" = Windows ] && exe=$exe.exe
+          node app/scripts/whisper-smoke.mjs --bin "$exe" --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" \
+            --vad app/resources/vad/ggml-silero-v6.2.0.bin --wav app/native/.whisper-build/samples/jfk.wav --expect country,ask --silence --runs 1 --unicode-dir --label tiny.en-unicode
+      - name: Without the UTF-8 manifest the José folder fails (so the check above means something)
+        if: runner.os == 'Windows'
+        run: |
+          plain="$RUNNER_TEMP/plainbin"; rm -rf "$plain"; cp -r app/resources/bin "$plain"
+          cp app/native/.whisper-build/build/bin/Release/whisper-server.exe "$plain/whisper-server.exe"
+          if node app/scripts/whisper-smoke.mjs --bin "$plain/whisper-server.exe" --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" \
+            --vad app/resources/vad/ggml-silero-v6.2.0.bin --wav app/native/.whisper-build/samples/jfk.wav --runs 1 --unicode-dir --label plain; then
+            echo "the program without the manifest worked under José too: the manifest may not be needed"; exit 1
+          fi
+
+      - name: Vulkan backend works (Mesa's software Vulkan)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq mesa-vulkan-drivers libvulkan1 >/dev/null
+          # software Vulkan is a CPU device, which ggml skips unless it is named
+          export GGML_VK_VISIBLE_DEVICES=0
+          app/resources/bin/whisper-server --help 2>&1 | grep -i 'vulkan' | head
+          app/resources/bin/whisper-server --help 2>&1 | grep -qi 'loaded Vulkan backend'
+          node app/scripts/whisper-smoke.mjs --bin app/resources/bin/whisper-server --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" \
+            --vad app/resources/vad/ggml-silero-v6.2.0.bin --wav app/native/.whisper-build/samples/jfk.wav --expect country,ask --runs 1 --label tiny.en-lavapipe
+
+      - name: Realtime factor, Whisper small and large-v3-turbo on the CPU
+        run: |
+          exe=app/resources/bin/whisper-server; [ "$RUNNER_OS" = Windows ] && exe=$exe.exe
+          clips=app/native/.whisper-build/samples/jfk.wav,app/e2e/fixtures/meeting-me.wav,app/e2e/fixtures/meeting-them.wav
+          for m in small-q5_1 large-v3-turbo-q5_0; do
+            node app/scripts/whisper-smoke.mjs --bin "$exe" --model "$RUNNER_TEMP/models/ggml-$m.bin" \
+              --vad app/resources/vad/ggml-silero-v6.2.0.bin --wav "$clips" --expect country --runs 1 --label "$m"
+          done
+
+      - name: What the app's fixed 4 threads cost on a 2-core runner (for the record)
+        if: runner.os == 'Linux'
+        run: |
+          node app/scripts/whisper-smoke.mjs --bin app/resources/bin/whisper-server --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" \
+            --vad app/resources/vad/ggml-silero-v6.2.0.bin --wav app/native/.whisper-build/samples/jfk.wav --runs 1 --threads 4 --label tiny.en-4-threads
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: whisper-server-${{ runner.os }}
+          path: |
+            app/resources/bin
+            app/resources/vad
+          retention-days: 30
+
+  # The Linux build on a newer Ubuntu, and the Windows build on the older Windows Server
+  elsewhere:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, from: Linux }
+          - { os: windows-2022, from: Windows }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@v4
+        with:
+          name: whisper-server-${{ matrix.from }}
+          path: app/resources
+      - name: Model
+        run: |
+          mkdir -p "$RUNNER_TEMP/models" && cd "$RUNNER_TEMP/models"
+          curl -sSfL --retry 3 -o ggml-tiny.en.bin "$MODELS_URL/ggml-tiny.en.bin"
+          echo "921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f  ggml-tiny.en.bin" | sha256sum -c -
+          curl -sSfL --retry 3 -o jfk.wav https://raw.githubusercontent.com/ggml-org/whisper.cpp/d1be6fde11ac6e0407606b4e42fe72d34add8037/samples/jfk.wav
+      - name: Transcribes
+        run: |
+          exe=app/resources/bin/whisper-server; [ "$RUNNER_OS" = Windows ] && exe=$exe.exe
+          chmod +x "$exe" || true
+          node app/scripts/whisper-smoke.mjs --bin "$exe" --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" \
+            --vad app/resources/vad/ggml-silero-v6.2.0.bin --wav "$RUNNER_TEMP/models/jfk.wav" --expect country,ask --silence --runs 1 --unicode-dir --label tiny.en-${{ matrix.os }}

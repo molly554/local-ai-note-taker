@@ -1,0 +1,21 @@
+diff --git a/examples/server/server.cpp b/examples/server/server.cpp
+index b745f4d7..013fb37f 100644
+--- a/examples/server/server.cpp
++++ b/examples/server/server.cpp
+@@ -1076,6 +1076,8 @@ int main(int argc, char ** argv) {
+             if (!params.no_language_probabilities) {
+                 std::vector<float> lang_probs(whisper_lang_max_id() + 1, 0.0f);
+                 const auto detected_lang_id = whisper_lang_auto_detect(ctx, 0, params.n_threads, lang_probs.data());
++                // VAD found no speech: there is no audio to detect a language in (a negative id, no name)
++                if (detected_lang_id >= 0) {
+                 jres["detected_language"] = whisper_lang_str_full(detected_lang_id);
+                 jres["detected_language_probability"] = lang_probs[detected_lang_id];
+                 jres["language_probabilities"] = json::object();
+@@ -1085,6 +1087,7 @@ int main(int argc, char ** argv) {
+                         jres["language_probabilities"][whisper_lang_str(i)] = lang_probs[i];
+                     }
+                 }
++                }
+             }
+             const int n_segments = whisper_full_n_segments(ctx);
+             for (int i = 0; i < n_segments; ++i)

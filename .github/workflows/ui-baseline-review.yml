@@ -1,0 +1,45 @@
+name: UI baseline review
+on:
+  workflow_dispatch:
+    inputs:
+      baseline:
+        description: Baseline commit for the same scrub and onboarding capture (a SHA, branch or tag)
+        required: true
+jobs:
+  review:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: current
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.baseline }}
+          path: baseline
+      - run: sudo xcode-select -s /Applications/Xcode_26.4.1.app
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: baseline/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: baseline/.nvmrc
+          cache: pnpm
+          cache-dependency-path: baseline/pnpm-lock.yaml
+      - run: pnpm -C baseline install --frozen-lockfile
+      - name: Use the same capture script on the baseline
+        run: cp current/app/e2e/scrubMotion.spec.ts current/app/e2e/firstRunPolish.spec.ts baseline/app/e2e/
+      - run: pnpm -C baseline/app native
+      - run: pnpm -C baseline/app exec electron-vite build
+      - run: pnpm -C baseline/app exec playwright install ffmpeg
+      - name: Capture baseline on CI only
+        env:
+          YOGURT_BACKGROUND: '0'
+          YOGURT_SCRUB_REVIEW: before
+          YOGURT_UI_REVIEW: before
+        run: pnpm -C baseline/app exec playwright test scrubMotion.spec.ts firstRunPolish.spec.ts --workers=1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-before
+          path: baseline/app/test-results
+          retention-days: 7

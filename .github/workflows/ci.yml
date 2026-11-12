@@ -1,0 +1,142 @@
+# Every push and pull request: typecheck, unit tests, then the end-to-end tests with stand-ins (YOGURT_FAKE), hidden.
+# The Mac job runs everything; Windows and Linux typecheck, unit-test, build their helpers and run the e2e specs that work there.
+name: CI
+
+# Docs, the website and licence text don't run it (site.yml checks the website). A newer push to the same branch
+# stops the run before it: macOS minutes cost ten times Linux ones.
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['site/**', 'docs/**', '**/*.md', 'LICENSE', '.github/workflows/site.yml']
+  pull_request:
+    paths-ignore: ['site/**', 'docs/**', '**/*.md', 'LICENSE', '.github/workflows/site.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    # Xcode 26: the helpers use macOS 26's speech APIs
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.4.1.app && xcodebuild -version
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm -r typecheck
+      - name: Unit tests
+        run: pnpm -r test
+      - name: Prepare CI motion capture
+        run: pnpm -C app exec playwright install ffmpeg
+      - name: End-to-end tests
+        # windows are shown on CI (nobody is watching)
+        env:
+          YOGURT_BACKGROUND: '0'
+        run: pnpm -C app e2e
+      - name: Keep agenda motion review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agenda-motion
+          path: app/test-results/**/agenda-motion/*.webm
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Keep UI review captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-review
+          path: |
+            app/test-results/**/*.png
+            app/test-results/**/scrub-motion/**/*.webm
+            app/test-results/**/glass-native-*.txt
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Keep the test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: app/test-results
+          if-no-files-found: ignore
+
+  other:
+    # Windows and Linux: the app builds, its tests pass and it starts (fake mode) with the Mac-only features hidden
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Linux build and test packages
+        if: runner.os == 'Linux'
+        # GitHub's Azure Ubuntu mirror sometimes can't be reached: after a failed try, use Ubuntu's own servers
+        run: |
+          get() { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends libpulse-dev pkg-config pulseaudio >/dev/null; }
+          for i in 1 2 3; do
+            get && exit 0
+            echo "::warning::apt try $i failed; switching to archive.ubuntu.com"
+            echo 'http://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt >/dev/null
+            sudo sed -i 's#http://azure.archive.ubuntu.com#http://archive.ubuntu.com#g' /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
+            sleep 10
+          done
+          exit 1
+      - name: Rust build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            app/native/*/target
+          key: helpers-${{ runner.os }}-${{ hashFiles('app/native/*/Cargo.lock', 'app/native/*/rust-toolchain.toml') }}
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm -r typecheck
+      - name: Unit tests
+        run: pnpm -r test
+      - name: Build
+        # the Rust helpers (scripts/native.mjs); whisper-server is left out here (fake mode doesn't use it), the preview builds and native-whisper.yml build it
+        env:
+          YOGURT_NO_WHISPER: '1'
+        run: pnpm -C app build
+      - name: The helpers run
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then pulseaudio --start --exit-idle-time=-1; fi
+          node app/scripts/helpers-smoke.mjs --resources app/resources --no-whisper
+      - name: Install Playwright
+        if: runner.os == 'Linux'
+        run: pnpm -C app exec playwright install-deps
+      # Ubuntu 24.04 blocks the user namespaces Electron's sandbox needs
+      - name: Let Electron start (Linux)
+        if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: End-to-end tests
+        shell: bash
+        # the specs tagged @everywhere (launch, and the Mac-only features hidden); windows are shown, hidden ones pause animation frames here
+        env:
+          YOGURT_BACKGROUND: '0'
+        run: |
+          cd app
+          if [ "$RUNNER_OS" = "Linux" ]; then xvfb-run -a pnpm exec playwright test --grep @everywhere; else pnpm exec playwright test --grep @everywhere; fi
+      - name: Keep the test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report-${{ runner.os }}
+          path: app/test-results
+          if-no-files-found: ignore

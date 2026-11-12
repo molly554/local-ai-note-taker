@@ -1,0 +1,70 @@
+# yogurt-mcp for Windows and Linux (app/native/yogurt-mcp-relay): unit tests, release build, then a smoke test
+# against a stand-in Yogurt on the pipe or socket: MCP messages both ways, the not-running message, and starting
+# Yogurt from what it recorded. The built helpers are kept as artifacts for packaging into resources/bin.
+name: MCP helper
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/native/yogurt-mcp-relay/**', '.github/workflows/native-mcp.yml']
+  pull_request:
+    paths: ['app/native/yogurt-mcp-relay/**', '.github/workflows/native-mcp.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-mcp-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    # the oldest supported glibc (Ubuntu 22.04)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app/native/yogurt-mcp-relay
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Rust (version from rust-toolchain.toml)
+        run: rustup show active-toolchain || rustup toolchain install
+      - run: cargo test --locked
+      - run: cargo build --release --locked
+      - name: Smoke test
+        run: node smoke/smoke.mjs target/release/yogurt-mcp
+      - name: Linked libraries (glibc only)
+        run: ldd target/release/yogurt-mcp && objdump -T target/release/yogurt-mcp | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: yogurt-mcp-linux-x86_64
+          path: app/native/yogurt-mcp-relay/target/release/yogurt-mcp
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: app/native/yogurt-mcp-relay
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Rust (version from rust-toolchain.toml)
+        run: rustup show active-toolchain || rustup toolchain install
+      - run: cargo test --locked
+      - run: cargo build --release --locked
+      - name: No C runtime to install
+        run: |
+          $s = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes("target/release/yogurt-mcp.exe"))
+          if ($s -match 'VCRUNTIME140') { throw 'yogurt-mcp.exe needs the Visual C++ runtime' }
+      - name: Smoke test
+        run: node smoke/smoke.mjs target/release/yogurt-mcp.exe
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: yogurt-mcp-windows-x64
+          path: app/native/yogurt-mcp-relay/target/release/yogurt-mcp.exe

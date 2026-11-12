@@ -1,0 +1,19 @@
+diff --git a/dist/bindings/utils/testBindingBinary.js b/dist/bindings/utils/testBindingBinary.js
+index fc2ed379662d4d5cc7282a9d01faf3c327caa593..755ff2e216960846739a8bcb1f8f3d3baf5dce63 100644
+--- a/dist/bindings/utils/testBindingBinary.js
++++ b/dist/bindings/utils/testBindingBinary.js
+@@ -22,6 +22,11 @@ export async function testBindingBinary(bindingBinaryPath, extBackendsPath, gpu,
+             'To resolve this issue, make sure that "node-llama-cpp" is not bundled together with other code and is imported as an external module with its original file structure.');
+         return true;
+     }
++    // Yogurt: the engine runs in an Electron utility process, which can't import utilityProcess, and child_process.fork()
++    // needs the runAsNode fuse a shipped app turns off. Load untested: if a graphics driver crashes the engine,
++    // the app starts it again without the graphics card (src/main/engine.ts).
++    if (runningInElectron && process.parentPort != null)
++        return true;
+     try {
+         const runningInsideSnapOnLinux = getPlatform() === "linux" && process.env.SNAP != null;
+         if (runningInsideSnapOnLinux && !runningInBun && !runningInElectron) {
+diff --git a/templates/README.md b/templates/README.md
+deleted file mode 100644
+index c47d3c3ae991accbfae308db67101ef5bc66c4c2..0000000000000000000000000000000000000000

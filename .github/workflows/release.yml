@@ -1,0 +1,196 @@
+# A release: `sh app/scripts/release.sh 0.3.0` sets the version, tags v0.3.0 and pushes; this builds Yogurt for Mac
+# (Apple Silicon), Windows (x64, unsigned) and Linux (x86_64 AppImage) and publishes one GitHub release with all
+# three, only once every build and its checks have worked.
+# Download links point at releases/latest/download/Yogurt-mac-arm64.dmg, Yogurt-windows-x64.exe and
+# Yogurt-linux-x86_64.AppImage, and installed copies update themselves from the same release
+# (latest-mac.yml, latest.yml, latest-linux.yml; app/src/main/updates.ts).
+# Running it by hand (Actions → Release → Run workflow) only builds: the files are attached to the run, nothing is published.
+# Windows and Linux are built by preview.yml, with the same checks (helpers run from the install folder, whisper-server
+# transcribes); the Mac steps are below.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: Add Windows and Linux to this draft release (e.g. v0.3.0) that holds a Mac built by hand; empty = only build
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  # what this run builds: everything (a tag, or a plain run by hand), or only Windows and Linux for a draft
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.plan.outputs.build }}
+      mac: ${{ steps.plan.outputs.mac }}
+      ref: ${{ steps.plan.outputs.ref }}
+    steps:
+      - id: plan
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DRAFT: ${{ inputs.draft }}
+        run: |
+          # every release, drafts too (a tag lookup doesn't find drafts)
+          release() { gh api "repos/$REPO/releases" --paginate --jq ".[] | select(.tag_name == \"$1\")"; }
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            if [ -n "$(release "$GITHUB_REF_NAME")" ]; then
+              echo "::notice::$GITHUB_REF_NAME already has a release (published from a draft): nothing to build"
+              echo build=false >> "$GITHUB_OUTPUT"; exit 0
+            fi
+            echo "build=true" >> "$GITHUB_OUTPUT"; echo "mac=true" >> "$GITHUB_OUTPUT"; echo "ref=" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ -z "$DRAFT" ]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"; echo "mac=true" >> "$GITHUB_OUTPUT"; echo "ref=" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          echo "$DRAFT" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "::error::draft is a tag like v0.3.0, not $DRAFT"; exit 1; }
+          r=$(release "$DRAFT")
+          [ -n "$r" ] || { echo "::error::No release $DRAFT"; exit 1; }
+          [ "$(echo "$r" | jq -r .draft)" = true ] || { echo "::error::$DRAFT is published already: only a draft gets files added"; exit 1; }
+          sha=$(echo "$r" | jq -r .target_commitish)
+          echo "$sha" | grep -qE '^[0-9a-f]{40}$' || { echo "::error::$DRAFT must point at a commit (gh release create --target <sha>), not $sha"; exit 1; }
+          version=$(gh api "repos/$REPO/contents/app/package.json?ref=$sha" --jq .content | base64 -d | jq -r .version)
+          [ "v$version" = "$DRAFT" ] || { echo "::error::The app at $sha is $version, not ${DRAFT#v}"; exit 1; }
+          assets=$(echo "$r" | jq -r '.assets[].name')
+          for f in Yogurt-mac-arm64.dmg Yogurt-mac-arm64.zip latest-mac.yml; do
+            echo "$assets" | grep -qx "$f" || { echo "::error::$DRAFT has no $f: add the Mac built by hand first"; exit 1; }
+          done
+          echo "$assets" | grep -qE '^(Yogurt-windows-|Yogurt-linux-|latest\.yml|latest-linux\.yml)' && { echo "::error::$DRAFT has Windows or Linux files already"; exit 1; }
+          echo "::notice::Building Windows and Linux for $DRAFT at $sha"
+          echo "build=true" >> "$GITHUB_OUTPUT"; echo "mac=false" >> "$GITHUB_OUTPUT"; echo "ref=$sha" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.build == 'true' && needs.plan.outputs.mac == 'true'
+    # Xcode 26: the helpers use macOS 26's speech APIs
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.4.1.app && xcodebuild -version
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: The tag matches the app's version
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        run: test "v$(node -p "require('./app/package.json').version")" = "${{ github.ref_name }}"
+      - name: A release is signed and notarized
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          for v in CSC_LINK CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
+            [ -n "$(printenv $v)" ] || { echo "::error::$v is missing: a release must be signed and notarized"; exit 1; }
+          done
+      - name: Typecheck
+        run: pnpm -r typecheck
+      - name: Test
+        run: pnpm -r test
+      - name: Build
+        run: |
+          pnpm -C app run native
+          pnpm -C app exec electron-vite build
+      - name: Package
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          extra=""
+          if [ -n "$CSC_LINK" ]; then [ -n "$APPLE_ID" ] && extra="-c.mac.notarize=true"; else export CSC_IDENTITY_AUTO_DISCOVERY=false; unset CSC_LINK CSC_KEY_PASSWORD; extra="-c.dmg.sign=false"; fi
+          cd app && pnpm exec electron-builder --mac --publish never $extra
+      # the app holds only the built code: a source folder inside means the build settings weren't applied
+      - name: Check the app
+        env:
+          SIGNED: ${{ secrets.MAC_CERT_P12_BASE64 != '' }}
+        run: |
+          node app/scripts/asar-check.mjs app/dist/mac-arm64/Yogurt.app/Contents/Resources/app.asar
+          pnpm -C app exec electron scripts/engine-smoke.cjs dist/mac-arm64/Yogurt.app/Contents/Resources/app.asar
+          if [ "$SIGNED" = true ]; then codesign --verify --deep --strict app/dist/mac-arm64/Yogurt.app; fi
+      # the app inside is notarized by electron-builder; the disk image is checked when downloaded too
+      - name: Notarize the disk image
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          [ -n "$APPLE_ID" ] || exit 0
+          xcrun notarytool submit app/dist/Yogurt-mac-arm64.dmg --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
+          xcrun stapler staple app/dist/Yogurt-mac-arm64.dmg
+          spctl -a -t open --context context:primary-signature -v app/dist/Yogurt-mac-arm64.dmg
+          # stapling changed the disk image: its checksum in latest-mac.yml again
+          node app/scripts/refresh-latest.mjs app/dist/latest-mac.yml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yogurt-mac
+          path: |
+            app/dist/*.dmg
+            app/dist/*.zip
+            app/dist/*.blockmap
+            app/dist/latest-mac.yml
+          if-no-files-found: error
+
+  # Windows and Linux: the preview build and its checks, with the files installed copies update from
+  other:
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
+    uses: ./.github/workflows/preview.yml
+    with:
+      ref: ${{ needs.plan.outputs.ref }}
+      release: true
+
+  # only a pushed tag publishes, and only once all three built; a run by hand never does
+  publish:
+    needs: [plan, build, other]
+    if: github.event_name == 'push' && github.ref_type == 'tag' && needs.plan.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: files
+          merge-multiple: true
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls -la files
+          gh release create "${{ github.ref_name }}" files/* --repo "${{ github.repository }}" --title "Yogurt ${GITHUB_REF_NAME#v}" --generate-notes --latest
+
+  # a draft with a Mac built by hand gets the Windows and Linux files; it stays a draft
+  draft:
+    needs: [plan, other]
+    if: github.event_name == 'workflow_dispatch' && inputs.draft != '' && needs.plan.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: files
+          merge-multiple: true
+      - name: Add to the draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DRAFT: ${{ inputs.draft }}
+        run: |
+          ls -la files
+          id=$(gh api "repos/$REPO/releases" --paginate --jq ".[] | select(.tag_name == \"$DRAFT\" and .draft) | .id")
+          [ -n "$id" ] || { echo "::error::$DRAFT is no longer a draft"; exit 1; }
+          # never --clobber: a file already there means something else went wrong
+          gh release upload "$DRAFT" files/* --repo "$REPO"
+          gh api "repos/$REPO/releases/$id" --jq '.assets[].name'
+          echo "::notice::Added to the draft $DRAFT. Check it, then publish: gh release edit $DRAFT --draft=false --latest"

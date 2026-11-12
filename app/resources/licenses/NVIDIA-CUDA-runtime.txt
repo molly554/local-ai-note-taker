@@ -1,0 +1,16 @@
+NVIDIA CUDA Runtime
+
+Yogurt's Windows and Linux builds include node-llama-cpp's prebuilt CUDA backends
+(@node-llama-cpp/win-x64-cuda, @node-llama-cpp/win-x64-cuda-ext, @node-llama-cpp/linux-x64-cuda,
+@node-llama-cpp/linux-x64-cuda-ext). Those libraries (ggml-cuda.dll, libggml-cuda.so) contain
+the statically linked NVIDIA CUDA Runtime (cudart).
+
+Portions of the CUDA backends contain the NVIDIA CUDA Runtime, Copyright (c) NVIDIA Corporation.
+It is redistributed in object code form, unmodified, as a distributable component listed in
+Attachment A of the NVIDIA CUDA Toolkit End User License Agreement:
+
+  https://docs.nvidia.com/cuda/eula/index.html
+
+The CUDA Runtime is not covered by Yogurt's MIT licence. It is used under, and subject to, the
+terms of that agreement. Yogurt does not include NVIDIA's cuBLAS or driver libraries; those are
+loaded from the user's own NVIDIA driver or CUDA installation.

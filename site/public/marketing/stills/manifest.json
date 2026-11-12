@@ -1,0 +1,43 @@
+{
+  "appCommit": "437a8cdb4956c05839ff02d2a593cf1c4da417d3",
+  "bundleSha256": "594890e88130d5df5ab6a47ace5b6984fc5350dbe3c285c2d3d1464c77c1f13b",
+  "generatedAt": "2026-11-11T16:38:52.245Z",
+  "images": {
+    "hero-desktop.webp": {
+      "bytes": 45094,
+      "sha256": "1f1acb34917a60ba9abe713b572fe811b4146f06c2b790f34ac12f1a0d9cfa0c"
+    },
+    "hero-finished-desktop.webp": {
+      "bytes": 80442,
+      "sha256": "5490f276fa6ef0d60e9ca5646d8de81fce6c2b36940e11f16fea3f156e2a5156"
+    },
+    "hero-phone.webp": {
+      "bytes": 63048,
+      "sha256": "4623d26a3cff52136bae83d2ad06ee4173a3ccb3c498ec179b2124896289cf0e"
+    },
+    "fragment-transcript-desktop.webp": {
+      "bytes": 13458,
+      "sha256": "233a1ea9049b4eaefca089510f5e9f09f782dff025cdcdb17ef4bed577f4f9ff"
+    },
+    "fragment-transcript-phone.webp": {
+      "bytes": 14622,
+      "sha256": "e2a0ee97b95b45a810748d49c64b20d46a778d96868a071445fd69e44f0965dc"
+    },
+    "fragment-summary-desktop.webp": {
+      "bytes": 20156,
+      "sha256": "4896fc99ec2d40173aa49c4e9789daae23b0b9bbf85f62661a577d445ae9eb29"
+    },
+    "fragment-summary-phone.webp": {
+      "bytes": 20090,
+      "sha256": "ec9f64988757c472af6a435e07d548a15b840b493e7091fcaee47b6be2d298bb"
+    },
+    "fragment-ask-desktop.webp": {
+      "bytes": 12856,
+      "sha256": "763e12ff1eaf3e3dacf2ee9ff78cfe9451bf212cb5a4eae15f902e2f2a48420d"
+    },
+    "fragment-ask-phone.webp": {
+      "bytes": 12696,
+      "sha256": "e0efce378eada45dbd63612a60a9890e29fcfeca5534e3a585082032ce992969"
+    }
+  }
+}

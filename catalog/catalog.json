@@ -1,0 +1,248 @@
+{
+  "version": 1,
+  "models": [
+    {
+      "id": "qwen3-1.7b",
+      "lastResort": true,
+      "name": "Qwen3 1.7B",
+      "family": "qwen3",
+      "license": "Apache-2.0",
+      "agentScore": 2,
+      "chatScore": 3,
+      "contextMax": 32768,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-14",
+      "starter": false,
+      "builds": [
+        {
+          "quant": "Q8_0",
+          "url": "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q8_0.gguf",
+          "sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a",
+          "sizeGB": 1.83,
+          "paramsB": 1.7,
+          "activeParamsB": 1.7
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-e2b",
+      "name": "Gemma 4 E2B",
+      "family": "gemma4",
+      "license": "Apache-2.0",
+      "agentScore": 5,
+      "chatScore": 5,
+      "contextMax": 131072,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-21",
+      "starter": false,
+      "builds": [
+        {
+          "quant": "Q4_0",
+          "url": "https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/675cff42a74c774d6cb76f76d8eacb49b48c9b93/gemma-4-E2B_q4_0-it.gguf",
+          "sha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+          "sizeGB": 3.35,
+          "paramsB": 5.1,
+          "activeParamsB": 2.3
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-e4b",
+      "name": "Gemma 4 E4B",
+      "family": "gemma4",
+      "license": "Apache-2.0",
+      "agentScore": 7,
+      "chatScore": 7,
+      "contextMax": 131072,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-21",
+      "starter": true,
+      "builds": [
+        {
+          "quant": "Q4_0",
+          "url": "https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf/resolve/4b4a2c1d584be7264f87aac328a1bc739ce81b6c/gemma-4-E4B_q4_0-it.gguf",
+          "sha256": "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",
+          "sizeGB": 5.15,
+          "paramsB": 8,
+          "activeParamsB": 4
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-e4b-compact",
+      "name": "Gemma 4 E4B Compact",
+      "family": "gemma4",
+      "license": "Apache-2.0",
+      "agentScore": 6,
+      "chatScore": 6,
+      "contextMax": 131072,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-22",
+      "starter": false,
+      "squeezedOf": "gemma-4-e4b",
+      "builds": [
+        {
+          "quant": "Q3_K_S",
+          "url": "https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/bfc15c382204943c3a8fff0c750b94ae2364d7a3/gemma-4-E4B-it-Q3_K_S.gguf",
+          "sha256": "fe6e02cdcd5f3287b4ac146ea68ea2c73363bf935159aa254a9d280a4ffe31aa",
+          "sizeGB": 3.86,
+          "paramsB": 8,
+          "activeParamsB": 4
+        }
+      ]
+    },
+    {
+      "id": "gpt-oss-20b",
+      "name": "gpt-oss 20B",
+      "family": "gpt-oss",
+      "license": "Apache-2.0",
+      "agentScore": 6,
+      "chatScore": 7,
+      "contextMax": 131072,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-14",
+      "starter": false,
+      "builds": [
+        {
+          "quant": "MXFP4",
+          "url": "https://huggingface.co/ggml-org/gpt-oss-20b-GGUF/resolve/main/gpt-oss-20b-MXFP4.gguf",
+          "sha256": "27cd6c432c7672cb812a92f611cf3ba7bbc35928262bb1e1253ff4ee6ae35901",
+          "sizeGB": 12.11,
+          "paramsB": 21,
+          "activeParamsB": 3.6
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-26b-a4b",
+      "name": "Gemma 4 26B",
+      "family": "gemma4",
+      "license": "Apache-2.0",
+      "agentScore": 8,
+      "chatScore": 8,
+      "contextMax": 262144,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-21",
+      "starter": false,
+      "builds": [
+        {
+          "quant": "Q4_0",
+          "url": "https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf/resolve/d1c082be9cf3c8a514acf63b8761f4b41935842e/gemma-4-26B_q4_0-it.gguf",
+          "sha256": "3eca3b8f6d7baf218a7dd6bba5fb59a56ee25fe2d567b6f5f589b4f697eca51d",
+          "sizeGB": 14.44,
+          "paramsB": 26,
+          "activeParamsB": 4
+        }
+      ]
+    },
+    {
+      "id": "gemma-4-26b-a4b-compact",
+      "name": "Gemma 4 26B Compact",
+      "family": "gemma4",
+      "license": "Apache-2.0",
+      "agentScore": 5,
+      "chatScore": 6,
+      "contextMax": 262144,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-22",
+      "starter": false,
+      "squeezedOf": "gemma-4-26b-a4b",
+      "builds": [
+        {
+          "quant": "IQ2_XXS",
+          "url": "https://huggingface.co/bartowski/google_gemma-4-26B-A4B-it-GGUF/resolve/10f3b41bcf8d3047f4e136e7197ffc2dd1654c9d/google_gemma-4-26B-A4B-it-IQ2_XXS.gguf",
+          "sha256": "2f3685099756ae2cde65c6328be73e5406b602803f2186536dce3ae06ea83c77",
+          "sizeGB": 9.66,
+          "paramsB": 26,
+          "activeParamsB": 4
+        }
+      ]
+    },
+    {
+      "id": "gpt-oss-120b",
+      "name": "gpt-oss 120B",
+      "family": "gpt-oss",
+      "license": "Apache-2.0",
+      "agentScore": 9,
+      "chatScore": 9,
+      "contextMax": 131072,
+      "minAppVersion": "0.1.0",
+      "addedAt": "2026-10-14",
+      "starter": false,
+      "builds": [
+        {
+          "quant": "MXFP4",
+          "url": "https://huggingface.co/ggml-org/gpt-oss-120b-GGUF/resolve/main/gpt-oss-120b-MXFP4.gguf",
+          "sha256": "582bd40f6886200101f4c4ed9f25f3fe80cc14c86e9e2b37746cd8904a0c622d",
+          "sizeGB": 63.39,
+          "paramsB": 117,
+          "activeParamsB": 5.1
+        }
+      ]
+    }
+  ],
+  "whisperCpp": {
+    "tag": "v1.9.5",
+    "commit": "d1be6fde11ac6e0407606b4e42fe72d34add8037"
+  },
+  "asr": [
+    {
+      "id": "whisper-large-v3-turbo-q5_0",
+      "name": "Whisper large-v3-turbo",
+      "license": "MIT",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo-q5_0.bin",
+      "sha256": "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
+      "sizeGB": 0.57,
+      "bytes": 574041195,
+      "minMemGB": 8,
+      "gpuOnly": true
+    },
+    {
+      "id": "whisper-small-q5_1",
+      "name": "Whisper small",
+      "license": "MIT",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small-q5_1.bin",
+      "sha256": "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb",
+      "sizeGB": 0.19,
+      "bytes": 190085487,
+      "minMemGB": 0
+    },
+    {
+      "id": "whisper-base-q5_1",
+      "lastResort": true,
+      "name": "Whisper base",
+      "license": "MIT",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-base-q5_1.bin",
+      "sha256": "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898",
+      "sizeGB": 0.06,
+      "bytes": 59707625,
+      "minMemGB": 0
+    },
+    {
+      "id": "whisper-tiny-q5_1",
+      "lastResort": true,
+      "name": "Whisper tiny",
+      "license": "MIT",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny-q5_1.bin",
+      "sha256": "818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7",
+      "sizeGB": 0.03,
+      "bytes": 32152673,
+      "minMemGB": 0
+    }
+  ],
+  "whisperServer": {
+    "id": "whisper-server",
+    "tag": "v1.9.5",
+    "bundled": true,
+    "note": "Built by app/scripts/native.sh from whisper.cpp at the commit under whisperCpp and shipped inside the app, so setup downloads nothing for it"
+  },
+  "embedding": {
+    "id": "embeddinggemma-300m-q8_0",
+    "name": "EmbeddingGemma 300M",
+    "license": "Gemma",
+    "url": "https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF/resolve/0f741b5a6585bd53aeb15cd1372c56f2a0f65e12/embeddinggemma-300M-Q8_0.gguf",
+    "sha256": "b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63",
+    "bytes": 333590944,
+    "dims": 512
+  }
+}

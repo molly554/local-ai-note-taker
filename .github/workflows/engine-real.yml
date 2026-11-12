@@ -1,0 +1,93 @@
+# By hand: a preview build's installer (preview.yml run) is installed (or, with no run given, this commit's engine is
+# built) and its notes engine loads a real small model
+# (Gemma 4 E2B, pinned with its sha256) and writes a few words, with the graphics check first, as the app does after a
+# meeting. Each step is timed, so a stall shows where it stopped. Nothing is published.
+name: Notes engine with a real model
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: The preview.yml run whose installers to test (empty = build this commit's engine instead)
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  MODEL_URL: https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/675cff42a74c774d6cb76f76d8eacb49b48c9b93/gemma-4-E2B_q4_0-it.gguf
+  MODEL_SHA256: fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634
+
+jobs:
+  engine:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Linux test packages
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends xvfb >/dev/null
+      - run: pnpm install --frozen-lockfile
+      - name: This commit's engine
+        if: inputs.run_id == ''
+        run: |
+          cd app && pnpm exec electron-vite build
+          echo "ASAR=$GITHUB_WORKSPACE/app" >> "$GITHUB_ENV"
+      - name: The preview installer
+        if: inputs.run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download "${{ inputs.run_id }}" -R "${{ github.repository }}" -n "yogurt-preview-${{ runner.os }}" -D "$RUNNER_TEMP/preview"
+      - name: Install it
+        if: inputs.run_id != ''
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            "$RUNNER_TEMP"/preview/Yogurt-windows-x64.exe //S
+            dir="$LOCALAPPDATA/Programs/Yogurt/resources"
+            for i in $(seq 1 90); do [ -f "$dir/app.asar" ] && [ -d "$dir/app.asar.unpacked/node_modules/@node-llama-cpp" ] && break; sleep 2; done
+            sleep 5
+          else
+            mkdir -p "$RUNNER_TEMP/appimage" && cd "$RUNNER_TEMP/appimage"
+            chmod +x "$RUNNER_TEMP"/preview/Yogurt-linux-x86_64.AppImage
+            "$RUNNER_TEMP"/preview/Yogurt-linux-x86_64.AppImage --appimage-extract >/dev/null
+            dir="$RUNNER_TEMP/appimage/squashfs-root/resources"
+          fi
+          ls "$dir/app.asar.unpacked/node_modules/@node-llama-cpp"
+          echo "ASAR=$dir/app.asar" >> "$GITHUB_ENV"
+      - name: Model (cached)
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/llm
+          key: llm-${{ env.MODEL_SHA256 }}
+      - name: Model
+        run: |
+          mkdir -p "$RUNNER_TEMP/llm" && cd "$RUNNER_TEMP/llm"
+          [ -f model.gguf ] || curl -sSfL --retry 3 -o model.gguf "$MODEL_URL"
+          echo "$MODEL_SHA256  model.gguf" | sha256sum -c -
+      - name: The installed notes engine loads it and writes (graphics on, as the app starts)
+        timeout-minutes: 20
+        run: |
+          cd app
+          run() { if [ "$RUNNER_OS" = Linux ]; then xvfb-run -a pnpm exec electron "$@"; else pnpm exec electron "$@"; fi; }
+          run scripts/engine-model-smoke.cjs "$ASAR" "$RUNNER_TEMP/llm/model.gguf"
+      - name: The same without the graphics card (the fallback)
+        if: always()
+        timeout-minutes: 20
+        run: |
+          cd app
+          run() { if [ "$RUNNER_OS" = Linux ]; then xvfb-run -a pnpm exec electron "$@"; else pnpm exec electron "$@"; fi; }
+          run scripts/engine-model-smoke.cjs "$ASAR" "$RUNNER_TEMP/llm/model.gguf" --gpu-off

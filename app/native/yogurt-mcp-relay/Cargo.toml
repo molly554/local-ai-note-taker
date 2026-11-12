@@ -1,0 +1,19 @@
+# yogurt-mcp for Windows and Linux: the same message relay as native/yogurt-mcp (Swift, Mac).
+# Only the standard library (Windows calls declared by hand), so there are no crates to pin.
+[package]
+name = "yogurt-mcp"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.82"
+publish = false
+license = "MIT"
+
+[[bin]]
+name = "yogurt-mcp"
+path = "src/main.rs"
+
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1
+strip = true

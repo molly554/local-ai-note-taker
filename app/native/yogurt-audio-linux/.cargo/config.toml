@@ -1,0 +1,4 @@
+# libopus from the source audiopus_sys bundles, linked statically: never a system libopus the AppImage can't count on
+[env]
+LIBOPUS_STATIC = "1"
+LIBOPUS_NO_PKG = "1"

@@ -1,0 +1,89 @@
+# yogurt-system (app/native/yogurt-system): call detection on Windows and Linux.
+# Unit tests for the parsing, then smoke tests on each OS: a fake mic and recorders on Linux, fake privacy
+# entries and a window on Windows. The built helpers are kept as artifacts for packaging.
+name: native-sys
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/native/yogurt-system/**', '.github/workflows/native-sys.yml']
+  pull_request:
+    paths: ['app/native/yogurt-system/**', '.github/workflows/native-sys.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: app/native/yogurt-system
+
+concurrency:
+  group: native-sys-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lock:
+    # every crate version at least 14 days old and not yanked
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make Cargo.lock when it is missing
+        run: |
+          test -f Cargo.lock && exit 0
+          cargo generate-lockfile
+          # hold back releases younger than 14 days
+          cargo update -p itoa --precise 1.0.18
+          cargo update -p syn@3.0.10 --precise 3.0.9
+      - run: python3 lock-age.py Cargo.lock
+      - uses: actions/upload-artifact@v4
+        # kept on failure too, to see what to hold back
+        if: always()
+        with:
+          name: cargo-lock
+          path: app/native/yogurt-system/Cargo.lock
+
+  linux:
+    needs: lock
+    # the oldest supported glibc (Ubuntu 22.04)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: cargo-lock
+          path: app/native/yogurt-system
+      - name: Install PulseAudio, an X server and a window manager
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libpulse-dev pulseaudio pulseaudio-utils xvfb openbox xterm
+      - run: cargo test --locked
+      - run: cargo build --release --locked
+      - run: bash smoke/linux.sh target/release/yogurt-system
+      - name: Linked libraries (glibc and libpulse only)
+        run: ldd target/release/yogurt-system && objdump -T target/release/yogurt-system | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yogurt-system-linux-x86_64
+          path: app/native/yogurt-system/target/release/yogurt-system
+
+  windows:
+    needs: lock
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: app/native/yogurt-system
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: cargo-lock
+          path: app/native/yogurt-system
+      - run: cargo test --locked
+      - run: cargo build --release --locked
+      - run: ./smoke/windows.ps1 target/release/yogurt-system.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yogurt-system-windows-x64
+          path: app/native/yogurt-system/target/release/yogurt-system.exe

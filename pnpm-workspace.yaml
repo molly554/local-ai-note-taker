@@ -1,0 +1,9 @@
+packages:
+  - packages/*
+  - app
+onlyBuiltDependencies:
+  - electron
+  - esbuild
+  - node-llama-cpp
+patchedDependencies:
+  node-llama-cpp@3.22.1: patches/node-llama-cpp@3.22.1.patch

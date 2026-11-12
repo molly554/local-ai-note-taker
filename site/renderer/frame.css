@@ -1,0 +1,76 @@
+html,body,#root{height:100%;margin:0;overflow:hidden;color-scheme:dark}
+html.main-window,body{background:transparent!important}
+body{pointer-events:none;user-select:none;caret-color:transparent}
+.marketing-window{position:absolute;inset:0;background:var(--bg);overflow:hidden;border-radius:12px}
+/* Native fixed titlebar actions are relative to this isolated window. */
+.marketing-window{transform:translateZ(0)}
+/* Let the app's viewport clamp size Ask, rather than the demo's short note body. */
+@media(min-width:1000px){.marketing-window .chat-panel{--chat-height:initial!important}}
+.marketing-traffic{position:absolute;left:18px;top:16px;display:flex;gap:7px;z-index:100}
+.marketing-traffic i{width:10px;height:10px;border-radius:50%;background:#ff6058}
+.marketing-traffic i:nth-child(2){background:#febc2e}
+.marketing-traffic i:nth-child(3){background:#29c840}
+html[data-still] *,html[data-still] *::before,html[data-still] *::after{animation:none!important;transition:none!important}
+html[data-playing=false] *,html[data-playing=false] *::before,html[data-playing=false] *::after{animation-play-state:paused!important}
+
+
+
+/* The first turn predates the demo; only later names use the app reveal. */
+.marketing-window .transcript-turn:nth-child(1) .name-in{animation:none}
+/* Keep the pointer legible against the dark window. */
+.marketing-cursor{position:fixed;top:0;left:0;width:30px;height:32px;z-index:1000;pointer-events:none;overflow:visible;opacity:0}
+.cursor-pointer{fill:#2f3649;stroke:white;filter:drop-shadow(0 1px 1.5px #0e142633);transform-origin:4px 3px;transition:transform 130ms ease-out}
+.marketing-cursor[data-clicking=true] .cursor-pointer{transform:scale(.88)}
+.cursor-ring{fill:none;stroke:white;stroke-width:1.5px;opacity:0;transform-origin:4px 3px;transform:scale(.6);transition:transform 240ms ease-out,opacity 180ms ease-out}
+.marketing-cursor[data-clicking=true] .cursor-ring{opacity:.3;transform:scale(1)}
+
+/* Fixture replay hides future lines without exposing the app's duplicate-recovery controls. */
+[data-testid=transcript-hidden-toggle],.transcript-echo{display:none}
+html[data-typing=true] [data-testid=note-mine] li:last-child p::after{content:'';display:inline-block;height:1em;border-right:1.5px solid currentColor;vertical-align:-.1em;animation:demo-caret 900ms step-end infinite}
+/* Tiptap's empty paragraph ends in a break; keep its preview caret on that line. */
+html[data-typing=true] [data-testid=note-mine] li:last-child p:has(>br:only-child){position:relative}
+html[data-typing=true] [data-testid=note-mine] li:last-child p:has(>br:only-child)::after{position:absolute;left:0;top:50%;translate:0 -50%}
+@keyframes demo-caret{50%{opacity:0}}
+
+/* Fragments render app components without window chrome. */
+html[data-fragment]{color-scheme:light}
+.marketing-fragment{position:absolute;inset:24px 24px auto;min-width:0}
+.marketing-fragment .transcript-toolbar,.marketing-fragment .transcript-player-dock,
+.marketing-fragment .ask-conversation-head,.marketing-fragment .ask-composer,.marketing-fragment .chat-answer-actions{display:none}
+/* Measured native turns reserve the final layout before live words begin. */
+.fragment-transcript .transcript-inline [data-testid=transcript]{padding:0;gap:20px;overflow:hidden;flex:none}
+.fragment-transcript .transcript-turn{margin:0;min-width:0}
+.fragment-transcript .turn-head{align-self:stretch}
+.fragment-transcript .line-who{flex:1}
+.fragment-transcript .turn-time{display:none}
+/* This marketing fragment labels the mic side; the app and hero keep their native treatment. */
+.fragment-transcript .transcript-turn[data-track=me]>p.sr-only{position:static;display:flex;align-self:stretch;width:auto;height:auto;margin:0;padding:0;overflow:visible;clip:auto;clip-path:none;white-space:normal;text-align:right;font-size:var(--text-xs);line-height:var(--text-xs--line-height);color:var(--muted)}
+.fragment-transcript [data-testid=transcript-empty],.fragment-transcript .loading-placeholder{display:none}
+.marketing-fragment .ask-thread{padding:0;overflow:visible}
+.marketing-fragment .ask-turn>.ask-question{order:0}
+.fragment-byline{display:flex;align-items:center;gap:9px;order:1;color:var(--muted);font-size:12px}
+.marketing-fragment .ask-turn>:is(.chat-progress,.chat-answer){order:2}
+.marketing-fragment .ask-turn>.chat-progress{margin:0}
+.marketing-fragment .ask-turn>.chat-answer{margin-left:29px}
+
+html[data-fragment-playing=false] *{animation-play-state:paused!important}
+
+/* Native waiting row overlays the reserved answer slot; no content enters flow. */
+.fragment-ask .ask-turn{position:relative}
+.fragment-ask .ask-turn>.chat-progress{position:absolute;left:29px;top:var(--fragment-answer-top);visibility:hidden}
+
+@media(max-width:320px){
+  .marketing-fragment{inset:20px 20px auto}
+  .marketing-fragment .bubble,.marketing-fragment .ask-question,.marketing-fragment .chat-answer{font-size:15px}
+}
+
+/* Demo speakers are known up front; reveal their native labels with the live turn. */
+.marketing-window [data-testid=transcript-who],.fragment-transcript [data-testid=transcript-who]{visibility:visible;animation:none}
+
+/* Reserve the finished document while its real editor streams in the same slot. */
+.fragment-plan{position:relative}
+.fragment-plan-size{visibility:hidden;pointer-events:none}
+.fragment-plan-live{position:absolute;inset:0}
+
+/* The demo types without focusing the field, so typed text stands in for focus and Ask's ring shows as it does in the app. */
+.ask-box:not([data-busy=true]):has(textarea:not(:placeholder-shown)){--ask-ring-opacity:1;--ask-ring-play:running}

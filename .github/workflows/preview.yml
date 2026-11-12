@@ -1,0 +1,167 @@
+# By hand only (Actions → Preview builds → Run workflow): unsigned Windows and Linux installers, attached to the run
+# for testers. Nothing is published, and the Mac release (release.yml) is not touched.
+# The installers carry the recorder, the system and AI apps helpers (Rust) and whisper-server with its backends, built
+# here by scripts/native.mjs. Each one is installed on the runner and its helpers are run from the install folder.
+# Linux builds on Ubuntu 22.04, so the AppImage's helpers run on glibc 2.35 and later.
+# release.yml calls this same workflow for a release's Windows and Linux files (installer, latest*.yml, blockmap).
+name: Preview builds
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: The commit to build (empty = the one that started the run)
+        type: string
+        default: ''
+      release:
+        description: Built for a release (release.yml), so it looks for updates; by hand it is a preview that never does
+        type: boolean
+        default: false
+
+env:
+  # the same SDK and checksums as native-whisper.yml
+  VULKAN_SDK_VERSION: 1.4.341.1
+  VULKAN_SDK_SHA256_LINUX: 3bf0f762afb6c79bc6a9d9fb5998745ccff928800a29619b501ed9de7fd9789b
+  VULKAN_SDK_SHA256_WINDOWS: bcf2d75aa9556889ab974858666e20b3655b6055a0db704ccb47279ff33b5bfe
+  MODELS_URL: https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: --win
+            unpacked: win-unpacked
+            files: app/dist/Yogurt-windows-*.exe
+          - os: ubuntu-22.04
+            platform: --linux
+            unpacked: linux-unpacked
+            files: app/dist/Yogurt-linux-*.AppImage
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Linux build and test packages
+        if: runner.os == 'Linux'
+        # GitHub's Azure Ubuntu mirror sometimes can't be reached: after a failed try, use Ubuntu's own servers
+        run: |
+          get() { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends libpulse-dev pkg-config pulseaudio xvfb >/dev/null; }
+          for i in 1 2 3; do
+            get && exit 0
+            echo "::warning::apt try $i failed; switching to archive.ubuntu.com"
+            echo 'http://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt >/dev/null
+            sudo sed -i 's#http://azure.archive.ubuntu.com#http://archive.ubuntu.com#g' /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
+            sleep 10
+          done
+          exit 1
+      - name: Rust build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            app/native/*/target
+          key: helpers-${{ runner.os }}-${{ hashFiles('app/native/*/Cargo.lock', 'app/native/*/rust-toolchain.toml') }}
+      - name: Vulkan SDK (cached)
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/vulkansdk-dl
+          key: vulkansdk-${{ runner.os }}-${{ env.VULKAN_SDK_VERSION }}
+      - name: Vulkan SDK
+        run: |
+          mkdir -p "$RUNNER_TEMP/vulkansdk-dl" && cd "$RUNNER_TEMP/vulkansdk-dl"
+          v=$VULKAN_SDK_VERSION
+          if [ "$RUNNER_OS" = Windows ]; then f=vulkansdk-windows-X64-$v.exe; sum=$VULKAN_SDK_SHA256_WINDOWS; url=https://sdk.lunarg.com/sdk/download/$v/windows/$f
+          else f=vulkansdk-linux-x86_64-$v.tar.xz; sum=$VULKAN_SDK_SHA256_LINUX; url=https://sdk.lunarg.com/sdk/download/$v/linux/$f; fi
+          [ -f "$f" ] || curl -sSfL --retry 3 -o "$f" "$url"
+          echo "$sum  $f" | sha256sum -c -
+          if [ "$RUNNER_OS" = Windows ]; then
+            ./"$f" --root "C:\\VulkanSDK\\$v" --accept-licenses --default-answer --confirm-command install
+            echo "VULKAN_SDK=C:\\VulkanSDK\\$v" >> "$GITHUB_ENV"
+            echo "C:\\VulkanSDK\\$v\\Bin" >> "$GITHUB_PATH"
+          else
+            mkdir -p "$RUNNER_TEMP/vulkansdk" && tar -xJf "$f" -C "$RUNNER_TEMP/vulkansdk"
+            echo "VULKAN_SDK=$RUNNER_TEMP/vulkansdk/$v/x86_64" >> "$GITHUB_ENV"
+            echo "$RUNNER_TEMP/vulkansdk/$v/x86_64/bin" >> "$GITHUB_PATH"
+          fi
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm -r typecheck
+      # unit tests run in ci.yml; a slower runner here only trips their timing checks
+      - name: Build (helpers, whisper-server, app)
+        run: pnpm -C app build
+      - name: Package (unsigned)
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          # a preview (by hand) was never released: it is marked so it never looks for updates (src/main/updates.ts)
+          PREVIEW: ${{ inputs.release != true }}
+        run: cd app && pnpm exec electron-builder ${{ matrix.platform }} --publish never $([ "$PREVIEW" = true ] && echo -c.extraMetadata.yogurtPreview=true)
+      # kept before the checks below, so testers get the installer even when one of them fails
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yogurt-preview-${{ runner.os }}
+          # what installed copies update from goes too: latest.yml / latest-linux.yml and the installer's blockmap
+          path: |
+            ${{ matrix.files }}
+            app/dist/*.blockmap
+            app/dist/latest*.yml
+          if-no-files-found: error
+          retention-days: 14
+      # the app holds only the built code, and its notes engine loads its dependencies
+      - name: Check the app
+        timeout-minutes: 5
+        run: |
+          node app/scripts/asar-check.mjs app/dist/${{ matrix.unpacked }}/resources/app.asar
+          cd app
+          # a preview never looks for updates; a release build does
+          node -e "const p=JSON.parse(require('@electron/asar').extractFile(process.argv[1],'package.json'));const want=process.argv[2]==='true';if((p.yogurtPreview===true)!==want){console.error('yogurtPreview is',p.yogurtPreview,'but this build is',want?'a preview':'for a release');process.exit(1)}" dist/${{ matrix.unpacked }}/resources/app.asar ${{ inputs.release != true }}
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a pnpm exec electron scripts/engine-smoke.cjs dist/${{ matrix.unpacked }}/resources/app.asar
+          else
+            pnpm exec electron scripts/engine-smoke.cjs dist/${{ matrix.unpacked }}/resources/app.asar
+          fi
+      - name: Install it
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            # one-click, per user: %LOCALAPPDATA%\Programs\Yogurt, as on a person's PC
+            ./app/dist/Yogurt-windows-x64.exe //S
+            dir="$LOCALAPPDATA/Programs/Yogurt/resources"
+            for i in $(seq 1 60); do [ -f "$dir/bin/yogurt-audio.exe" ] && break; sleep 2; done
+          else
+            mkdir -p "$RUNNER_TEMP/appimage" && cd "$RUNNER_TEMP/appimage"
+            "$GITHUB_WORKSPACE"/app/dist/Yogurt-linux-x86_64.AppImage --appimage-extract >/dev/null
+            dir="$RUNNER_TEMP/appimage/squashfs-root/resources"
+          fi
+          ls -la "$dir/bin"
+          echo "INSTALLED=$dir" >> "$GITHUB_ENV"
+      - name: Speech model for the check
+        run: |
+          mkdir -p "$RUNNER_TEMP/models" && cd "$RUNNER_TEMP/models"
+          curl -sSfL --retry 3 -o ggml-tiny.en.bin "$MODELS_URL/ggml-tiny.en.bin"
+          echo "921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f  ggml-tiny.en.bin" | sha256sum -c -
+      - name: The installed helpers run
+        timeout-minutes: 5
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then pulseaudio --start --exit-idle-time=-1; fi
+          node app/scripts/helpers-smoke.mjs --resources "$INSTALLED"
+      - name: The installed whisper-server transcribes
+        if: always() && env.INSTALLED != ''
+        timeout-minutes: 10
+        run: |
+          exe="$INSTALLED/bin/whisper-server"; [ "$RUNNER_OS" = Windows ] && exe=$exe.exe
+          node app/scripts/whisper-smoke.mjs --bin "$exe" --model "$RUNNER_TEMP/models/ggml-tiny.en.bin" \
+            --vad "$INSTALLED/vad/ggml-silero-v6.2.0.bin" --wav app/native/.whisper-build/samples/jfk.wav --expect country,ask --runs 1 --label installed

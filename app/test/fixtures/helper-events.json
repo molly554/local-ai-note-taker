@@ -1,0 +1,7 @@
+[
+  {"id":"E1:2026-10-29T15:00:00Z","title":"Design review","start":"2026-10-29T15:00:00Z","end":"2026-10-29T15:30:00Z","allDay":false,"calendar":"Work",
+   "location":"https://zoom.us/j/123456789?pwd=abc","notes":"Agenda below","attendees":[{"name":"Ann Lee","email":"ann@example.com"},{"name":"Bo","email":null}]},
+  {"id":"E2:2026-10-29T15:05:00Z","title":"Coffee","start":"2026-10-29T15:05:00Z","end":"2026-10-29T15:35:00Z","allDay":false,"calendar":"Home"},
+  {"id":"E3:2026-10-29T16:00:00Z","title":"Sync","start":"2026-10-29T16:00:00Z","end":"2026-10-29T16:30:00Z","allDay":false,"calendar":"Work",
+   "url":"https://teams.microsoft.com/l/meetup-join/abc","attendees":[]}
+]

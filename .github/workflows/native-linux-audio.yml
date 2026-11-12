@@ -1,0 +1,70 @@
+# The Linux recorder (app/native/yogurt-audio-linux): build on Ubuntu 22.04 (the oldest glibc Yogurt supports),
+# unit tests, then a smoke test against a real PulseAudio with virtual speakers and a virtual mic.
+name: Linux audio helper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - app/native/yogurt-audio-linux/**
+      - .github/workflows/native-linux-audio.yml
+  pull_request:
+    paths:
+      - app/native/yogurt-audio-linux/**
+      - .github/workflows/native-linux-audio.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-linux-audio-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: app/native/yogurt-audio-linux
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Build tools and libpulse headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libpulse-dev cmake pkg-config pulseaudio pulseaudio-utils ffmpeg
+
+      - name: Rust (pinned by rust-toolchain.toml)
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          cargo --version
+
+      - name: Unit tests
+        run: cargo test --locked --release
+
+      - name: Build
+        run: cargo build --locked --release
+
+      - name: Linking (libopus inside, libpulse from the system, glibc 2.35 at most)
+        run: |
+          bin=target/release/yogurt-audio
+          ls -la $bin
+          # the binary's own needs (ldd also lists libpulse's, which pulls in a libopus through libsndfile)
+          objdump -p $bin | grep NEEDED
+          if objdump -p $bin | grep NEEDED | grep -q opus; then echo "libopus must be linked in"; exit 1; fi
+          objdump -p $bin | grep NEEDED | grep -q 'libpulse-simple.so.0'
+          objdump -p $bin | grep NEEDED | grep -q 'libpulse.so.0'
+          nm -D $bin | grep -q ' U opus_encode' && { echo "opus_encode must be inside"; exit 1; } || true
+          max=$(objdump -T $bin | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)
+          echo "needs $max"
+          [ "$(printf '%s\nGLIBC_2.35\n' "$max" | sort -V | tail -1)" = "GLIBC_2.35" ]
+
+      - name: Smoke test with PulseAudio
+        run: sh smoke/smoke.sh target/release/yogurt-audio
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: yogurt-audio-linux-x86_64
+          path: app/native/yogurt-audio-linux/target/release/yogurt-audio
