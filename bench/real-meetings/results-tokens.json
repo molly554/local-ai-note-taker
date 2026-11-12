@@ -1,0 +1,85 @@
+{
+ "node": "v26.1.0",
+ "platform": "win32",
+ "date": "2026-11-12",
+ "results": [
+  {
+   "tokenizer": "Gemma 4 E4B",
+   "set": "AISHELL-4 test",
+   "lines": 10541,
+   "characters": 192479,
+   "cjkLetters": 180578,
+   "tokens": 130527,
+   "tokensPerCharacter": 0.678,
+   "tokensPerCjkLetter": 0.637,
+   "tokensPerOtherCharacter": 1.166,
+   "upstreamGuessOverReal": 0.52,
+   "forkGuessOverReal": 1.43
+  },
+  {
+   "tokenizer": "Gemma 4 E4B",
+   "set": "VCSum",
+   "lines": 83097,
+   "characters": 3455907,
+   "cjkLetters": 3120892,
+   "tokens": 2099081,
+   "tokensPerCharacter": 0.607,
+   "tokensPerCjkLetter": 0.614,
+   "tokensPerOtherCharacter": 0.483,
+   "upstreamGuessOverReal": 0.56,
+   "forkGuessOverReal": 1.56
+  },
+  {
+   "tokenizer": "Gemma 4 E4B",
+   "set": "QMSum (AMI + ICSI)",
+   "lines": 115430,
+   "characters": 6662407,
+   "cjkLetters": 0,
+   "tokens": 1648673,
+   "tokensPerCharacter": 0.247,
+   "tokensPerCjkLetter": null,
+   "tokensPerOtherCharacter": 0.247,
+   "upstreamGuessOverReal": 1.37,
+   "forkGuessOverReal": 1.37
+  },
+  {
+   "tokenizer": "Qwen3 1.7B",
+   "set": "AISHELL-4 test",
+   "lines": 10541,
+   "characters": 192479,
+   "cjkLetters": 180578,
+   "tokens": 123111,
+   "tokensPerCharacter": 0.64,
+   "tokensPerCjkLetter": 0.596,
+   "tokensPerOtherCharacter": 1.152,
+   "upstreamGuessOverReal": 0.55,
+   "forkGuessOverReal": 1.52
+  },
+  {
+   "tokenizer": "Qwen3 1.7B",
+   "set": "VCSum",
+   "lines": 83097,
+   "characters": 3455907,
+   "cjkLetters": 3120892,
+   "tokens": 1991872,
+   "tokensPerCharacter": 0.576,
+   "tokensPerCjkLetter": 0.567,
+   "tokensPerOtherCharacter": 0.614,
+   "upstreamGuessOverReal": 0.59,
+   "forkGuessOverReal": 1.64
+  },
+  {
+   "tokenizer": "Qwen3 1.7B",
+   "set": "QMSum (AMI + ICSI)",
+   "lines": 115430,
+   "characters": 6662407,
+   "cjkLetters": 0,
+   "tokens": 1629634,
+   "tokensPerCharacter": 0.245,
+   "tokensPerCjkLetter": null,
+   "tokensPerOtherCharacter": 0.245,
+   "upstreamGuessOverReal": 1.39,
+   "forkGuessOverReal": 1.39
+  }
+ ]
+}

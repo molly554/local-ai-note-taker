@@ -1,0 +1,28 @@
+{
+ "date": "2026-11-12",
+ "check": {
+  "file": "embeddinggemma-300M-Q8_0.gguf",
+  "headerMB": 7.2,
+  "fileMB": 318.1,
+  "lines": 512,
+  "linesCountedTheSame": 512
+ },
+ "files": [
+  {
+   "id": "gemma-4-e4b",
+   "url": "https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf/resolve/4b4a2c1d584be7264f87aac328a1bc739ce81b6c/gemma-4-E4B_q4_0-it.gguf",
+   "file": "gemma-4-E4B_q4_0-it.header-only.gguf",
+   "headerMB": 16.1,
+   "fileGB": 5.15,
+   "tokensInFirstMeeting": 6517
+  },
+  {
+   "id": "gemma-4-e2b",
+   "url": "https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/675cff42a74c774d6cb76f76d8eacb49b48c9b93/gemma-4-E2B_q4_0-it.gguf",
+   "file": "gemma-4-E2B_q4_0-it.header-only.gguf",
+   "headerMB": 16.1,
+   "fileGB": 3.35,
+   "tokensInFirstMeeting": 6517
+  }
+ ]
+}

@@ -1,0 +1,23 @@
+{
+ "date": "2026-11-12",
+ "results": [
+  {
+   "name": "EmbeddingGemma 300M",
+   "kind": "llama",
+   "tokens": 262144,
+   "sha256": "afa3945939b919cdf06deb3aa2ef216bb7bfcf3c8bdc8fa2496e61f256df555c"
+  },
+  {
+   "name": "Gemma 4 E2B",
+   "kind": "gemma4",
+   "tokens": 262144,
+   "sha256": "7af66a9004b0dd94832142c7cd1f4670c9249d38f101de44c4f435e643573a23"
+  },
+  {
+   "name": "Gemma 4 E4B (the starter notes model)",
+   "kind": "gemma4",
+   "tokens": 262144,
+   "sha256": "7af66a9004b0dd94832142c7cd1f4670c9249d38f101de44c4f435e643573a23"
+  }
+ ]
+}

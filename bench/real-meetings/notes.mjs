@@ -1,13 +1,14 @@
 // Real meetings through the notes pipeline, before (upstream) and after (this fork).
 //   node bench/real-meetings/fetch.mjs     once: about 26 MB of public transcripts into data/
-//   node bench/real-meetings/notes.mjs     Node 24+; nothing to install; about a minute
+//   node bench/real-meetings/notes.mjs            Node 24+; nothing to install; about a minute
+//   node bench/real-meetings/notes.mjs --models   tokens counted by two of the app's tokenizers (fetch.mjs --models, pnpm install)
 // It runs the app's own enhance() on each meeting, with a stand-in for the model that writes nothing and records the
 // prompts it was sent. What is measured: is every prompt small enough for the model's context, how many parts a long
 // meeting is read in, and whether any of the transcript went missing on the way.
-// No model runs here, so token counts come from a stand-in tokenizer (standIn below): the sizes are estimates.
+// No model writes anything here. Without --models the token counts come from a stand-in tokenizer (standIn below).
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { aishell4, here, qmsum, useAppSource, vcsum } from './meetings.mjs'
+import { aishell4, here, MODES, qmsum, segmentsOf, useAppSource, vcsum } from './meetings.mjs'
 
 useAppSource()
 const builds = { upstream: await import('./upstream/enhance.ts'), fork: await import('../../app/src/main/notes/enhance.ts') }
@@ -17,17 +18,6 @@ const SETS = [
   { set: 'VCSum', lang: 'zh', meetings: vcsum() },
   { set: 'QMSum (AMI + ICSI)', lang: 'en', meetings: qmsum() },
 ]
-
-// ---- how the app would have heard them ------------------------------------------------------------------------
-// The app knows two voices for sure: the microphone ("You") and the computer's sound (a name when the call app shows
-// who is talking, "Them" otherwise). A room recorded on one microphone is all "You". The meeting's first speaker
-// stands in for the person recording.
-const MODES = {
-  'call, names shown': (l, me) => (l.speaker === me ? { track: 'me', speaker: null } : { track: 'them', speaker: l.speaker }),
-  'call, no names': (l, me) => ({ track: l.speaker === me ? 'me' : 'them', speaker: null }),
-  'one microphone': () => ({ track: 'me', speaker: null }),
-}
-const segmentsOf = (m, mode) => m.lines.map((l, i) => ({ id: i, meetingId: m.id, startMs: l.startMs, endMs: l.endMs, text: l.text, ...MODES[mode](l, m.lines[0].speaker) }))
 
 // ---- the stand-in model ---------------------------------------------------------------------------------------
 const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu
@@ -80,13 +70,19 @@ const about = SETS.map(({ set, lang, meetings }) => ({
   longestTurnCharacters: Object.fromEntries(Object.keys(MODES).map((mode) => [mode, { median: median(meetings.map((m) => longestTurn(m, mode))), most: Math.max(...meetings.map((m) => longestTurn(m, mode))) }])),
 }))
 
+// --models: the tokenizers of two of the app's models in place of the stand-in (fetch.mjs --models first)
+const real = process.argv.includes('--models')
+const counters = real
+  ? (await import('./tokenizers.mjs').then((m) => m.realTokenizers())).map((t) => ({ ...t, langs: ['zh', 'en'] }))
+  : [{ name: 'stand-in, 1 token a CJK letter', count: standIn(1), langs: ['zh', 'en'] }, { name: 'stand-in, 0.7 tokens a CJK letter', count: standIn(0.7), langs: ['zh'] }]
+
 const results = []
 const started = performance.now()
 for (const { set, lang, meetings } of SETS) {
-  for (const perCjk of lang === 'zh' ? [1, 0.7] : [1]) {
-    const count = standIn(perCjk)
-    for (const contextSize of [32_768, 8192]) for (const mode of Object.keys(MODES)) for (const [name, build] of Object.entries(builds)) {
-      const row = { set, mode, contextSize, tokensPerCjkLetter: lang === 'zh' ? perCjk : null, build: name, meetings: meetings.length, readWhole: 0, readInParts: 0, parts: 0, fewestPartsThatFit: 0, promptsThatDoNotFit: 0, meetingsWithOne: 0, worstTimesContext: 0, meetingsWithWordsLost: 0, meetingsWithMarksDropped: 0, marksDropped: 0 }
+  for (const counter of counters.filter((c) => c.langs.includes(lang))) {
+    const count = (s) => counter.count(s)
+    for (const mode of Object.keys(MODES)) for (const contextSize of [32_768, 8192]) for (const [name, build] of Object.entries(builds)) {
+      const row = { set, mode, contextSize, tokenizer: counter.name, build: name, meetings: meetings.length, readWhole: 0, readInParts: 0, parts: 0, fewestPartsThatFit: 0, promptsThatDoNotFit: 0, meetingsWithOne: 0, worstTimesContext: 0, meetingsWithWordsLost: 0, meetingsWithMarksDropped: 0, marksDropped: 0 }
       for (const m of meetings) {
         const r = await one(build, segmentsOf(m, mode), lang, contextSize, count)
         if (r.parts) { row.readInParts++; row.parts += r.parts; row.fewestPartsThatFit += r.fewest } else row.readWhole++
@@ -98,12 +94,15 @@ for (const { set, lang, meetings } of SETS) {
       }
       row.worstTimesContext = +row.worstTimesContext.toFixed(2)
       results.push(row)
-      console.error(`${set} | ${mode} | ${contextSize} | ${perCjk} | ${name}`)
+      console.error(`${set} | ${counter.name} | ${mode} | ${contextSize} | ${name} | ${Math.round((performance.now() - started) / 1000)}s`)
+      // the same turns come back for the next context and build; a new way of hearing the meeting makes new ones
+      if (contextSize === 8192 && name === 'fork') counter.reset?.()
     }
   }
 }
 
-console.log('| meetings | heard as | context | tokens per CJK letter | build | read whole | read in parts | parts (fewest that fit) | meetings with a prompt that does not fit | worst prompt (x context) | meetings with words lost | punctuation marks dropped |')
+console.log('| meetings | tokenizer | heard as | context | build | read whole | read in parts | parts (fewest that fit) | meetings with a prompt that does not fit | worst prompt (x context) | meetings with words lost | punctuation marks dropped |')
 console.log('|---|---|---|---|---|---|---|---|---|---|---|---|')
-for (const r of results) console.log(`| ${r.set} (${r.meetings}) | ${r.mode} | ${r.contextSize.toLocaleString('en')} | ${r.tokensPerCjkLetter ?? '-'} | ${r.build} | ${r.readWhole} | ${r.readInParts} | ${r.parts} (${r.fewestPartsThatFit}) | ${r.meetingsWithOne} | ${r.worstTimesContext} | ${r.meetingsWithWordsLost} | ${r.marksDropped} |`)
-writeFileSync(join(here, 'results-notes.json'), JSON.stringify({ node: process.version, platform: process.platform, date: new Date().toISOString().slice(0, 10), seconds: Math.round((performance.now() - started) / 1000), about, results }, null, 1) + '\n')
+for (const r of results) console.log(`| ${r.set} (${r.meetings}) | ${r.tokenizer} | ${r.mode} | ${r.contextSize.toLocaleString('en')} | ${r.build} | ${r.readWhole} | ${r.readInParts} | ${r.parts} (${r.fewestPartsThatFit}) | ${r.meetingsWithOne} | ${r.worstTimesContext} | ${r.meetingsWithWordsLost} | ${r.marksDropped} |`)
+writeFileSync(join(here, real ? 'results-notes-models.json' : 'results-notes.json'), JSON.stringify({ node: process.version, platform: process.platform, date: new Date().toISOString().slice(0, 10), seconds: Math.round((performance.now() - started) / 1000), about, results }, null, 1) + '\n')
+process.exit(0)

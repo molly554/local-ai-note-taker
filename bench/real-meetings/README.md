@@ -1,12 +1,19 @@
 # Real meetings: do long Chinese meetings reach the notes model whole, and does search find them?
 
-Two checks on public meeting transcripts, run against the app's own code. No model runs in either; what that leaves
-unmeasured is at the end.
+Checks on public meeting transcripts, run against the app's own code: its notes pipeline, its tokenizers, its engine
+and its search. What is still unmeasured is at the end.
 
 ```
-node bench/real-meetings/fetch.mjs                                                   # once: 26 MB of transcripts into data/ (not kept in the repository)
-node bench/real-meetings/notes.mjs                                                   # about a minute
-pnpm --dir app exec vitest run --config ../bench/real-meetings/vitest.config.mjs     # search; needs pnpm install
+node bench/real-meetings/fetch.mjs                # once: 26 MB of transcripts into data/ (not kept in the repository)
+node bench/real-meetings/notes.mjs                # stand-in tokenizer, nothing to install, about a minute
+
+# with the app's own tokenizers and engine (pnpm install first)
+node bench/real-meetings/fetch.mjs --models       # Qwen3 1.7B and EmbeddingGemma, 2.2 GB, checked against the catalogue's SHA-256
+node bench/real-meetings/headers.mjs              # the Gemma 4 notes models' tokenizer from their files' headers, 32 MB
+node bench/real-meetings/tokens.mjs               # section 1
+node bench/real-meetings/notes.mjs --models       # section 2, about 6 minutes
+node bench/real-meetings/overlong.mjs             # section 3: a real model on the processor, very slow
+pnpm --dir app exec vitest run --config ../bench/real-meetings/vitest.config.mjs     # section 4
 ```
 
 ## The meetings
@@ -25,51 +32,95 @@ The app does not hear a meeting the way a corpus stores it. It knows the microph
 first speaker standing in for the person recording: **a call with names shown**, **a call without names**, and **a room
 on one microphone**, where everything is "You" and the whole meeting is one turn.
 
-## 1. Notes: is every prompt small enough for the model?
+## 1. How many tokens is Chinese?
+
+The notes code guesses the size of any text the tokenizer has not counted. Upstream guesses a third of a token a
+character. This fork guesses one token for a Chinese, Japanese or Korean letter and a third of a token for any other
+character. `tokens.mjs` counts every line of every meeting with two of the app's tokenizers: Gemma 4 E4B (the starter
+notes model) and Qwen3 1.7B (the smallest one).
+
+| tokenizer | meetings | tokens a character | upstream's guess / real | fork's guess / real |
+|---|---|---|---|---|
+| Gemma 4 E4B | AISHELL-4 (Mandarin) | 0.678 | 0.52 | 1.43 |
+| | VCSum (Mandarin) | 0.607 | 0.56 | 1.56 |
+| | QMSum (English) | 0.247 | 1.37 | 1.37 |
+| Qwen3 1.7B | AISHELL-4 (Mandarin) | 0.640 | 0.55 | 1.52 |
+| | VCSum (Mandarin) | 0.576 | 0.59 | 1.64 |
+| | QMSum (English) | 0.245 | 1.39 | 1.39 |
+
+A Chinese letter is about 0.6 tokens. Upstream's guess is a little over half the real size; the fork's is about one and
+a half times it. For English both guess a third too high. Full figures: [`results-tokens.json`](results-tokens.json).
+
+## 2. Notes: is every prompt small enough for the model?
 
 `notes.mjs` runs `enhance()` on every meeting twice: `upstream/enhance.ts`, which is the file as it was at the commit
 this fork started from (db8aaf9, byte for byte), and the fork's. In place of the model there is a stand-in that writes
-nothing and records each prompt. A prompt **does not fit** when its tokens plus the room kept for the answer are more
-than the context. The app asks for a context of 32,768 tokens and takes as little as 8,192 when memory is short.
-
-Tokens are counted by a stand-in tokenizer: one for every four characters, and for a Chinese letter either 1 or 0.7
-(both are run, because the real figure for the app's models was not measured).
+nothing and records each prompt; tokens are counted by the two tokenizers above. A prompt **does not fit** when its
+tokens plus the room kept for the answer are more than the context. The app asks for a context of 32,768 tokens and
+takes as little as 8,192 when memory is short.
 
 **Context 8,192. Meetings with a prompt that does not fit (the worst prompt, in contexts):**
 
-| set | heard as | upstream, 1 token a letter | upstream, 0.7 | fork, either |
+| set | heard as | upstream, Gemma 4 E4B | upstream, Qwen3 1.7B | fork, either |
 |---|---|---|---|---|
-| AISHELL-4 (20) | call, names shown | 20 (1.67) | 1 (1.01) | 0 |
-| | call, no names | 20 (1.59) | 3 (1.11) | 0 |
-| | one microphone | 20 (1.56) | 3 (1.14) | 0 |
-| VCSum (239) | call, names shown | 102 (1.93) | 83 (1.78) | 0 |
-| | call, no names | 119 (2.56) | 93 (1.78) | 0 |
-| | one microphone | 183 (2.59) | 142 (1.86) | 0 |
-| QMSum (196) | all three | 0 | - | 0 |
+| AISHELL-4 (20) | call, names shown | 13 (1.57) | 13 (1.57) | 0 |
+| | call, no names | 8 (1.25) | 11 (1.30) | 0 |
+| | one microphone | 3 (1.18) | 8 (1.25) | 0 |
+| VCSum (239) | call, names shown | 11 (1.84) | 15 (1.86) | 0 |
+| | call, no names | 30 (1.84) | 31 (1.86) | 0 |
+| | one microphone | 119 (1.83) | 125 (1.86) | 0 |
+| QMSum (196) | all three | 0 | 0 | 0 |
 
-**Context 32,768.** Every AISHELL-4 and QMSum meeting is read whole, and the two builds do the same thing. In VCSum, at
-1 token a letter, 11 of 239 meetings are read in parts; upstream has a prompt that does not fit in 1 of them (call
-without names) and 3 of them (one microphone), 1.02 to 1.03 contexts; the fork in none. At 0.7 every meeting is read whole.
+**Context 32,768.** No prompt fails to fit, in either build, and the two builds do the same thing: every Mandarin
+meeting is read whole. The difference between the builds exists only below the context the app asks for.
 
-Across all 30 combinations the fork sent no prompt that does not fit and lost no words. Full figures: [`results-notes.json`](results-notes.json).
+Across all 36 combinations the fork sent no prompt that does not fit and lost no words. Full figures:
+[`results-notes-models.json`](results-notes-models.json).
 
 ### What the real meetings showed
 
-- **The cause is the length guess, not unpunctuated speech.** Text the tokenizer has not counted is guessed at a third
-  of a token a character. That is on the safe side for English and two to three times too low for Chinese (at 0.7 to
-  1 token a letter). The guess is used in
-  two places: to decide whether what is left of a meeting fits in one part (so a whole Chinese meeting too big for the
-  context is passed on as a single part: every AISHELL-4 row above is this), and to size the pieces of a turn that has
-  to be cut (a room on one microphone). The fork counts a Chinese, Japanese or Korean letter as one token.
-- **The fork's guess is on the high side, and that costs parts.** Fewest parts that could hold the VCSum meetings at
-  8,192: 378 to 380 at 0.7 tokens a letter. The fork used 438 (names shown), 506 (no names) and 565 (one microphone):
-  up to half as many again, each one more call to the model. At 1 token a letter it used 528 to 653 for 523 to 525.
-  English has the same slack in both builds on one microphone: 407 parts where 289 could hold it.
+- **The cause is the length guess, not unpunctuated speech.** The guess is used in two places: to decide whether what
+  is left of a meeting fits in one part (so a whole Chinese meeting too big for the context is passed on as a single
+  part: most of the AISHELL-4 rows are this), and to size the pieces of a turn that has to be cut (a room on one
+  microphone: half of the VCSum meetings).
+- **The fork's guess is on the high side, and that costs parts.** At 8,192, with Gemma 4's tokenizer, the fewest parts
+  that could hold the VCSum meetings are 348 to 355. The fork used 409 (names shown), 462 (no names) and 536 (one
+  microphone): up to 54% more, each one more call to the model. English has the same slack in both builds on one
+  microphone: 396 parts where 279 could hold it. Counting the cut pieces with the tokenizer instead of guessing would
+  remove it; that is not done.
 - **A sentence splitter dropped punctuation.** When a turn is cut between sentences, a mark standing on its own
-  ("the ? ? You know") fell between two sentences: 164 marks in 43 QMSum meetings, no words. Fixed in the fork, with a test.
+  ("the ? ? You know") fell between two sentences: upstream drops 158 marks in 41 QMSum meetings (Gemma 4, one
+  microphone, 8,192), no words. Fixed in the fork, with a test.
 - **English was never at risk.** Both builds fit every prompt in all 196 meetings.
 
-## 2. Search: does a Chinese word show the meetings it is in?
+## 3. What a prompt that does not fit does on a real model
+
+`overlong.mjs` loads Qwen3 1.7B into the app's own engine (`app/src/engine/llm.ts`) with a context of 8,192.
+
+**Where is it cut?** Three passwords are put into a transcript, near the start, the middle and the end, and the model
+is asked at the end to list them.
+
+| transcript | prompt (tokens) | read by the engine | passwords listed |
+|---|---|---|---|
+| fits (the start of one AISHELL-4 meeting) | 4,486 | 4,494 | all three |
+| does not fit (two AISHELL-4 meetings) | 12,934 | 4,846 | none |
+
+Nothing failed and nothing was reported. The engine read 37% of the prompt, and the model wrote a summary of a
+meeting instead of a list of passwords, as if the question at the end had never reached it.
+
+**The pipeline's own prompt.** The AISHELL-4 meeting where upstream overshoots the most (a call with names shown) was
+then put through upstream's `enhance()`. Its first call was the whole meeting as one part: 12,172 tokens, plus 700 for
+the answer, into a context of 8,192. The engine read 5,437 of them, raised no error, and the answer did not start
+with a topic line as the prompt asks: it opened with an introduction and closed with a summary, both of which the
+instructions at the end of the prompt forbid.
+
+So on this model a prompt that does not fit is cut without a word, and both answers read as if the instructions at
+its end were among what was cut.
+Figures: [`results-overlong.json`](results-overlong.json). The run was stopped by hand after that call: on the machine
+used (4 cores, no graphics) the model wrote about 0.3 tokens a second whether or not the prompt fitted, so upstream's
+last call and the fork's calls were not run.
+
+## 4. Search: does a Chinese word show the meetings it is in?
 
 `search.bench.mjs` puts the 259 Mandarin meetings (93,638 lines) into the app's own `Store` and asks its `search()`
 for 15 ordinary words, 30 results at a time as the search window does. The words were fixed before any result was seen.
@@ -96,12 +147,29 @@ Every word showed as many meetings as it should, and every meeting shown has the
 times the pair index that was tried and dropped ([`../cjk-search`](../cjk-search/README.md)) on these lines; the
 figures are in [`results-search.json`](results-search.json) and agree with the generated ones.
 
+## How the tokenizers were got
+
+- **Qwen3 1.7B**: the whole file (1.83 GB) from its catalogue address; its SHA-256 matches the catalogue's.
+- **Gemma 4 E4B**: the file is 5.15 GB, and counting tokens needs only its header (settings, vocabulary, list of
+  tensors). `headers.mjs` fetches the first 16 MB and leaves the rest of the file empty, at the real file's length.
+  The method is checked on a file that is here whole: a header-only copy of EmbeddingGemma counted all 512 lines of a
+  real meeting the same as the whole file did ([`results-headers.json`](results-headers.json)). Gemma 4 E2B's header
+  gave the same count as E4B's on the meeting tried.
+- **Why not EmbeddingGemma's tokenizer for Gemma**: its vocabulary is not the one in the Gemma 4 files
+  ([`results-vocab.json`](results-vocab.json)), so it was not taken on trust.
+- **Without any of this**, `notes.mjs` falls back to a stand-in tokenizer (a Chinese letter is 1 token, or 0.7), and
+  writes [`results-notes.json`](results-notes.json). Its figures differ from the real ones in both directions; they
+  are there for a run with nothing to download, not to be quoted.
+
 ## What this does not show
 
-- **Real token counts.** The stand-in tokenizer is an assumption. How many tokens a Chinese letter is for the app's
-  models decides how often upstream goes over (the two columns above) and how many extra parts the fork makes.
-- **What the model does with a prompt that does not fit.** No model was run; whether it fails or reads only some of
-  the transcript was not tested.
+- **Gemma 4 itself was never run**, only its tokenizer. What it does with a prompt that does not fit is assumed to be
+  what Qwen3 did, because the cutting is done by the engine, not the model; that was not tested.
+- **One real call.** Section 3 is two prompts with passwords and one pipeline call, on one model. The fork's own
+  calls were not run on the model: that its prompts are read whole rests on the "fits" row and on the counts in
+  section 2.
+- **How often the app runs at 8,192.** It depends on the memory of the computer and the model chosen; no figures
+  for real users.
 - **How whisper writes Chinese.** These transcripts were written by people or by another speech-to-text service. How
   much punctuation whisper leaves in Chinese, which is what cutting a long turn depends on, needs audio.
 - **Who is "You".** The three ways of hearing a meeting are built from the corpus's speaker labels, not recorded.

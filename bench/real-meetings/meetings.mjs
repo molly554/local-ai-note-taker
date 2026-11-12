@@ -17,7 +17,8 @@ if (!existsSync(join(data, 'manifest.json'))) throw new Error('No data yet: run 
 export function useAppSource() {
   registerHooks({
     resolve(specifier, context, next) {
-      if (/^\.{1,2}\//.test(specifier) && !/\.(mjs|js|ts|json)$/.test(specifier)) {
+      // only the app's own files: an installed package's imports are left as they are
+      if (/^\.{1,2}\//.test(specifier) && !/\.(mjs|js|ts|json)$/.test(specifier) && !(context.parentURL ?? '').includes('/node_modules/')) {
         if ((context.parentURL ?? '').endsWith('/upstream/enhance.ts')) return next(new URL(`../../app/src/main/${specifier.replace(/^(\.\.\/)+/, '')}.ts`, import.meta.url).href, context)
         return next(`${specifier}.ts`, context)
       }
@@ -25,6 +26,19 @@ export function useAppSource() {
     },
   })
 }
+
+/**
+ * How the app would have heard a meeting. It knows two voices for sure: the microphone ("You") and the computer's
+ * sound (a name when the call app shows who is talking, "Them" otherwise). A room recorded on one microphone is all
+ * "You". The meeting's first speaker stands in for the person recording.
+ */
+export const MODES = {
+  'call, names shown': (l, me) => (l.speaker === me ? { track: 'me', speaker: null } : { track: 'them', speaker: l.speaker }),
+  'call, no names': (l, me) => ({ track: l.speaker === me ? 'me' : 'them', speaker: null }),
+  'one microphone': () => ({ track: 'me', speaker: null }),
+}
+/** the meeting's lines as the Store's segments */
+export const segmentsOf = (m, mode) => m.lines.map((l, i) => ({ id: i, meetingId: m.id, startMs: l.startMs, endMs: l.endMs, text: l.text, ...MODES[mode](l, m.lines[0].speaker) }))
 
 /** AISHELL-4, test set: 20 meetings in Mandarin, written down by people, with who spoke and when */
 export function aishell4() {

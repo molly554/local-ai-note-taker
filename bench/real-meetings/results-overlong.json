@@ -1,0 +1,56 @@
+{
+ "node": "v26.1.0",
+ "platform": "win32",
+ "date": "2026-11-12",
+ "model": "Qwen3 1.7B Q8_0",
+ "contextSize": 8192,
+ "loadSeconds": 7,
+ "passwords": [
+  {
+   "case": "fits",
+   "promptTokens": 4486,
+   "contextSize": 8192,
+   "tokensRead": 4494,
+   "listed": {
+    "start": true,
+    "middle": true,
+    "end": true
+   },
+   "seconds": 365
+  },
+  {
+   "case": "does not fit",
+   "promptTokens": 12934,
+   "contextSize": 8192,
+   "tokensRead": 4846,
+   "listed": {
+    "start": false,
+    "middle": false,
+    "end": false
+   },
+   "seconds": 655
+  }
+ ],
+ "pipeline": [
+  {
+   "build": "upstream",
+   "meeting": "AISHELL-4 test, S_R003S04C01, heard as a call with names shown",
+   "transcriptTokens": 12176,
+   "calls": [
+    {
+     "kind": "part",
+     "promptTokens": 12172,
+     "roomForAnswer": 700,
+     "fits": false,
+     "tokensRead": 5437,
+     "timing": "read 5,437 tok 395.7 s, wrote 698 tok 2422.5 s",
+     "answerCharacters": 1215,
+     "seconds": 2818,
+     "answerStartsAsAsked": false,
+     "answerHasIntroductionOrClosing": true
+    }
+   ]
+  }
+ ],
+ "stopped": "By hand, after upstream's first call. On this machine (4 cores, no graphics) the model wrote about 0.3 tokens a second whether or not the prompt fitted, so each call that writes 700 tokens takes about 40 minutes; upstream's notes call and the fork's calls were not run."
+}
