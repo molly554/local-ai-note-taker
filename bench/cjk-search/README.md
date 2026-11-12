@@ -27,5 +27,11 @@ Numbers below: Windows, Node 26.1, Intel i5-6400. Full output in [`results.json`
 than 66 ms, so there was no slowness to fix. The index would add storage, a one-time build for existing libraries and
 five write paths to keep in step, in exchange for ranking that was not measured to be better.
 
-**What it does not show.** The lines are generated, not real meetings. No relevance judgments were made, so whether
+**On real lines.** Timed again on 93,638 lines from 259 public Mandarin meetings
+([`../real-meetings`](../real-meetings/README.md)), with the same pattern: rare words went from 55 to 77 ms down to
+under 5 ms, the commonest word from 3 ms up to 73 ms, and the index took 6.5 s to build and 37.2 MB for 20.4 MB of
+lines. Searching through the app itself took at most 93 ms a word (260 ms for the commonest) and showed every meeting
+it should.
+
+**What it does not show.** The table above is from generated lines. No relevance judgments were made, so whether
 ranked results are more useful than the current order is untested.

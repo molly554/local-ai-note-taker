@@ -50,3 +50,6 @@ site/.vercel/
 # written by next dev
 site/AGENTS.md
 site/CLAUDE.md
+
+# public meeting transcripts fetched by bench/real-meetings/fetch.mjs
+bench/real-meetings/data/

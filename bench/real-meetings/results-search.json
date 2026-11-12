@@ -1,0 +1,228 @@
+{
+ "node": "v26.1.0",
+ "platform": "win32",
+ "date": "2026-11-12",
+ "meetings": 259,
+ "lines": 93638,
+ "insertSeconds": 9.8,
+ "limit": 30,
+ "words": [
+  {
+   "word": "我们",
+   "linesWithIt": 30013,
+   "meetingsWithIt": 259,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 260.3
+  },
+  {
+   "word": "问题",
+   "linesWithIt": 5717,
+   "meetingsWithIt": 255,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 13.4
+  },
+  {
+   "word": "市场",
+   "linesWithIt": 1536,
+   "meetingsWithIt": 168,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 4.9
+  },
+  {
+   "word": "技术",
+   "linesWithIt": 2612,
+   "meetingsWithIt": 195,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 8.2
+  },
+  {
+   "word": "客户",
+   "linesWithIt": 689,
+   "meetingsWithIt": 100,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 62.1
+  },
+  {
+   "word": "数据",
+   "linesWithIt": 1673,
+   "meetingsWithIt": 173,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 4.2
+  },
+  {
+   "word": "项目",
+   "linesWithIt": 981,
+   "meetingsWithIt": 158,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 4.3
+  },
+  {
+   "word": "合作",
+   "linesWithIt": 705,
+   "meetingsWithIt": 160,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 73.4
+  },
+  {
+   "word": "预算",
+   "linesWithIt": 30,
+   "meetingsWithIt": 18,
+   "shouldShow": 18,
+   "shown": 18,
+   "shownAndHaveIt": 18,
+   "ms": 71.7
+  },
+  {
+   "word": "物业",
+   "linesWithIt": 126,
+   "meetingsWithIt": 10,
+   "shouldShow": 10,
+   "shown": 10,
+   "shownAndHaveIt": 10,
+   "ms": 77.8
+  },
+  {
+   "word": "区块链",
+   "linesWithIt": 304,
+   "meetingsWithIt": 37,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 91.7
+  },
+  {
+   "word": "人工智能",
+   "linesWithIt": 407,
+   "meetingsWithIt": 78,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 83.7
+  },
+  {
+   "word": "供应链",
+   "linesWithIt": 197,
+   "meetingsWithIt": 43,
+   "shouldShow": 30,
+   "shown": 30,
+   "shownAndHaveIt": 30,
+   "ms": 93.1
+  },
+  {
+   "word": "董事会",
+   "linesWithIt": 15,
+   "meetingsWithIt": 9,
+   "shouldShow": 9,
+   "shown": 9,
+   "shownAndHaveIt": 9,
+   "ms": 74.1
+  },
+  {
+   "word": "鲸鲨",
+   "linesWithIt": 0,
+   "meetingsWithIt": 0,
+   "shouldShow": 0,
+   "shown": 0,
+   "shownAndHaveIt": 0,
+   "ms": 69
+  }
+ ],
+ "pairIndex": {
+  "buildMs": 6541,
+  "indexMB": 37.2,
+  "dataMB": 20.4,
+  "queries": [
+   {
+    "word": "我们",
+    "readEveryLineMs": 2.92,
+    "pairIndexMs": 73.37
+   },
+   {
+    "word": "问题",
+    "readEveryLineMs": 6.44,
+    "pairIndexMs": 14.64
+   },
+   {
+    "word": "市场",
+    "readEveryLineMs": 27.9,
+    "pairIndexMs": 7.55
+   },
+   {
+    "word": "技术",
+    "readEveryLineMs": 14.59,
+    "pairIndexMs": 9.29
+   },
+   {
+    "word": "客户",
+    "readEveryLineMs": 48.32,
+    "pairIndexMs": 4.25
+   },
+   {
+    "word": "数据",
+    "readEveryLineMs": 23.87,
+    "pairIndexMs": 6.85
+   },
+   {
+    "word": "项目",
+    "readEveryLineMs": 35.16,
+    "pairIndexMs": 4.67
+   },
+   {
+    "word": "合作",
+    "readEveryLineMs": 54.39,
+    "pairIndexMs": 4.26
+   },
+   {
+    "word": "预算",
+    "readEveryLineMs": 56.7,
+    "pairIndexMs": 0.45
+   },
+   {
+    "word": "物业",
+    "readEveryLineMs": 62.22,
+    "pairIndexMs": 2.05
+   },
+   {
+    "word": "区块链",
+    "readEveryLineMs": 76.81,
+    "pairIndexMs": 3.25
+   },
+   {
+    "word": "人工智能",
+    "readEveryLineMs": 66.82,
+    "pairIndexMs": 4.59
+   },
+   {
+    "word": "供应链",
+    "readEveryLineMs": 67.87,
+    "pairIndexMs": 3.32
+   },
+   {
+    "word": "董事会",
+    "readEveryLineMs": 59.21,
+    "pairIndexMs": 0.23
+   },
+   {
+    "word": "鲸鲨",
+    "readEveryLineMs": 55,
+    "pairIndexMs": 0.08
+   }
+  ]
+ }
+}
