@@ -169,10 +169,43 @@ export function splitForContext(transcript: string, maxTokens: number, count: (s
   return pieces
 }
 
+/** Chinese, Japanese and Korean letters: a tokenizer gives each about a token of its own, where other writing gets about one per three characters */
+const CJK_LETTER = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu
+/** a guess at the tokens in a text the model's tokenizer has not counted, on the high side so a part never outgrows its room */
+export function roughTokens(s: string): number {
+  const cjk = s.match(CJK_LETTER)?.length ?? 0
+  return cjk + Math.ceil((s.length - cjk) / 3)
+}
+
+/**
+ * A sentence too long for a part on its own: speech to text often leaves Chinese and Japanese without punctuation, so a
+ * whole talk is one "sentence". It is cut between words, and a run with no spaces in it between characters.
+ */
+function breakLong(s: string, fits: (x: string) => boolean): string[] {
+  if (fits(s)) return [s]
+  const out: string[] = []
+  let cur = ''
+  for (const word of s.match(/\S+\s*/g) ?? [s]) {
+    if (fits(cur + word)) { cur += word; continue }
+    if (cur) { out.push(cur); cur = '' }
+    let rest = Array.from(word)
+    while (rest.length && !fits(rest.join(''))) {
+      // the longest beginning that fits; at least one character, so it always moves on
+      let lo = 1, hi = rest.length
+      while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); if (fits(rest.slice(0, mid).join(''))) lo = mid; else hi = mid - 1 }
+      out.push(rest.slice(0, lo).join('')); rest = rest.slice(lo)
+    }
+    cur = rest.join('')
+  }
+  if (cur) out.push(cur)
+  return out
+}
+
 export function cutTurn(turn: string, maxTokens: number, count: (s: string) => number): string[] {
   const m = /^([^:]{1,60}: )([\s\S]*)$/.exec(turn)
   const who = m?.[1] ?? '', words = m?.[2] ?? turn
-  const sentences = words.match(/[^.!?。！？]+[.!?。！？]*\s*/g) ?? [words]
+  const fits = (x: string) => count(who + x.trim()) <= maxTokens
+  const sentences = (words.match(/[^.!?。！？]+[.!?。！？]*\s*/g) ?? [words]).flatMap((s) => breakLong(s, fits))
   const out: string[] = []
   let cur = ''
   for (const s of sentences) {
@@ -372,7 +405,7 @@ export async function enhance(input: EnhanceInput, llm: Llm, onToken: (text: str
     // even parts read better than one full part and a scrap
     const target = Math.min(max, Math.ceil(rest / Math.ceil(rest / max)) + 256)
     const known = new Map(lines.map((l, i) => [l, lineTokens[i]]))
-    const count = (s: string) => known.get(s) ?? Math.ceil(s.length / 3)
+    const count = (s: string) => known.get(s) ?? roughTokens(s)
     const pieces = from < lines.length ? splitForContext(lines.slice(from).join('\n'), target, count) : []
     const summaries = done.map((p) => p.summary)
     for (const piece of pieces) {
