@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="816" viewBox="0 0 860 816" role="img" aria-labelledby="t d">
+<title id="t">很长的会议是怎么读完的</title>
+<desc id="d">文字记录先用分词器数一遍。放得下，整场会议就是一个提示词。放不下，就在两段话之间切成几段；一段话本身比一段还长，就先在句子之间、再在词之间切；每一段再数一遍，有超出的就留小一点重新切，直到都放得下；每段写一份小结，小结按顺序排成一个提示词。最后纪要模型写出摘要。</desc>
+<style>
+  text { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
+  .surface { fill: #fcfcfb; stroke: rgba(11,11,11,0.10); }
+  .zone { fill: #f4f4f1; stroke: #e1e0d9; }
+  .zone-name { font-size: 12px; font-weight: 600; fill: #52514e; }
+  .label { font-size: 13px; fill: #0b0b0b; }
+  .tag { font-size: 12px; fill: #52514e; }
+  .patch { fill: #fcfcfb; }
+  .zone-patch { fill: #f4f4f1; }
+  .step, .start { fill: #ffffff; stroke: #c3c2b7; }
+  .ask { fill: #e6f0fc; stroke: #86b6ef; }
+  .away { fill: #ffffff; stroke: #898781; stroke-dasharray: 5 4; }
+  .line { fill: none; stroke: #52514e; stroke-width: 1.5; stroke-linejoin: round; }
+  .away-line { stroke-dasharray: 5 4; }
+  .head { fill: #52514e; }
+  @media (prefers-color-scheme: dark) {
+    .surface, .patch { fill: #1a1a19; }
+    .surface { stroke: rgba(255,255,255,0.10); }
+    .zone, .zone-patch { fill: #232322; }
+    .zone { stroke: #383835; }
+    .zone-name, .tag { fill: #c3c2b7; }
+    .label { fill: #f0efec; }
+    .step, .start, .away { fill: #2c2c2a; stroke: #52514e; }
+    .away { stroke: #898781; }
+    .ask { fill: #17335a; stroke: #3987e5; }
+    .line { stroke: #c3c2b7; }
+    .head { fill: #c3c2b7; }
+  }
+</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="head"/></marker></defs>
+<rect x="0.5" y="0.5" width="859" height="815" rx="12" class="surface"/>
+<path d="M470 80L470 111" class="line" marker-end="url(#head)"/>
+<path d="M336.5 142L130 142L130 635" class="line" marker-end="url(#head)"/>
+<rect x="116.75" y="370" width="26.5" height="20" rx="4" class="patch"/><text x="130" y="384" text-anchor="middle" class="tag">是</text>
+<path d="M470 171L470 210" class="line" marker-end="url(#head)"/>
+<rect x="456.75" y="180.5" width="26.5" height="20" rx="4" class="patch"/><text x="470" y="194.5" text-anchor="middle" class="tag">否</text>
+<path d="M470 252L470 292" class="line" marker-end="url(#head)"/>
+<path d="M369.5 334L369.5 368" class="line" marker-end="url(#head)"/>
+<rect x="356.25" y="341" width="26.5" height="20" rx="4" class="patch"/><text x="369.5" y="355" text-anchor="middle" class="tag">是</text>
+<path d="M530 334L530 471" class="line" marker-end="url(#head)"/>
+<rect x="516.75" y="398" width="26.5" height="20" rx="4" class="patch"/><text x="530" y="412" text-anchor="middle" class="tag">否</text>
+<path d="M406 446L406 471" class="line" marker-end="url(#head)"/>
+<path d="M560 502L730 502L730 232L564.5 232" class="line" marker-end="url(#head)"/>
+<rect x="651.5" y="357" width="157" height="20" rx="4" class="patch"/><text x="730" y="371" text-anchor="middle" class="tag">否：留小一点，重新切</text>
+<path d="M470 531L470 568" class="line" marker-end="url(#head)"/>
+<rect x="456.75" y="539.5" width="26.5" height="20" rx="4" class="patch"/><text x="470" y="553.5" text-anchor="middle" class="tag">是</text>
+<path d="M470 610L470 644" class="line" marker-end="url(#head)"/>
+<path d="M130 695L130 760L220 760" class="line" marker-end="url(#head)"/>
+<path d="M470 686L470 760L380 760" class="line" marker-end="url(#head)"/>
+<rect x="355.5" y="40" width="229" height="40" rx="20" class="start"/><text x="470" y="64.5" text-anchor="middle" class="label">文字记录，一人一段话为一行</text>
+<path d="M352.5 113H587.5L603.5 142L587.5 171H352.5L336.5 142Z" class="ask"/><text x="470" y="137.5" text-anchor="middle" class="label">用分词器数过：</text><text x="470" y="155.5" text-anchor="middle" class="label">留出写纪要的空间后放得下吗？</text>
+<rect x="377.5" y="212" width="185" height="40" rx="8" class="step"/><text x="470" y="236.5" text-anchor="middle" class="label">在两段话之间切成几段</text>
+<path d="M359.5 294H580.5L596.5 314L580.5 334H359.5L343.5 314Z" class="ask"/><text x="470" y="318.5" text-anchor="middle" class="label">有一段话本身比一段还长吗？</text>
+<rect x="238" y="370" width="258" height="76" rx="8" class="step"/><text x="367" y="394.5" text-anchor="middle" class="label">先在句子之间切，再在词之间切。</text><text x="367" y="412.5" text-anchor="middle" class="label">每一小块按比例</text><text x="367" y="430.5" text-anchor="middle" class="label">分到这段话的真实大小</text>
+<path d="M396 473H544L560 502L544 531H396L380 502Z" class="ask"/><text x="470" y="497.5" text-anchor="middle" class="label">每一段再数一遍：</text><text x="470" y="515.5" text-anchor="middle" class="label">都放得下吗？</text>
+<rect x="399" y="570" width="142" height="40" rx="8" class="step"/><text x="470" y="594.5" text-anchor="middle" class="label">每段写一份小结</text>
+<rect x="348.5" y="646" width="243" height="40" rx="8" class="step"/><text x="470" y="670.5" text-anchor="middle" class="label">一个提示词：按顺序排好的小结</text>
+<rect x="66.5" y="637" width="127" height="58" rx="8" class="step"/><text x="130" y="661.5" text-anchor="middle" class="label">一个提示词：</text><text x="130" y="679.5" text-anchor="middle" class="label">整场会议</text>
+<rect x="222" y="740" width="156" height="40" rx="8" class="step"/><text x="300" y="764.5" text-anchor="middle" class="label">纪要模型写出摘要</text>
+</svg>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="816" viewBox="0 0 860 816" role="img" aria-labelledby="t d">
+<title id="t">How a long meeting is read</title>
+<desc id="d">The transcript is counted by the tokenizer. If it fits, the whole meeting is one prompt. If not, it is cut into parts between turns; a turn longer than a part is cut between sentences, then words; every part is counted again and cut again with less room until all fit; each part is summarised and the summaries make one prompt. The notes model then writes the Summary.</desc>
+<style>
+  text { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
+  .surface { fill: #fcfcfb; stroke: rgba(11,11,11,0.10); }
+  .zone { fill: #f4f4f1; stroke: #e1e0d9; }
+  .zone-name { font-size: 12px; font-weight: 600; fill: #52514e; }
+  .label { font-size: 13px; fill: #0b0b0b; }
+  .tag { font-size: 12px; fill: #52514e; }
+  .patch { fill: #fcfcfb; }
+  .zone-patch { fill: #f4f4f1; }
+  .step, .start { fill: #ffffff; stroke: #c3c2b7; }
+  .ask { fill: #e6f0fc; stroke: #86b6ef; }
+  .away { fill: #ffffff; stroke: #898781; stroke-dasharray: 5 4; }
+  .line { fill: none; stroke: #52514e; stroke-width: 1.5; stroke-linejoin: round; }
+  .away-line { stroke-dasharray: 5 4; }
+  .head { fill: #52514e; }
+  @media (prefers-color-scheme: dark) {
+    .surface, .patch { fill: #1a1a19; }
+    .surface { stroke: rgba(255,255,255,0.10); }
+    .zone, .zone-patch { fill: #232322; }
+    .zone { stroke: #383835; }
+    .zone-name, .tag { fill: #c3c2b7; }
+    .label { fill: #f0efec; }
+    .step, .start, .away { fill: #2c2c2a; stroke: #52514e; }
+    .away { stroke: #898781; }
+    .ask { fill: #17335a; stroke: #3987e5; }
+    .line { stroke: #c3c2b7; }
+    .head { fill: #c3c2b7; }
+  }
+</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="head"/></marker></defs>
+<rect x="0.5" y="0.5" width="859" height="815" rx="12" class="surface"/>
+<path d="M470 80L470 111" class="line" marker-end="url(#head)"/>
+<path d="M289.5 142L130 142L130 635" class="line" marker-end="url(#head)"/>
+<rect x="112.3" y="370" width="35.4" height="20" rx="4" class="patch"/><text x="130" y="384" text-anchor="middle" class="tag">yes</text>
+<path d="M470 171L470 210" class="line" marker-end="url(#head)"/>
+<rect x="456.2" y="180.5" width="27.6" height="20" rx="4" class="patch"/><text x="470" y="194.5" text-anchor="middle" class="tag">no</text>
+<path d="M470 252L470 292" class="line" marker-end="url(#head)"/>
+<path d="M371.5 334L371.5 368" class="line" marker-end="url(#head)"/>
+<rect x="353.8" y="341" width="35.4" height="20" rx="4" class="patch"/><text x="371.5" y="355" text-anchor="middle" class="tag">yes</text>
+<path d="M570 334L570 471" class="line" marker-end="url(#head)"/>
+<rect x="556.2" y="398" width="27.6" height="20" rx="4" class="patch"/><text x="570" y="412" text-anchor="middle" class="tag">no</text>
+<path d="M371.5 446L371.5 471" class="line" marker-end="url(#head)"/>
+<path d="M600 502L730 502L730 232L601.5 232" class="line" marker-end="url(#head)"/>
+<rect x="630.4" y="357" width="199.20000000000005" height="20" rx="4" class="patch"/><text x="730" y="371" text-anchor="middle" class="tag">no: less room, cut again</text>
+<path d="M470 531L470 568" class="line" marker-end="url(#head)"/>
+<rect x="452.3" y="539.5" width="35.4" height="20" rx="4" class="patch"/><text x="470" y="553.5" text-anchor="middle" class="tag">yes</text>
+<path d="M470 610L470 644" class="line" marker-end="url(#head)"/>
+<path d="M130 695L130 760L145 760" class="line" marker-end="url(#head)"/>
+<path d="M470 686L470 760L455 760" class="line" marker-end="url(#head)"/>
+<rect x="344.5" y="40" width="251" height="40" rx="20" class="start"/><text x="470" y="64.5" text-anchor="middle" class="label">Transcript, one line a turn</text>
+<path d="M305.5 113H634.5L650.5 142L634.5 171H305.5L289.5 142Z" class="ask"/><text x="470" y="137.5" text-anchor="middle" class="label">Counted by the tokenizer: does it fit,</text><text x="470" y="155.5" text-anchor="middle" class="label">with room for the notes?</text>
+<rect x="340.5" y="212" width="259" height="40" rx="8" class="step"/><text x="470" y="236.5" text-anchor="middle" class="label">Cut into parts between turns</text>
+<path d="M333 294H607L623 314L607 334H333L317 314Z" class="ask"/><text x="470" y="318.5" text-anchor="middle" class="label">Is one turn longer than a part?</text>
+<rect x="207" y="370" width="329" height="76" rx="8" class="step"/><text x="371.5" y="394.5" text-anchor="middle" class="label">Cut it between sentences, then words.</text><text x="371.5" y="412.5" text-anchor="middle" class="label">Each piece gets its share</text><text x="371.5" y="430.5" text-anchor="middle" class="label">of the turn’s real size</text>
+<path d="M356 473H584L600 502L584 531H356L340 502Z" class="ask"/><text x="470" y="497.5" text-anchor="middle" class="label">Every part counted again:</text><text x="470" y="515.5" text-anchor="middle" class="label">do they all fit?</text>
+<rect x="372" y="570" width="196" height="40" rx="8" class="step"/><text x="470" y="594.5" text-anchor="middle" class="label">Each part summarised</text>
+<rect x="313" y="646" width="314" height="40" rx="8" class="step"/><text x="470" y="670.5" text-anchor="middle" class="label">One prompt: the summaries, in order</text>
+<rect x="43.5" y="637" width="173" height="58" rx="8" class="step"/><text x="130" y="661.5" text-anchor="middle" class="label">One prompt:</text><text x="130" y="679.5" text-anchor="middle" class="label">the whole meeting</text>
+<rect x="147" y="740" width="306" height="40" rx="8" class="step"/><text x="300" y="764.5" text-anchor="middle" class="label">The notes model writes the Summary</text>
+</svg>

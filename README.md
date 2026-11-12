@@ -44,19 +44,9 @@ Five things it takes care over:
 
 ## How it works
 
-```mermaid
-flowchart TD
-  subgraph pc [Your computer]
-    audio([Microphone and call audio]) --> rec[Recorder]
-    rec --> asr[whisper.cpp: speech to text]
-    asr --> db[(Transcript and notes, SQLite)]
-    db --> parts[Notes pipeline: parts sized by the model's tokenizer]
-    parts --> llm[Notes model, llama.cpp]
-    llm --> out[Summary, titles, answers]
-  end
-  parts -.-> cloud[A service you choose<br>only while Cloud AI is on]
-  cloud -.-> out
-```
+<p align="center">
+  <img src="docs/assets/how-it-works.svg" width="860" alt="On your computer: microphone and call audio, recorder, whisper.cpp speech to text, transcript and notes in SQLite, the notes pipeline, the notes model, then the Summary, titles and answers. The one way out is a service you choose, only while Cloud AI is on.">
+</p>
 
 | Stage | What runs | Where |
 | --- | --- | --- |
@@ -71,21 +61,9 @@ flowchart TD
 
 A notes model reads a fixed number of tokens at a time: its context. The app asks for 32,768 and takes as little as 8,192 when memory is short. A meeting that does not fit is read in parts, each part is summarised, and the notes are written from the summaries.
 
-```mermaid
-flowchart TD
-  t[Transcript, one line a turn] --> c{{Counted by the tokenizer: does it fit,<br>with room for the notes?}}
-  c -- yes --> whole[One prompt: the whole meeting]
-  c -- no --> cut[Cut into parts between turns]
-  cut --> long{{Is one turn longer than a part?}}
-  long -- yes --> inside[Cut it between sentences, then words.<br>Each piece gets its share of the turn's real size]
-  long -- no --> check
-  inside --> check{{Every part counted again: do they all fit?}}
-  check -- no: less room, cut again --> cut
-  check -- yes --> sum[Each part summarised]
-  sum --> merged[One prompt: the summaries, in order]
-  whole --> notes[The notes model writes the Summary]
-  merged --> notes
-```
+<p align="center">
+  <img src="docs/assets/long-meeting.svg" width="860" alt="The transcript is counted by the tokenizer. If it fits, the whole meeting is one prompt. If not, it is cut into parts between turns; a turn longer than a part is cut between sentences, then words; every part is counted again, and cut again with less room until all fit; each part is summarised, and the summaries make one prompt. The notes model then writes the Summary.">
+</p>
 
 Three things make it hold:
 

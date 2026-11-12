@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="604" viewBox="0 0 860 604" role="img" aria-labelledby="t d">
+<title id="t">How a meeting becomes notes</title>
+<desc id="d">On your computer: microphone and call audio, recorder, whisper.cpp speech to text, transcript and notes in SQLite, the notes pipeline, the notes model, then the Summary, titles and answers. The one way out is a service you choose, only while Cloud AI is on.</desc>
+<style>
+  text { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
+  .surface { fill: #fcfcfb; stroke: rgba(11,11,11,0.10); }
+  .zone { fill: #f4f4f1; stroke: #e1e0d9; }
+  .zone-name { font-size: 12px; font-weight: 600; fill: #52514e; }
+  .label { font-size: 13px; fill: #0b0b0b; }
+  .tag { font-size: 12px; fill: #52514e; }
+  .patch { fill: #fcfcfb; }
+  .zone-patch { fill: #f4f4f1; }
+  .step, .start { fill: #ffffff; stroke: #c3c2b7; }
+  .ask { fill: #e6f0fc; stroke: #86b6ef; }
+  .away { fill: #ffffff; stroke: #898781; stroke-dasharray: 5 4; }
+  .line { fill: none; stroke: #52514e; stroke-width: 1.5; stroke-linejoin: round; }
+  .away-line { stroke-dasharray: 5 4; }
+  .head { fill: #52514e; }
+  @media (prefers-color-scheme: dark) {
+    .surface, .patch { fill: #1a1a19; }
+    .surface { stroke: rgba(255,255,255,0.10); }
+    .zone, .zone-patch { fill: #232322; }
+    .zone { stroke: #383835; }
+    .zone-name, .tag { fill: #c3c2b7; }
+    .label { fill: #f0efec; }
+    .step, .start, .away { fill: #2c2c2a; stroke: #52514e; }
+    .away { stroke: #898781; }
+    .ask { fill: #17335a; stroke: #3987e5; }
+    .line { stroke: #c3c2b7; }
+    .head { fill: #c3c2b7; }
+  }
+</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="head"/></marker></defs>
+<rect x="0.5" y="0.5" width="859" height="603" rx="12" class="surface"/>
+<rect x="40" y="36" width="520" height="540" rx="10" class="zone"/>
+<text x="58" y="60" class="zone-name">Your computer</text>
+<path d="M300 116L300 146" class="line" marker-end="url(#head)"/>
+<path d="M300 188L300 218" class="line" marker-end="url(#head)"/>
+<path d="M300 260L300 290" class="line" marker-end="url(#head)"/>
+<path d="M300 332L300 353" class="line" marker-end="url(#head)"/>
+<path d="M300 413L300 434" class="line" marker-end="url(#head)"/>
+<path d="M300 476L300 506" class="line" marker-end="url(#head)"/>
+<path d="M460.5 384L700 384L700 425" class="line away-line" marker-end="url(#head)"/>
+<path d="M700 485L700 528L416 528" class="line away-line" marker-end="url(#head)"/>
+<rect x="182" y="76" width="236" height="40" rx="20" class="start"/><text x="300" y="100.5" text-anchor="middle" class="label">Microphone and call audio</text>
+<rect x="248.5" y="148" width="103" height="40" rx="8" class="step"/><text x="300" y="172.5" text-anchor="middle" class="label">Recorder</text>
+<rect x="174.5" y="220" width="251" height="40" rx="8" class="step"/><text x="300" y="244.5" text-anchor="middle" class="label">whisper.cpp: speech to text</text>
+<rect x="170.5" y="292" width="259" height="40" rx="8" class="step"/><text x="300" y="316.5" text-anchor="middle" class="label">Transcript and notes, SQLite</text>
+<rect x="139.5" y="355" width="321" height="58" rx="8" class="step"/><text x="300" y="379.5" text-anchor="middle" class="label">Notes pipeline:</text><text x="300" y="397.5" text-anchor="middle" class="label">parts sized by the model’s tokenizer</text>
+<rect x="194" y="436" width="212" height="40" rx="8" class="step"/><text x="300" y="460.5" text-anchor="middle" class="label">Notes model, llama.cpp</text>
+<rect x="186" y="508" width="228" height="40" rx="8" class="step"/><text x="300" y="532.5" text-anchor="middle" class="label">Summary, titles, answers</text>
+<rect x="582" y="427" width="236" height="58" rx="8" class="away"/><text x="700" y="451.5" text-anchor="middle" class="label">A service you choose</text><text x="700" y="469.5" text-anchor="middle" class="label">only while Cloud AI is on</text>
+</svg>

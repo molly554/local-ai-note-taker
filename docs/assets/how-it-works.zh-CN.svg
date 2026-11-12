@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="604" viewBox="0 0 860 604" role="img" aria-labelledby="t d">
+<title id="t">一场会议怎么变成纪要</title>
+<desc id="d">都在你的电脑上：麦克风和通话里的声音、录音、whisper.cpp 语音转文字、存进 SQLite 的文字记录和笔记、纪要流程、纪要模型，最后是摘要、标题和回答。唯一向外的一条路是你选的服务，只在云端 AI 打开期间。</desc>
+<style>
+  text { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
+  .surface { fill: #fcfcfb; stroke: rgba(11,11,11,0.10); }
+  .zone { fill: #f4f4f1; stroke: #e1e0d9; }
+  .zone-name { font-size: 12px; font-weight: 600; fill: #52514e; }
+  .label { font-size: 13px; fill: #0b0b0b; }
+  .tag { font-size: 12px; fill: #52514e; }
+  .patch { fill: #fcfcfb; }
+  .zone-patch { fill: #f4f4f1; }
+  .step, .start { fill: #ffffff; stroke: #c3c2b7; }
+  .ask { fill: #e6f0fc; stroke: #86b6ef; }
+  .away { fill: #ffffff; stroke: #898781; stroke-dasharray: 5 4; }
+  .line { fill: none; stroke: #52514e; stroke-width: 1.5; stroke-linejoin: round; }
+  .away-line { stroke-dasharray: 5 4; }
+  .head { fill: #52514e; }
+  @media (prefers-color-scheme: dark) {
+    .surface, .patch { fill: #1a1a19; }
+    .surface { stroke: rgba(255,255,255,0.10); }
+    .zone, .zone-patch { fill: #232322; }
+    .zone { stroke: #383835; }
+    .zone-name, .tag { fill: #c3c2b7; }
+    .label { fill: #f0efec; }
+    .step, .start, .away { fill: #2c2c2a; stroke: #52514e; }
+    .away { stroke: #898781; }
+    .ask { fill: #17335a; stroke: #3987e5; }
+    .line { stroke: #c3c2b7; }
+    .head { fill: #c3c2b7; }
+  }
+</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="head"/></marker></defs>
+<rect x="0.5" y="0.5" width="859" height="603" rx="12" class="surface"/>
+<rect x="40" y="36" width="520" height="540" rx="10" class="zone"/>
+<text x="58" y="60" class="zone-name">你的电脑</text>
+<path d="M300 116L300 146" class="line" marker-end="url(#head)"/>
+<path d="M300 188L300 218" class="line" marker-end="url(#head)"/>
+<path d="M300 260L300 290" class="line" marker-end="url(#head)"/>
+<path d="M300 332L300 353" class="line" marker-end="url(#head)"/>
+<path d="M300 413L300 434" class="line" marker-end="url(#head)"/>
+<path d="M300 476L300 506" class="line" marker-end="url(#head)"/>
+<path d="M407 384L700 384L700 425" class="line away-line" marker-end="url(#head)"/>
+<path d="M700 485L700 528L380 528" class="line away-line" marker-end="url(#head)"/>
+<rect x="207.5" y="76" width="185" height="40" rx="20" class="start"/><text x="300" y="100.5" text-anchor="middle" class="label">麦克风和通话里的声音</text>
+<rect x="265.5" y="148" width="69" height="40" rx="8" class="step"/><text x="300" y="172.5" text-anchor="middle" class="label">录音</text>
+<rect x="193.5" y="220" width="213" height="40" rx="8" class="step"/><text x="300" y="244.5" text-anchor="middle" class="label">whisper.cpp：语音转文字</text>
+<rect x="198.5" y="292" width="203" height="40" rx="8" class="step"/><text x="300" y="316.5" text-anchor="middle" class="label">文字记录和笔记，SQLite</text>
+<rect x="193" y="355" width="214" height="58" rx="8" class="step"/><text x="300" y="379.5" text-anchor="middle" class="label">纪要流程：</text><text x="300" y="397.5" text-anchor="middle" class="label">按模型的分词器量好每一段</text>
+<rect x="208.5" y="436" width="183" height="40" rx="8" class="step"/><text x="300" y="460.5" text-anchor="middle" class="label">纪要模型，llama.cpp</text>
+<rect x="222" y="508" width="156" height="40" rx="8" class="step"/><text x="300" y="532.5" text-anchor="middle" class="label">摘要、标题、回答</text>
+<rect x="606" y="427" width="188" height="58" rx="8" class="away"/><text x="700" y="451.5" text-anchor="middle" class="label">你选的服务</text><text x="700" y="469.5" text-anchor="middle" class="label">只在云端 AI 打开期间</text>
+</svg>

@@ -44,19 +44,9 @@ Lynote NoteTaker 录下你的麦克风和通话里的声音，用 whisper.cpp �
 
 ## 工作方式
 
-```mermaid
-flowchart TD
-  subgraph pc [你的电脑]
-    audio([麦克风和通话里的声音]) --> rec[录音]
-    rec --> asr[whisper.cpp：语音转文字]
-    asr --> db[(文字记录和笔记，SQLite)]
-    db --> parts[纪要流程：按模型的分词器量好每一段]
-    parts --> llm[纪要模型，llama.cpp]
-    llm --> out[摘要、标题、回答]
-  end
-  parts -.-> cloud[你选的服务<br>只在云端 AI 打开期间]
-  cloud -.-> out
-```
+<p align="center">
+  <img src="docs/assets/how-it-works.zh-CN.svg" width="860" alt="都在你的电脑上：麦克风和通话里的声音、录音、whisper.cpp 语音转文字、存进 SQLite 的文字记录和笔记、纪要流程、纪要模型，最后是摘要、标题和回答。唯一向外的一条路是你选的服务，只在云端 AI 打开期间。">
+</p>
 
 | 环节 | 用的是什么 | 在哪里运行 |
 | --- | --- | --- |
@@ -71,21 +61,9 @@ flowchart TD
 
 纪要模型一次只能读固定数量的 token，叫上下文。应用默认要 32,768，内存不够时最少拿 8,192。一场会议放不下，就分段读，每段先写小结，再根据这些小结写纪要。
 
-```mermaid
-flowchart TD
-  t[文字记录，一人一段话为一行] --> c{{用分词器数过：留出写纪要的空间后放得下吗？}}
-  c -- 放得下 --> whole[一个提示词：整场会议]
-  c -- 放不下 --> cut[在两段话之间切成几段]
-  cut --> long{{有一段话本身比一段还长吗？}}
-  long -- 有 --> inside[先在句子之间切，再在词之间切。<br>每一小块按比例分到这段话的真实大小]
-  long -- 没有 --> check
-  inside --> check{{每一段再数一遍：都放得下吗？}}
-  check -- 放不下：留小一点，重新切 --> cut
-  check -- 都放得下 --> sum[每段写一份小结]
-  sum --> merged[一个提示词：按顺序排好的小结]
-  whole --> notes[纪要模型写出摘要]
-  merged --> notes
-```
+<p align="center">
+  <img src="docs/assets/long-meeting.zh-CN.svg" width="860" alt="文字记录先用分词器数一遍。放得下，整场会议就是一个提示词。放不下，就在两段话之间切成几段；一段话本身比一段还长，就先在句子之间、再在词之间切；每一段再数一遍，有超出的就留小一点重新切，直到都放得下；每段写一份小结，小结按顺序排成一个提示词。最后纪要模型写出摘要。">
+</p>
 
 靠三点保证不出错：
 
