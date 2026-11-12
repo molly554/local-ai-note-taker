@@ -48,6 +48,15 @@ test('@everywhere Cloud AI: off until turned on; then the notes come from the se
     await page.getByTestId('cloud-model').fill('some-model')
     await page.getByTestId('cloud-key').fill('plain-test-key')
     await page.getByTestId('cloud-model').focus()
+    // a computer with nowhere safe to keep a key (a Linux session with no keyring, as on CI): the key is not kept
+    // at all, sealed or plain, so there is nothing more to try here
+    if (!await app.evaluate(({ safeStorage }) => safeStorage.isEncryptionAvailable())) {
+      await expect(page.getByTestId('cloud-key')).toHaveValue('')
+      await expect.poll(() => JSON.parse(settingsFile()).cloud).toMatchObject({ on: true, url: cloud.url, model: 'some-model' })
+      expect(JSON.parse(settingsFile()).cloud.key).toBeUndefined()
+      expect(settingsFile()).not.toContain('plain-test-key')
+      return
+    }
     // the key field empties and says one is kept; the file has the address and the model, and the key only sealed
     await expect(page.getByTestId('cloud-key')).toHaveValue('')
     await expect(page.getByTestId('cloud-key')).toHaveAttribute('placeholder', 'Saved. Type a new key to replace it.')
