@@ -2,14 +2,14 @@
 # The Mac job runs everything; Windows and Linux typecheck, unit-test, build their helpers and run the e2e specs that work there.
 name: CI
 
-# Docs, the website and licence text don't run it (site.yml checks the website). A newer push to the same branch
+# Docs, the bench write-ups and licence text don't run it. A newer push to the same branch
 # stops the run before it: macOS minutes cost ten times Linux ones.
 on:
   push:
     branches: [main]
-    paths-ignore: ['site/**', 'docs/**', '**/*.md', 'LICENSE', '.github/workflows/site.yml']
+    paths-ignore: ['docs/**', 'bench/**', '**/*.md', 'LICENSE']
   pull_request:
-    paths-ignore: ['site/**', 'docs/**', '**/*.md', 'LICENSE', '.github/workflows/site.yml']
+    paths-ignore: ['docs/**', 'bench/**', '**/*.md', 'LICENSE']
   workflow_dispatch:
 
 concurrency:
