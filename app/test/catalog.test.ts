@@ -21,10 +21,11 @@ describe('the catalog', () => {
 const files = (dir: string): string[] => readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? files(join(dir, f)) : [join(dir, f)]))
 
 describe('nothing leaves the Mac', () => {
-  it('only model downloads (pinned URLs) and whisper-server on 127.0.0.1 make requests; the update check is electron-updater', () => {
+  it('only model downloads (pinned URLs), whisper-server on 127.0.0.1 and Cloud AI once the person turns it on make requests; the update check is electron-updater', () => {
     const src = join(__dirname, '../src')
-    // files allowed to make requests: model downloads from the catalog's pinned URLs, whisper-server on 127.0.0.1
-    const allowed = new Set(['main/downloader.ts', 'main/asr/server.ts', 'main/asr/transcribe.ts'])
+    // files allowed to make requests: model downloads from the catalog's pinned URLs, whisper-server on 127.0.0.1,
+    // and the cloud notes model: off until the person turns it on, and only to the address they typed (test/cloud.test.ts)
+    const allowed = new Set(['main/downloader.ts', 'main/asr/server.ts', 'main/asr/transcribe.ts', 'main/notes/cloud.ts'])
     const calls = files(src).filter((f) => /\.(ts|tsx)$/.test(f))
       .filter((f) => /(?<![.\w]|async )fetch\(|(\?\?|=) fetch\b|net\.request|from 'node:https?'|require\('https?'\)|new WebSocket|XMLHttpRequest|raw\.githubusercontent/.test(readFileSync(f, 'utf8')))
       .map((f) => f.slice(src.length + 1).replaceAll('\\', '/'))
