@@ -1,6 +1,6 @@
 {
   "name": "@yogurt/app",
-  "version": "0.3.6",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "main": "out/main/index.js",
@@ -58,6 +58,9 @@
   "description": "Free, private, open-source AI meeting notes for Mac, Windows and Linux.",
   "author": "molly554",
   "homepage": "https://github.com/molly554/local-ai-note-taker",
-  "repository": { "type": "git", "url": "https://github.com/molly554/local-ai-note-taker.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/molly554/local-ai-note-taker.git"
+  },
   "license": "MIT"
 }
