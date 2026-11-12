@@ -53,6 +53,26 @@ describe('one person talking for a whole meeting (a lecture, a room on one mic)'
     expect(pieces.length).toBeGreaterThan(1)
     expect(pieces.every((p) => p.endsWith('.'))).toBe(true)
   })
+
+  it('a mark standing on its own between sentences is kept (transcripts written by hand have "the ? ? You know")', () => {
+    const turn = 'You: ' + Array.from({ length: 2000 }, (_, i) => `So that is topic ${i + 1} . . And the ? ? Well, what I mean ... is this !`).join(' ')
+    const pieces = splitForContext(turn, MAX, counter(turn, 40_000))
+    expect(pieces.length).toBeGreaterThan(1)
+    expect(said(pieces, 'You: ')).toBe(said([turn], 'You: '))
+  })
+})
+
+describe('a Chinese meeting of many short turns', () => {
+  it('is not passed on whole because a third of its characters looked small enough', () => {
+    // 500 turns of about 30 letters: some 17,000 tokens by the letter, 6,500 by a third of the characters
+    const lines = Array.from({ length: 500 }, (_, i) => `${i % 2 ? 'Them' : 'You'}: 我们今天讨论第${i + 1}个议题主要是关于产品发布的时间安排和定价`)
+    const known = new Map(lines.map((l) => [l, roughTokens(l)]))
+    const count = (s: string) => known.get(s) ?? roughTokens(s)
+    const pieces = splitForContext(lines.join('\n'), 7000, count)
+    expect(pieces.length).toBeGreaterThan(2)
+    for (const p of pieces) expect(p.split('\n').reduce((n, l) => n + count(l) + 1, 0)).toBeLessThanOrEqual(7000)
+    expect(pieces.join('\n')).toBe(lines.join('\n'))
+  })
 })
 
 describe('roughTokens', () => {

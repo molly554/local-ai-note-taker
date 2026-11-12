@@ -205,7 +205,8 @@ export function cutTurn(turn: string, maxTokens: number, count: (s: string) => n
   const m = /^([^:]{1,60}: )([\s\S]*)$/.exec(turn)
   const who = m?.[1] ?? '', words = m?.[2] ?? turn
   const fits = (x: string) => count(who + x.trim()) <= maxTokens
-  const sentences = (words.match(/[^.!?。！？]+[.!?。！？]*\s*/g) ?? [words]).flatMap((s) => breakLong(s, fits))
+  // a sentence takes every mark after it, spaced out or not ("so . . and the ? ?"), so no character falls between two sentences
+  const sentences = (words.match(/[^.!?。！？]+(?:[.!?。！？]+\s*)*|[.!?。！？]+\s*/g) ?? [words]).flatMap((s) => breakLong(s, fits))
   const out: string[] = []
   let cur = ''
   for (const s of sentences) {
