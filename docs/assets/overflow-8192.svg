@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="860" height="524" viewBox="0 0 860 524" role="img" aria-labelledby="t d">
 <title id="t">Meetings where the notes model is sent more than it can read</title>
-<desc id="d">Horizontal bars. Upstream sends a prompt that does not fit in AISHELL-4 test, call, names shown: 13 of 20; AISHELL-4 test, call, no names: 8 of 20; AISHELL-4 test, one microphone: 3 of 20; AISHELL-4 test, one microphone, no punctuation: 2 of 20; VCSum, call, names shown: 11 of 239; VCSum, call, no names: 30 of 239; VCSum, one microphone: 119 of 239; VCSum, one microphone, no punctuation: 112 of 239. This fork: 0.</desc>
+<desc id="d">Horizontal bars. Before the changes, a prompt that does not fit was sent in AISHELL-4 test, call, names shown: 13 of 20; AISHELL-4 test, call, no names: 8 of 20; AISHELL-4 test, one microphone: 3 of 20; AISHELL-4 test, one microphone, no punctuation: 2 of 20; VCSum, call, names shown: 11 of 239; VCSum, call, no names: 30 of 239; VCSum, one microphone: 119 of 239; VCSum, one microphone, no punctuation: 112 of 239. Now: 0.</desc>
 <style>
   text { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
   .surface { fill: #fcfcfb; stroke: rgba(11,11,11,0.10); }
@@ -33,9 +33,9 @@
 <path d="M716 146V266" class="grid"/><path d="M716 304V424" class="grid"/>
 <text x="28" y="40" class="title">Meetings where the notes model is sent more than it can read</text>
 <text x="28" y="59" class="sub">Context of 8,192 tokens (what the app takes when memory is short) · counted with the Gemma 4 E4B tokenizer</text>
-<text x="28" y="78" class="sub">Upstream at db8aaf9 against this fork · English meetings (QMSum, 196): 0 in both</text>
-<text x="262" y="108" class="head">Upstream</text>
-<text x="776" y="108" class="head" text-anchor="middle">This fork</text>
+<text x="28" y="78" class="sub">The notes pipeline before these changes against now · English meetings (QMSum, 196): 0 either way</text>
+<text x="262" y="108" class="head">Before</text>
+<text x="776" y="108" class="head" text-anchor="middle">Now</text>
 <text x="28" y="138" class="group">AISHELL-4 · 20 Mandarin meetings of 4 to 8 people</text>
 <text x="38" y="165" class="label">Call, names shown</text>
 <path d="M262 155h243a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-243z" class="bar"/>
@@ -71,5 +71,5 @@
 <text x="448.1" y="413" class="value">112 of 239</text>
 <text x="776" y="413" class="zero" text-anchor="middle">0</text>
 <text x="28" y="483" class="foot">* The same text with every punctuation mark removed, as speech to text may leave Chinese; not in the corpora.</text>
-<text x="28" y="502" class="foot">At the 32,768 tokens the app asks for, both builds fit every prompt. Method and all figures: bench/real-meetings.</text>
+<text x="28" y="502" class="foot">At the 32,768 tokens the app asks for, every prompt fits either way. Method and all figures: bench/real-meetings.</text>
 </svg>

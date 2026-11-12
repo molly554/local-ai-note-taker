@@ -21,9 +21,9 @@ pnpm dev             # opens the app from source
 The first run downloads the AI models, like the installed app.
 
 - **Separate profile:** `YOGURT_USER_DATA=/tmp/notetaker-dev pnpm dev` keeps your real meetings out of it.
-- **Without models:** `YOGURT_FAKE=1 pnpm dev` swaps in a stand-in transcriber, notes model and call audio, so the whole app runs in seconds. It needs none of Rust, CMake or the Vulkan SDK: `pnpm install`, then `pnpm -C app exec electron-vite build` and `YOGURT_FAKE=1 YOGURT_USER_DATA=/tmp/notetaker-demo pnpm -C app exec electron out/main/index.js`.
+- **Without models:** `pnpm -C app demo` builds the app and opens it in demo mode: a stand-in transcriber, notes model and call audio, and a profile folder of its own, so the whole app runs in seconds. It needs none of Rust, CMake or the Vulkan SDK. While developing, `YOGURT_FAKE=1 pnpm dev` does the same from source.
 
-The switches and the helper programs (`yogurt-audio`, `yogurt-system`, `yogurt-mcp`) keep the names they have in Yogurt, the app this is a fork of, so its changes stay easy to bring over.
+The developer switches (`YOGURT_FAKE`, `YOGURT_USER_DATA`) and the helper programs (`yogurt-audio`, `yogurt-system`, `yogurt-mcp`) keep the names of the open-source code this app is built on.
 
 ## Test
 
@@ -50,4 +50,4 @@ Installers land in `app/dist/`. They're unsigned unless signing is set up; see `
 
 `sh app/scripts/release.sh X.Y.Z` sets the version, tags it and pushes. GitHub Actions builds Windows and Linux, and publishes one release once they pass. Installed copies update from it.
 
-The Mac is only released signed and notarized. With the secrets `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID` set in the repository, the same tag builds and adds it; without them the release carries Windows and Linux only.
+No Mac is released. A Mac would only go out signed and notarized: with the secrets `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID` set in the repository, the same tag would build and add it.

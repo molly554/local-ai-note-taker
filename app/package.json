@@ -9,6 +9,7 @@
     "build": "node scripts/native.mjs && electron-vite build",
     "test": "vitest run",
     "e2e": "node scripts/native.mjs && electron-vite build && playwright test",
+    "demo": "electron-vite build && node scripts/demo.mjs",
     "native": "node scripts/native.mjs",
     "typecheck": "tsc -p ."
   },

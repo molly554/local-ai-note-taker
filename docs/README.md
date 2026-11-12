@@ -8,7 +8,7 @@ Download Lynote NoteTaker from [GitHub Releases](https://github.com/molly554/loc
 
 - **Windows:** Windows 10 version 2004 or later, x64. Run the `.exe` installer. The installer isn't signed: if Windows says it protected your PC, click More info, then Run anyway.
 - **Linux:** x64, Ubuntu 22.04 or a compatible newer system, with PulseAudio or PipeWire. Make the `.AppImage` executable in its file properties, then open it. If it doesn't open, install FUSE 2 first: `sudo apt install libfuse2` on Ubuntu 22.04, `sudo apt install libfuse2t64` on 24.04 and newer. GNOME needs the AppIndicator extension to show the tray icon.
-- **Mac:** Apple Silicon, macOS 14.4 or later. A release only carries a Mac download when it could be signed and notarized. If the release has none, [build it yourself](building.md).
+- **Mac:** there is no download. On Apple Silicon with macOS 14.4 or later it can be [built from source](building.md).
 
 On first run, Lynote NoteTaker downloads the models it needs. Windows and Linux also check transcription speed and stop setup if the computer cannot keep up. Recording works as soon as setup finishes. The notes model keeps downloading in the background, and notes and questions work offline once it's in. Calendar access and speaker names from calls are available on Mac only.
 
@@ -62,8 +62,6 @@ Meetings, recordings, settings and downloaded models live here:
 | Mac | `~/Library/Application Support/Lynote NoteTaker` |
 | Windows | `%APPDATA%\Lynote NoteTaker` |
 | Linux | `~/.config/Lynote NoteTaker` (or `$XDG_CONFIG_HOME/Lynote NoteTaker` if set) |
-
-Lynote NoteTaker keeps its own folder: if Yogurt, the app it is based on, is installed too, neither reads the other's meetings. To bring meetings over, export a backup in one and import it in the other.
 
 ## Backup and restore
 

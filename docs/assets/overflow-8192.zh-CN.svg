@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="860" height="524" viewBox="0 0 860 524" role="img" aria-labelledby="t d">
 <title id="t">送给纪要模型的内容超出它一次能读的量：有多少场会议</title>
-<desc id="d">横向条形图。上游发出放不下的提示词的会议数： AISHELL-4 test, call, names shown: 13 of 20; AISHELL-4 test, call, no names: 8 of 20; AISHELL-4 test, one microphone: 3 of 20; AISHELL-4 test, one microphone, no punctuation: 2 of 20; VCSum, call, names shown: 11 of 239; VCSum, call, no names: 30 of 239; VCSum, one microphone: 119 of 239; VCSum, one microphone, no punctuation: 112 of 239. 本分叉: 0.</desc>
+<desc id="d">横向条形图。改之前发出放不下的提示词的会议数： AISHELL-4 test, call, names shown: 13 of 20; AISHELL-4 test, call, no names: 8 of 20; AISHELL-4 test, one microphone: 3 of 20; AISHELL-4 test, one microphone, no punctuation: 2 of 20; VCSum, call, names shown: 11 of 239; VCSum, call, no names: 30 of 239; VCSum, one microphone: 119 of 239; VCSum, one microphone, no punctuation: 112 of 239. 现在: 0.</desc>
 <style>
   text { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
   .surface { fill: #fcfcfb; stroke: rgba(11,11,11,0.10); }
@@ -33,9 +33,9 @@
 <path d="M716 146V266" class="grid"/><path d="M716 304V424" class="grid"/>
 <text x="28" y="40" class="title">送给纪要模型的内容超出它一次能读的量：有多少场会议</text>
 <text x="28" y="59" class="sub">上下文 8,192 token（内存不够时应用实际拿到的大小）· 用 Gemma 4 E4B 的分词器计数</text>
-<text x="28" y="78" class="sub">上游 db8aaf9 对比本分叉 · 英文会议（QMSum，196 场）：两边都是 0</text>
-<text x="262" y="108" class="head">上游</text>
-<text x="776" y="108" class="head" text-anchor="middle">本分叉</text>
+<text x="28" y="78" class="sub">纪要流程改之前对比现在 · 英文会议（QMSum，196 场）：两边都是 0</text>
+<text x="262" y="108" class="head">改之前</text>
+<text x="776" y="108" class="head" text-anchor="middle">现在</text>
 <text x="28" y="138" class="group">AISHELL-4 · 20 场 4 到 8 人的中文会议</text>
 <text x="38" y="165" class="label">通话，显示说话人名字</text>
 <path d="M262 155h243a4 4 0 0 1 4 4v4a4 4 0 0 1 -4 4h-243z" class="bar"/>
@@ -71,5 +71,5 @@
 <text x="448.1" y="413" class="value">112 / 239 场</text>
 <text x="776" y="413" class="zero" text-anchor="middle">0</text>
 <text x="28" y="483" class="foot">* 同一份文字去掉全部标点，模拟语音转文字不给中文加标点的情况；语料里本来没有这一种。</text>
-<text x="28" y="502" class="foot">上下文是应用默认要的 32,768 token 时，两个版本的提示词都放得下。方法和全部数字见 bench/real-meetings。</text>
+<text x="28" y="502" class="foot">上下文是应用默认要的 32,768 token 时，改之前和现在的提示词都放得下。方法和全部数字见 bench/real-meetings。</text>
 </svg>

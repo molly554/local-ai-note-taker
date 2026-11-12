@@ -1,6 +1,6 @@
 # Third-party notices
 
-Lynote NoteTaker is MIT licensed (see [LICENSE](LICENSE)). It is a fork of [Yogurt](https://github.com/FrigadeHQ/yogurt) by Frigade, also MIT licensed, and includes or uses third-party software under its own licences.
+Lynote NoteTaker is MIT licensed (see [LICENSE](LICENSE)). It is built on Yogurt by Frigade, also MIT licensed (their copyright is in the licence), and includes or uses third-party software under its own licences.
 
 - Licence texts for bundled and statically linked code are in [app/resources/licenses](app/resources/licenses). Installers ship them in a `licenses` folder.
   - Fonts: Inter and Noto Sans SC (OFL).

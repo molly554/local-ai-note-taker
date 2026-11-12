@@ -1,7 +1,7 @@
 // Draws the README's chart from results-notes-models.json, so the picture can only say what the run said:
 //   node bench/real-meetings/chart.mjs      → docs/assets/overflow-8192.svg and overflow-8192.zh-CN.svg
-// One bar a row: the share of a set's meetings where upstream sent the model a prompt that does not fit a context of
-// 8,192 tokens, counted with Gemma 4 E4B's tokenizer (the starter notes model). The fork's count is printed beside it.
+// One bar a row: the share of a set's meetings where the pipeline as it was (upstream/enhance.ts) sent the model a prompt that does not fit a context of
+// 8,192 tokens, counted with Gemma 4 E4B's tokenizer (the starter notes model). Today's count is printed beside it.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -28,27 +28,27 @@ const TEXT = {
     file: 'overflow-8192.svg',
     title: 'Meetings where the notes model is sent more than it can read',
     sub: [`Context of 8,192 tokens (what the app takes when memory is short) · counted with the ${TOKENIZER} tokenizer`,
-      `Upstream at db8aaf9 against this fork · English meetings (QMSum, ${englishMeetings}): 0 in both`],
-    upstream: 'Upstream', fork: 'This fork', axis: 'share of the set’s meetings',
+      `The notes pipeline before these changes against now · English meetings (QMSum, ${englishMeetings}): 0 either way`],
+    upstream: 'Before', fork: 'Now', axis: 'share of the set’s meetings',
     sets: { 'AISHELL-4 test': (n) => `AISHELL-4 · ${n} Mandarin meetings of 4 to 8 people`, VCSum: (n) => `VCSum · ${n} Mandarin round-table meetings` },
     modes: { 'call, names shown': 'Call, names shown', 'call, no names': 'Call, no names', 'one microphone': 'One microphone', 'one microphone, no punctuation': 'One microphone, no punctuation*' },
     of: (a, b) => `${a} of ${b}`,
     foot: ['* The same text with every punctuation mark removed, as speech to text may leave Chinese; not in the corpora.',
-      'At the 32,768 tokens the app asks for, both builds fit every prompt. Method and all figures: bench/real-meetings.'],
-    desc: 'Horizontal bars. Upstream sends a prompt that does not fit in',
+      'At the 32,768 tokens the app asks for, every prompt fits either way. Method and all figures: bench/real-meetings.'],
+    desc: 'Horizontal bars. Before the changes, a prompt that does not fit was sent in',
   },
   zh: {
     file: 'overflow-8192.zh-CN.svg',
     title: '送给纪要模型的内容超出它一次能读的量：有多少场会议',
     sub: [`上下文 8,192 token（内存不够时应用实际拿到的大小）· 用 ${TOKENIZER} 的分词器计数`,
-      `上游 db8aaf9 对比本分叉 · 英文会议（QMSum，${englishMeetings} 场）：两边都是 0`],
-    upstream: '上游', fork: '本分叉', axis: '占该语料会议数的比例',
+      `纪要流程改之前对比现在 · 英文会议（QMSum，${englishMeetings} 场）：两边都是 0`],
+    upstream: '改之前', fork: '现在', axis: '占该语料会议数的比例',
     sets: { 'AISHELL-4 test': (n) => `AISHELL-4 · ${n} 场 4 到 8 人的中文会议`, VCSum: (n) => `VCSum · ${n} 场中文圆桌会议` },
     modes: { 'call, names shown': '通话，显示说话人名字', 'call, no names': '通话，不显示名字', 'one microphone': '一个麦克风', 'one microphone, no punctuation': '一个麦克风，没有标点*' },
     of: (a, b) => `${a} / ${b} 场`,
     foot: ['* 同一份文字去掉全部标点，模拟语音转文字不给中文加标点的情况；语料里本来没有这一种。',
-      '上下文是应用默认要的 32,768 token 时，两个版本的提示词都放得下。方法和全部数字见 bench/real-meetings。'],
-    desc: '横向条形图。上游发出放不下的提示词的会议数：',
+      '上下文是应用默认要的 32,768 token 时，改之前和现在的提示词都放得下。方法和全部数字见 bench/real-meetings。'],
+    desc: '横向条形图。改之前发出放不下的提示词的会议数：',
   },
 }
 
