@@ -34,7 +34,7 @@ test('paused recording controls fit the minimum window and keep focus inside eac
     await expect(page.getByTestId('note-pause')).toHaveAccessibleName('Resume recording')
     await page.keyboard.press('Tab')
     await expect(page.getByTestId('note-stop')).toBeFocused()
-    await expect(page.getByTestId('note-stop')).toHaveCSS('background-color', 'rgb(111, 0, 255)')
+    await expect(page.getByTestId('note-stop')).toHaveCSS('background-color', 'rgb(134, 94, 255)')
     await expect(page.getByTestId('note-stop').locator('svg')).toHaveCount(0)
     for (const button of await buttons.all()) {
       expect(await button.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)

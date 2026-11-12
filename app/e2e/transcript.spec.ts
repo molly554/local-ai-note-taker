@@ -155,7 +155,7 @@ test('transcription trouble shows in the widget in plain words', async () => {
     await fake(app, 'warn', 'falling-behind')
     // the recorder shows a warning sign; the words are inside the expanded recorder
     const w = await windowOf(app, '#widget')
-    await expect(w.getByTestId('widget-note')).toHaveText('Yogurt is falling behind. Some lines may be missing.')
+    await expect(w.getByTestId('widget-note')).toHaveText('Lynote NoteTaker is falling behind. Some lines may be missing.')
     await fake(app, 'warn', 'transcribe-failed')
     await expect(w.getByTestId('widget-note')).toHaveText("Some of this meeting couldn't be transcribed.")
   } finally { await app.close() }

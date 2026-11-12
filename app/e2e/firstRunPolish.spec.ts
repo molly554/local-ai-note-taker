@@ -171,7 +171,7 @@ test('permission help starts collapsed and uses the same secondary action in onb
       await expect(help).not.toHaveAttribute('open', '')
       for (const colorScheme of ['light', 'dark'] as const) {
         await page.emulateMedia({ colorScheme })
-        await expect(page.locator('.ob-switch-on')).toHaveCSS('background-color', colorScheme === 'light' ? 'rgb(111, 0, 255)' : 'rgb(183, 128, 255)')
+        await expect(page.locator('.ob-switch-on')).toHaveCSS('background-color', colorScheme === 'light' ? 'rgb(134, 94, 255)' : 'rgb(183, 128, 255)')
         await expect(page.getByTestId('settings-guide-relaunch')).not.toBeVisible()
         if (surface === 'settings') expect(await help.evaluate(el => {
           const r = el.getBoundingClientRect()

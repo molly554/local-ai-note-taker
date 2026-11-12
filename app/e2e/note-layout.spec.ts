@@ -161,7 +161,7 @@ test('people added and removed by hand are saved, and the notes are written agai
   } finally { await app.close() }
 })
 
-test('people changed on edited notes: they are kept, and Yogurt offers to write them again', async () => {
+test('people changed on edited notes: they are kept, and Lynote NoteTaker offers to write them again', async () => {
   const { app, page } = await launch()
   try {
     const id = await finished(app, page)

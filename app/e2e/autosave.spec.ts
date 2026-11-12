@@ -40,7 +40,7 @@ test('failed My notes saves retain exact text across navigation and reload; Copy
     await expect(page.getByTestId('note-save-status')).toHaveAttribute('data-state', 'failed')
     await expect(page.getByTestId('note-save-warning')).toBeVisible()
     await expect(page.getByTestId('note-save-status')).toHaveAttribute('role', 'alert')
-    await expect(page.getByTestId('note-save-status')).not.toContainText('Yogurt can make mistakes.')
+    await expect(page.getByTestId('note-save-status')).not.toContainText('Lynote NoteTaker can make mistakes.')
     await expect(page.getByTestId('note-mine')).toBeFocused()
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((w) => !w.webContents.getURL().includes('#'))!.setSize(720, 520))
     await expect(page.getByTestId('note-mine')).toBeInViewport()

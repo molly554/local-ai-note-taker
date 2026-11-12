@@ -39,7 +39,7 @@ for (const theme of ['light', 'dark'] as const) test(`split metadata popovers st
     // An event disappearing between listing and selection must be a retryable error.
     await app.evaluate(() => (globalThis as any).__fake__.calendarEvents([]))
     await page.getByTestId('note-date-event').filter({ hasText: 'Planning with Jamie' }).press('Enter')
-    await expect(date.getByRole('alert')).toContainText("Yogurt couldn't update the calendar link")
+    await expect(date.getByRole('alert')).toContainText("Lynote NoteTaker couldn't update the calendar link")
     expect((await page.evaluate(id => window.yogurt.meetings.get(id), meeting.id))?.eventId).toBeNull()
     await app.evaluate((_e, events) => (globalThis as any).__fake__.calendarEvents(events), events)
     await page.getByTestId('note-date-event').filter({ hasText: 'Planning with Jamie' }).press('Enter')

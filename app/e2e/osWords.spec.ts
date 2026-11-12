@@ -9,9 +9,9 @@ const launch = (env: Record<string, string> = {}) =>
   electron.launch({ args: [main], env: { ...process.env, YOGURT_FAKE: '1', YOGURT_USER_DATA: mkdtempSync(join(tmpdir(), 'yogurt-e2e-')), ...env } })
 
 const WORDS = {
-  win32: { theme: 'Match Windows', login: 'Open Yogurt when Windows starts', tray: 'Show Yogurt in the notification area' },
-  linux: { theme: 'Match my system', login: 'Open Yogurt when you log in', tray: 'Show Yogurt in the tray' },
-  darwin: { theme: 'Match my Mac', login: 'Open Yogurt when your Mac starts', tray: 'Show Yogurt in the menu bar' },
+  win32: { theme: 'Match Windows', login: 'Open Lynote NoteTaker when Windows starts', tray: 'Show Lynote NoteTaker in the notification area' },
+  linux: { theme: 'Match my system', login: 'Open Lynote NoteTaker when you log in', tray: 'Show Lynote NoteTaker in the tray' },
+  darwin: { theme: 'Match my Mac', login: 'Open Lynote NoteTaker when your Mac starts', tray: 'Show Lynote NoteTaker in the menu bar' },
 }
 
 for (const platform of ['win32', 'linux', 'darwin'] as const) {

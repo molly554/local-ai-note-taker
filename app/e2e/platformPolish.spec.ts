@@ -38,12 +38,12 @@ for (const platform of ['win32', 'linux']) {
     } finally { await app.close() }
   })
 
-  test(`@everywhere on ${platform}: the tray menu opens Yogurt, records and quits, with Ctrl for Settings, and pauses no music`, async () => {
+  test(`@everywhere on ${platform}: the tray menu opens Lynote NoteTaker, records and quits, with Ctrl for Settings, and pauses no music`, async () => {
     const app = await launch({ YOGURT_FAKE_PLATFORM: platform })
     try {
       const page = await app.firstWindow()
       await expect(page.getByTestId('home')).toBeVisible({ timeout: 15_000 })
-      expect(await fake(app, 'tray')).toEqual(expect.arrayContaining(['Start recording', 'Open Yogurt', 'Settings…', 'Quit Yogurt']))
+      expect(await fake(app, 'tray')).toEqual(expect.arrayContaining(['Start recording', 'Open Lynote NoteTaker', 'Settings…', 'Quit Lynote NoteTaker']))
       expect(await fake(app, 'trayAccelerators')).toEqual({ 'Settings…': 'Ctrl+,' })
       await fake(app, 'trayClick', 'new')
       await expect.poll(() => fake(app, 'tray')).toContain('Finish recording')

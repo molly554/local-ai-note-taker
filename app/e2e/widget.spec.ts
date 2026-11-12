@@ -240,9 +240,9 @@ test('hints retain both unavailable recording inputs', async () => {
     const before = (await snap(app)).bounds!
     await fake(app, 'warn', 'no-system-audio')
     const preview = await windowOf(app, '#widget')
-    await expect(preview.getByTestId('widget-note')).toHaveText("Yogurt can't hear the call audio. Allow it in System Settings.")
+    await expect(preview.getByTestId('widget-note')).toHaveText("Lynote NoteTaker can't hear the call audio. Allow it in System Settings.")
     await fake(app, 'warn', 'no-mic')
-    await expect(preview.getByTestId('widget-note')).toContainText("Yogurt can't hear your microphone or the call.")
+    await expect(preview.getByTestId('widget-note')).toContainText("Lynote NoteTaker can't hear your microphone or the call.")
     // Warnings expand the recorder without changing its saved pill bounds.
     expect((await snap(app)).bounds).toEqual(before)
     await w.mouse.move(0, 0)
@@ -253,7 +253,7 @@ test('hints retain both unavailable recording inputs', async () => {
     await expect(preview.getByTestId('widget')).toHaveCount(0)
     expect((await snap(app)).visible).toBe(false)
     expect((await snap(app)).bounds).toEqual(before)
-    await expect(page.getByTestId('rec-hint')).toContainText("Yogurt can't hear your microphone or the call.")
+    await expect(page.getByTestId('rec-hint')).toContainText("Lynote NoteTaker can't hear your microphone or the call.")
   } finally { await app.close() }
 })
 

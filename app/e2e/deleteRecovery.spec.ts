@@ -29,7 +29,7 @@ test('delete distinguishes a recording from removal failure and keeps the note a
       await page.getByTestId('delete-yes').click()
       await expect(page.getByTestId('delete-confirm')).toContainText(result === 'recording'
         ? 'Stop the recording first, then try again.'
-        : "Yogurt couldn't finish deleting this note. Try again.")
+        : "Lynote NoteTaker couldn't finish deleting this note. Try again.")
       if (result !== 'recording') await expect(page.getByTestId('delete-confirm')).not.toContainText('Stop the recording')
       await expect(page.getByTestId('trash-row')).toHaveCount(1)
       await expect(page.getByTestId('delete-yes')).toBeEnabled()

@@ -15,8 +15,8 @@ async function launch(env: Record<string, string>) {
 const fake = <T>(app: ElectronApplication, fn: string, arg?: unknown): Promise<T> =>
   app.evaluate((_e, [fn, arg]) => (globalThis as unknown as Record<string, Record<string, (a?: unknown) => unknown>>).__fake__[fn as string](arg), [fn, arg] as const) as Promise<T>
 
-test('every meeting goes to one file and into a fresh Yogurt, with notes, transcript, audio and search; twice adds nothing', async () => {
-  const file = join(mkdtempSync(join(tmpdir(), 'yogurt-backup-')), 'Yogurt backup.zip')
+test('every meeting goes to one file and into a fresh Lynote NoteTaker, with notes, transcript, audio and search; twice adds nothing', async () => {
+  const file = join(mkdtempSync(join(tmpdir(), 'yogurt-backup-')), 'Lynote NoteTaker backup.zip')
   const a = await launch({ YOGURT_BACKUP_PATH: file })
   let id: string
   try {
@@ -67,8 +67,8 @@ test('every meeting goes to one file and into a fresh Yogurt, with notes, transc
 })
 
 // the zip itself differs by computer (ditto on a Mac, JavaScript elsewhere): the round trip must hold on each
-test('@everywhere a backup restores into a fresh Yogurt on this computer, recordings too', async () => {
-  const file = join(mkdtempSync(join(tmpdir(), 'yogurt backup ü-')), 'Yogurt backup.zip')
+test('@everywhere a backup restores into a fresh Lynote NoteTaker on this computer, recordings too', async () => {
+  const file = join(mkdtempSync(join(tmpdir(), 'yogurt backup ü-')), 'Lynote NoteTaker backup.zip')
   const a = await launch({ YOGURT_BACKUP_PATH: file })
   let id: string
   try {

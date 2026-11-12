@@ -64,7 +64,7 @@ test('a bottom event opens above its row, tracks scrolling, flips without chatte
       expect(hover.titleGap).toBe('12px')
       expect(hover.cursor).toBe('pointer')
       expect(hover.transition).toBe('0s')
-      await expect(trigger).toHaveCSS('color', colorScheme === 'light' ? 'rgb(41, 41, 44)' : 'rgb(231, 230, 235)')
+      await expect(trigger).toHaveCSS('color', colorScheme === 'light' ? 'rgb(28, 31, 35)' : 'rgb(231, 230, 235)')
       expect(hover.background).not.toBe('rgba(0, 0, 0, 0)')
       // The time and divider hit area opens the same card as the title.
       await row.click({ position: { x: 20, y: 8 } })

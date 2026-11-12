@@ -49,7 +49,7 @@ test('calendar disclosure summarizes the enabled selection and stays useful when
       for (const status of ['denied', 'error', 'granted']) {
         await app.evaluate(({ ipcMain }, status) => { ipcMain.removeHandler('calendar:list'); ipcMain.handle('calendar:list', () => ({ status, calendars: [] })) }, status)
         await page.evaluate(() => window.dispatchEvent(new Event('focus')))
-        await expect(summary).toHaveText(status === 'denied' ? 'Allow calendar access to choose your calendars.' : status === 'error' ? "Yogurt couldn't read your calendars." : 'No calendars found on this Mac.')
+        await expect(summary).toHaveText(status === 'denied' ? 'Allow calendar access to choose your calendars.' : status === 'error' ? "Lynote NoteTaker couldn't read your calendars." : 'No calendars found on this Mac.')
       }
     }
   } finally { await app.close() }

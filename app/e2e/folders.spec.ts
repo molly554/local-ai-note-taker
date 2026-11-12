@@ -253,7 +253,7 @@ test('deleting a folder asks first and keeps its meetings; deleting a meeting ta
 })
 
 test('a backup carries folders and which meetings are in them', async () => {
-  const file = join(mkdtempSync(join(tmpdir(), 'yogurt-backup-')), 'Yogurt backup.zip')
+  const file = join(mkdtempSync(join(tmpdir(), 'yogurt-backup-')), 'Lynote NoteTaker backup.zip')
   const a = await launch({ YOGURT_BACKUP_PATH: file })
   try {
     await withMeetings(a.app, a.page)

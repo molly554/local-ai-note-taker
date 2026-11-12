@@ -118,7 +118,7 @@ test('asking about a finished meeting streams the answer in, word by word, and i
     await expect(page.getByTestId('chat-stop')).toBeVisible()
     await expect(page.getByTestId('chat-stop')).toHaveAccessibleName('Stop')
     // a quiet grey stop with an ink square, so typing ahead never looks ready to send
-    await expect(page.getByTestId('chat-stop')).toHaveCSS('color', 'rgb(41, 41, 44)')
+    await expect(page.getByTestId('chat-stop')).toHaveCSS('color', 'rgb(28, 31, 35)')
     await expect(page.getByTestId('chat-answer').locator('.fw').first()).toBeVisible()
     await expect(turn).toHaveAttribute('data-status', 'done', { timeout: 15_000 })
     const answer = page.getByTestId('chat-answer')

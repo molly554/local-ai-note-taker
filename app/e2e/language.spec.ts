@@ -37,7 +37,7 @@ test('picking a language in Settings changes everything at once, menus too, and 
   try {
     await page.getByTestId('settings-open').click()
     await expect(page.getByTestId('settings-heading')).toHaveText('Settings')
-    expect(await tray(app)).toContain('Open Yogurt')
+    expect(await tray(app)).toContain('Open Lynote NoteTaker')
     expect(await menuBar(app)).toContain('Edit')
 
     const picker = page.getByTestId('settings-app-language')
@@ -46,7 +46,7 @@ test('picking a language in Settings changes everything at once, menus too, and 
     await expect(page.getByTestId('settings-heading')).toHaveText('Einstellungen')
     await expect(page.locator('html')).toHaveAttribute('lang', 'de')
     await expect(page.getByRole('navigation', { name: 'Arbeitsbereich' })).toBeVisible()
-    await expect.poll(() => tray(app)).toContain('Yogurt öffnen')
+    await expect.poll(() => tray(app)).toContain('Lynote NoteTaker öffnen')
     await expect.poll(() => menuBar(app)).toContain('Bearbeiten')
 
     // Arabic reads right to left: the sidebar moves to the right, text starts on the right
@@ -69,6 +69,6 @@ test('picking a language in Settings changes everything at once, menus too, and 
     await page.getByTestId('settings-app-language').selectOption('')
     await expect(page.getByTestId('settings-heading')).toHaveText('Settings')
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
-    await expect.poll(() => tray(app)).toContain('Open Yogurt')
+    await expect.poll(() => tray(app)).toContain('Open Lynote NoteTaker')
   } finally { await app.close() }
 })

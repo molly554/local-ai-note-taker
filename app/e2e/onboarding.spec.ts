@@ -52,12 +52,12 @@ test('first run records as soon as speech and speakers are in; notes say they ar
     await expect.poll(async () => (await page.evaluate((id) => window.yogurt.transcript.get(id), id)).length, { timeout: 30_000 }).toBeGreaterThanOrEqual(2)
     await page.getByTestId('note-stop').click()
     await page.getByRole('tab', { name: 'Summary', exact: true }).click()
-    await expect(page.getByTestId('note-enhanced-model-download')).toContainText('Yogurt is still downloading its AI model.')
+    await expect(page.getByTestId('note-enhanced-model-download')).toContainText('Lynote NoteTaker is still downloading its AI model.')
     // a question waits too, and says why (never as if notes were being written)
     await page.getByTestId('chat-open').click()
     await page.getByTestId('chat-input').fill('What was decided?')
     await page.getByTestId('chat-input').press('Enter')
-    await expect(page.getByTestId('chat-turn').last()).toContainText("Waiting for Yogurt's AI to finish downloading")
+    await expect(page.getByTestId('chat-turn').last()).toContainText("Waiting for Lynote NoteTaker's AI to finish downloading")
     await expect(page.getByTestId('chat-turn').last()).not.toContainText('Generating notes')
     // the notes model lands: the notes are written without anyone asking, and the question is answered
     await expect(page.getByTestId('note-enhanced')).toHaveAttribute('data-status', 'done', { timeout: 60_000 })
@@ -75,13 +75,13 @@ const settingsOf = (dir: string) => JSON.parse(readFileSync(join(dir, 'settings.
 const firstRun = { YOGURT_FAKE_PERMISSIONS: 'unknown', YOGURT_FAKE_CALENDAR: 'notDetermined' }
 const focus = (page: Page) => page.evaluate(() => window.dispatchEvent(new Event('focus')))
 
-test('a slow start shows the launch screen until Yogurt is ready, then goes', async () => {
+test('a slow start shows the launch screen until Lynote NoteTaker is ready, then goes', async () => {
   const userData = mkdtempSync(join(tmpdir(), 'yogurt-e2e-'))
   const app = await launchWith(userData, { YOGURT_FAKE_BOOT_MS: '2000' })
   try {
     const page = await app.firstWindow()
     await expect(page.getByTestId('boot-screen')).toBeVisible()
-    await expect(page.getByTestId('boot-screen')).toHaveAttribute('aria-label', 'Yogurt')
+    await expect(page.getByTestId('boot-screen')).toHaveAttribute('aria-label', 'Lynote NoteTaker')
     await expect(page.getByTestId('home')).toBeVisible({ timeout: 15_000 })
     await expect(page.getByTestId('boot-screen')).toHaveCount(0)
   } finally { await app.close() }
@@ -97,7 +97,7 @@ test('a quick start goes straight to home, with the launch screen gone', async (
   } finally { await app.close() }
 })
 
-test('the welcome says what Yogurt is on one screen, and Get started goes on to the permissions', async () => {
+test('the welcome says what Lynote NoteTaker is on one screen, and Get started goes on to the permissions', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-e2e-'))
   const app = await launchWith(dir, firstRun)
   try {
@@ -166,7 +166,7 @@ test('every permission step leads with what it gives, Allow asks the Mac, and Ac
     await expect(page.getByTestId('record-art')).toContainText('Everyone else')
     for (const screen of ['record', 'calendar', 'notifications']) {
       await expect(step).toHaveAttribute('data-step', screen)
-      await expect(page.getByTestId('step-title')).not.toHaveText(/^Can Yogurt/)
+      await expect(page.getByTestId('step-title')).not.toHaveText(/^Can Lynote NoteTaker/)
       await expect(page.getByTestId('step-later')).toHaveText('Not now')
       await expect(page.getByTestId('step-allow')).toHaveText('Allow')
       await page.getByTestId('step-allow').click()
@@ -182,8 +182,8 @@ test('every permission step leads with what it gives, Allow asks the Mac, and Ac
     // only System Settings turns it on: the pane opens, with where to click
     await expect(page.getByTestId('settings-guide')).toBeVisible()
     await expect(page.getByTestId('settings-window-art')).toContainText('Accessibility')
-    await expect(page.getByTestId('step-title')).toHaveText('Turn on Yogurt in System Settings')
-    await expect(page.getByTestId('step-reason')).toHaveText('In Accessibility, find Yogurt and turn it on.')
+    await expect(page.getByTestId('step-title')).toHaveText('Turn on Lynote NoteTaker in System Settings')
+    await expect(page.getByTestId('step-reason')).toHaveText('In Accessibility, find Lynote NoteTaker and turn it on.')
     expect((await fake(app, 'main') as { systemSettings: string[] }).systemSettings).toEqual([expect.stringContaining('Privacy_Accessibility')])
     // turned on there: noticed without a click (the poll), and Continue goes on
     await fake(app, 'permission', ['accessibility', 'granted'])
@@ -199,7 +199,7 @@ test('every permission step leads with what it gives, Allow asks the Mac, and Ac
   } finally { await app.close() }
 })
 
-test('turned off before: the step says so, opens System Settings with the guide, notices it on return, and can reopen Yogurt', async () => {
+test('turned off before: the step says so, opens System Settings with the guide, notices it on return, and can reopen Lynote NoteTaker', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-e2e-'))
   const app = await launchWith(dir, { YOGURT_FAKE_PERMISSIONS: 'denied', YOGURT_FAKE_CALENDAR: 'granted' })
   try {
@@ -211,7 +211,7 @@ test('turned off before: the step says so, opens System Settings with the guide,
     await expect(page.getByTestId('step-access-status')).toContainText('only System Settings can turn it on')
     await page.getByTestId('step-allow').click()
     await expect(page.getByTestId('settings-guide')).toBeVisible()
-    await expect(page.getByTestId('step-reason')).toHaveText('In Microphone, find Yogurt and turn it on.')
+    await expect(page.getByTestId('step-reason')).toHaveText('In Microphone, find Lynote NoteTaker and turn it on.')
     await expect(page.getByTestId('settings-window-art')).toContainText('Microphone')
     expect((await fake(app, 'main') as { systemSettings: string[] }).systemSettings).toEqual([expect.stringContaining('Privacy_Microphone')])
     await page.getByText('Still not working?', { exact: true }).click()
@@ -226,7 +226,7 @@ test('turned off before: the step says so, opens System Settings with the guide,
     await expect(page.getByTestId('step-allow')).toHaveText('Open System Settings')
     // the call audio pane, and its own list
     await page.getByTestId('step-allow').click()
-    await expect(page.getByTestId('step-reason')).toContainText('under System Audio Recording Only, turn on Yogurt.')
+    await expect(page.getByTestId('step-reason')).toContainText('under System Audio Recording Only, turn on Lynote NoteTaker.')
     await page.getByTestId('step-later').click()
     await expect(page.getByTestId('onboarding-step')).toHaveAttribute('data-step', 'notifications')
   } finally { await app.close() }
@@ -326,7 +326,7 @@ test('starting a recording without the mic says so under the note, with a button
     await page.getByTestId('new-note').or(page.getByTestId('past-empty').getByRole('button')).first().click()
     const hint = page.getByTestId('rec-hint')
     await expect(hint).toHaveAttribute('data-code', 'no-mic')
-    await expect(hint).toContainText("Yogurt can't hear your mic.")
+    await expect(hint).toContainText("Lynote NoteTaker can't hear your mic.")
     // call audio was never asked: asked as the recording started (the fake Mac says yes), so no message for it
     await expect.poll(async () => (await fake(app, 'permissions') as Record<string, string>).systemAudio).toBe('granted')
     await hint.getByTestId('rec-hint-fix').click()

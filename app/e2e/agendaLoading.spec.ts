@@ -140,7 +140,7 @@ test('the compact calendar keeps its original type and geometry with a bright to
     for (const colorScheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme, reducedMotion: 'reduce' })
       const today = week.locator('[aria-current=date]')
-      await expect(today.locator('b')).toHaveCSS('background-color', 'rgb(111, 0, 255)')
+      await expect(today.locator('b')).toHaveCSS('background-color', 'rgb(134, 94, 255)')
       await expect(today.locator('b')).toHaveCSS('color', 'rgb(255, 255, 255)')
       await expect(today.locator('b')).toHaveCSS('font-size', '11px')
       await expect(today.locator('b')).toHaveCSS('width', '26px')
@@ -155,10 +155,10 @@ test('the compact calendar keeps its original type and geometry with a bright to
       await page.keyboard.press('Space')
       await expect(other).toHaveAttribute('aria-pressed', 'true')
       await expect(today).toHaveAttribute('aria-pressed', 'false')
-      await expect(today.locator('b')).toHaveCSS('background-color', 'rgb(111, 0, 255)')
+      await expect(today.locator('b')).toHaveCSS('background-color', 'rgb(134, 94, 255)')
       await today.hover()
-      await expect(today.locator('b')).toHaveCSS('background-color', 'rgb(111, 0, 255)')
-      await expect(other.locator('b')).toHaveCSS('background-color', colorScheme === 'light' ? 'rgb(241, 230, 255)' : 'rgb(44, 22, 74)')
+      await expect(today.locator('b')).toHaveCSS('background-color', 'rgb(134, 94, 255)')
+      await expect(other.locator('b')).toHaveCSS('background-color', colorScheme === 'light' ? 'rgb(240, 235, 255)' : 'rgb(44, 22, 74)')
       await expect(other).toHaveCSS('outline-style', 'solid')
       await expect(other).toHaveCSS('outline-width', '2px')
       // Logical order and hit targets stay within the compact calendar in either direction.

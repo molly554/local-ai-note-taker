@@ -80,7 +80,7 @@ test('delete is centered over the whole workspace, traps focus safely and restor
     await page.keyboard.press('Escape')
     await page.mouse.click(10, 100)
     await expect(modal).toBeVisible()
-    await expect(modal).toContainText("Yogurt couldn't finish deleting this note. Try again.")
+    await expect(modal).toContainText("Lynote NoteTaker couldn't finish deleting this note. Try again.")
     await expect(yes).toBeEnabled()
     await cancel.click()
     await expect(opener).toBeFocused()

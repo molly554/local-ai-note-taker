@@ -14,6 +14,7 @@ node bench/real-meetings/tokens.mjs               # section 1
 node bench/real-meetings/notes.mjs --models       # section 2, about 6 minutes
 node bench/real-meetings/overlong.mjs             # section 3: a real model on the processor, very slow
 pnpm --dir app exec vitest run --config ../bench/real-meetings/vitest.config.mjs     # section 4
+node bench/real-meetings/chart.mjs                # the chart in the repository's README, drawn from results-notes-models.json
 ```
 
 ## The meetings

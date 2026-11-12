@@ -63,7 +63,7 @@ test('first reads have skeletons; a loaded transcript stays mounted across tabs'
   } finally { await app.close() }
 })
 
-test('toast yields to Ask Yogurt and returns without replacing its Undo action', async ({}, testInfo) => {
+test('toast yields to Ask Lynote NoteTaker and returns without replacing its Undo action', async ({}, testInfo) => {
   const { app, page } = await launch()
   try {
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => !w.isDestroyed())!.setSize(1280, 900))
