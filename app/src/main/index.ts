@@ -121,6 +121,9 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1100, height: 760, minWidth: 720, minHeight: 520,
     title: PRODUCT,
+    // run from source (pnpm dev, the demo command) the program is Electron's own, with Electron's icon in the taskbar:
+    // the window carries the app's. An installed copy has it in its program file; a Mac's Dock gets it below
+    ...(!app.isPackaged && process.platform !== 'darwin' ? { icon: join(__dirname, '../../build/icon.png') } : {}),
     ...windowChrome(process.platform, nativeTheme.shouldUseDarkColors),
     show: false,
     // hidden pages would otherwise pause timers and animations
