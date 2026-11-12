@@ -34,42 +34,13 @@
 
 Lynote NoteTaker records your microphone and the sound of the call, writes the transcript with whisper.cpp, and writes a Summary with a model running on your computer through llama.cpp. You can ask questions about your meetings, search them, back them up, and let an AI app read them over MCP.
 
-Four things it takes care over:
+Five things it takes care over:
 
 - **Long meetings in Chinese.** Every part sent to the notes model is sized with the model's own tokenizer, so nothing is cut off without a word, even on a computer short of memory: 0 of 455 test meetings go over.
 - **The language of the meeting.** You pick: English, 中文, 日本語, 한국어, Español, Français, Deutsch, Português, Русский or Multi-language. It starts as your computer's language.
 - **The language of the notes.** The meeting's, or one you set.
 - **A computer too slow for a notes model.** Optional Cloud AI: a service you choose writes the notes. Off by default.
-
-## The measurements
-
-The first of these is a claim, so it was measured: 455 public meeting transcripts were put through the notes pipeline as it was before these changes and as it is now, with the app's own tokenizers counting what each prompt really costs.
-
-<p align="center">
-  <img src="docs/assets/overflow-8192.svg" width="860" alt="At a context of 8,192 tokens, before the changes a prompt that does not fit was sent for 13, 8, 3 and 2 of 20 AISHELL-4 meetings and 11, 30, 119 and 112 of 239 VCSum meetings, depending on how the meeting was heard. Now: 0 in every row.">
-</p>
-
-- **Chinese is about 0.6 tokens a character.** The size of a text used to be guessed at a third of a token a character, which takes a Chinese meeting for a little over half its real size (52% to 59%).
-- **It only shows when memory is short.** At the 32,768 tokens the app asks for, every prompt fits either way. At the 8,192 it takes when memory is short, the guess went over in up to 13 of 20 and 119 of 239 Mandarin meetings (Gemma 4 E4B's tokenizer; Qwen3's counts are a little higher). English: 0 of 196 either way.
-- **Nothing reports it.** A real model in the app's own engine (Qwen3 1.7B) was given a prompt of 12,934 tokens in a context of 8,192. The engine read 4,846 of them, raised no error, and the answer did not do what the end of the prompt asked.
-
-The same measurements changed the work twice. The first fix guessed too high and used 536 parts where 348 would do, each one more call to the model; it now counts with the tokenizer and uses 348. And an index for faster Chinese search was built, measured and dropped: on 200,000 generated lines the existing search took at most 66 ms, and the index made common words slower.
-
-Commands, tables and what the measurements do not show: [bench/real-meetings](bench/real-meetings/README.md) and [bench/cjk-search](bench/cjk-search/README.md).
-
-## Languages and Cloud AI
-
-The language people speak and the language the notes are written in are two settings. The app itself comes in English and 31 other languages.
-
-<p align="center">
-  <img src="docs/assets/settings-language.png" width="700" alt="Settings: app language, spoken language and notes language">
-</p>
-
-Cloud AI is off until you turn it on. It works with any service that speaks the OpenAI chat format, and the key is encrypted by your system's own key storage.
-
-<p align="center">
-  <img src="docs/assets/settings-cloud.png" width="700" alt="Settings: Cloud AI, off, with what it sends written under the switch">
-</p>
+- **Different meetings, different notes.** Templates for a team meeting, a one-on-one, a customer call and an interview; next steps at the top if you want them there; one line of your own instructions. Any Summary can be written again with another template.
 
 ## How it works
 
@@ -86,6 +57,113 @@ flowchart TD
   parts -.-> cloud[A service you choose<br>only while Cloud AI is on]
   cloud -.-> out
 ```
+
+| Stage | What runs | Where |
+| --- | --- | --- |
+| Recording | A small native recorder for the microphone and the call's sound, two tracks | Your computer |
+| Speech to text | whisper.cpp, with voice detection, in the language you picked | Your computer |
+| Storage | SQLite with full-text search; recordings as files beside it | Your computer |
+| Notes | A Gemma, Qwen or gpt-oss model through llama.cpp, the best one your computer can run | Your computer, or the service you chose while Cloud AI is on |
+| Questions | The same model, over one meeting or across all of them, naming the meetings it drew on | Same as notes |
+| Other apps | A read-only MCP helper, off until you turn it on | Your computer |
+
+### How a long meeting is read
+
+A notes model reads a fixed number of tokens at a time: its context. The app asks for 32,768 and takes as little as 8,192 when memory is short. A meeting that does not fit is read in parts, each part is summarised, and the notes are written from the summaries.
+
+```mermaid
+flowchart TD
+  t[Transcript, one line a turn] --> c{{Counted by the tokenizer: does it fit,<br>with room for the notes?}}
+  c -- yes --> whole[One prompt: the whole meeting]
+  c -- no --> cut[Cut into parts between turns]
+  cut --> long{{Is one turn longer than a part?}}
+  long -- yes --> inside[Cut it between sentences, then words.<br>Each piece gets its share of the turn's real size]
+  long -- no --> check
+  inside --> check{{Every part counted again: do they all fit?}}
+  check -- no: less room, cut again --> cut
+  check -- yes --> sum[Each part summarised]
+  sum --> merged[One prompt: the summaries, in order]
+  whole --> notes[The notes model writes the Summary]
+  merged --> notes
+```
+
+Three things make it hold:
+
+1. **Count, never guess.** Every line is counted by the tokenizer of the model that is loaded. A guess from the number of characters is right for English and half the real size for Chinese (the first chart below).
+2. **A long turn is cut where it can be.** A room on one microphone is one speaker talking for an hour. It is cut between sentences, and a sentence with no punctuation between words. Sentences counted one at a time do not add up to their turn (a tokenizer reads a space at the end of a text differently from one in the middle), so each piece gets its share of the turn's real size.
+3. **Every part is counted once more before it is sent.** If one is too big, all are cut again with less room. A prompt that is too big is not an error to the engine: it reads the start and drops the rest, instructions included (the third table below).
+
+## The measurements
+
+455 public meeting transcripts were put through the notes pipeline as it was before these changes and as it is now, with the app's own tokenizers counting what each prompt really costs. The scripts and every result file are in [bench/](bench/real-meetings/README.md).
+
+**1. What a character costs.** The size of a text used to be guessed at a third of a token a character.
+
+<p align="center">
+  <img src="docs/assets/tokens-per-character.svg" width="860" alt="Tokens a character: Mandarin 0.68 and 0.64 on AISHELL-4, 0.61 and 0.58 on VCSum; English 0.25 and 0.24 on QMSum; against a guess of one third.">
+</p>
+
+| Meetings | Tokenizer | Tokens a character | The old guess, as a share of the real size |
+| --- | --- | --- | --- |
+| Mandarin, AISHELL-4 | Gemma 4 E4B | 0.678 | 52% |
+| | Qwen3 1.7B | 0.640 | 55% |
+| Mandarin, VCSum | Gemma 4 E4B | 0.607 | 56% |
+| | Qwen3 1.7B | 0.576 | 59% |
+| English, QMSum | Gemma 4 E4B | 0.247 | 137% |
+| | Qwen3 1.7B | 0.245 | 139% |
+
+**2. Meetings sent to the model too big to read.** Only when memory is short: at the 32,768 tokens the app asks for, every prompt fits either way.
+
+<p align="center">
+  <img src="docs/assets/overflow-8192.svg" width="860" alt="At a context of 8,192 tokens, before the changes a prompt that does not fit was sent for 13, 8, 3 and 2 of 20 AISHELL-4 meetings and 11, 30, 119 and 112 of 239 VCSum meetings, depending on how the meeting was heard. Now: 0 in every row.">
+</p>
+
+Across all 44 combinations of meetings, how they were heard, tokenizer and context, the pipeline now sends no prompt that does not fit, and loses no words.
+
+**3. What a prompt that is too big does.** A real model in the app's own engine (Qwen3 1.7B, context 8,192) was given a transcript with three passwords in it, near the start, the middle and the end, and asked at the end to list them.
+
+| Prompt | Its tokens | Read by the engine | Passwords listed | Error raised |
+| --- | --- | --- | --- | --- |
+| Fits | 4,486 | 4,494 | 3 of 3 | none |
+| Does not fit | 12,934 | 4,846 (37%) | 0 of 3 | none |
+
+The second answer was a summary of a meeting, not a list of passwords: the question at the end never reached the model.
+
+**4. Parts used.** Each part is one more call to the model, so fewer is faster. Meetings on one microphone, context 8,192, Gemma 4 E4B's tokenizer:
+
+| Meetings | Before | Now | Fewest that can hold them |
+| --- | --- | --- | --- |
+| Mandarin, VCSum (239) | 301, with 119 meetings too big | 348 | 348 |
+| English, QMSum (196) | 396 | 280 | 279 |
+
+The first fix guessed a Chinese character at one token and used 536 parts for the Mandarin meetings. Measuring it is what led to counting.
+
+**5. Search in Chinese.** 15 ordinary words were looked up in 259 Mandarin meetings (93,638 lines) through the app's own search: each showed every meeting it should, in 4 to 260 ms. An index to make it faster was built, measured and dropped: [it made common words slower](bench/cjk-search/README.md).
+
+### What is tested
+
+| | How much | When |
+| --- | --- | --- |
+| Unit tests | over 1,600 | every push, on Windows, Linux and macOS |
+| End-to-end tests, the app driven in demo mode | 28 on Windows and Linux, all 340 on macOS | every push |
+| Native helpers | built and run on each system | when they change |
+| The measurements above | 455 meetings, 44 combinations | by hand; results kept in `bench/` |
+
+## Languages, Cloud AI and templates
+
+The language people speak and the language the notes are written in are two settings. The app itself comes in English and 31 other languages.
+
+<p align="center">
+  <img src="docs/assets/settings-language.png" width="700" alt="Settings: app language, spoken language and notes language">
+</p>
+
+Cloud AI is off until you turn it on. It works with any service that speaks the OpenAI chat format, and the key is encrypted by your system's own key storage.
+
+<p align="center">
+  <img src="docs/assets/settings-cloud.png" width="700" alt="Settings: Cloud AI, off, with what it sends written under the switch">
+</p>
+
+A template adds a few lines to what the notes model is asked, for what that kind of meeting needs: who is blocked in a team meeting, what the customer objected to in a call, what the candidate answered in an interview and no verdict on them. What the model may use stays the same: only what was said, or what you typed.
 
 ## What leaves your computer
 
@@ -115,20 +193,6 @@ cd local-ai-note-taker
 pnpm install --frozen-lockfile
 pnpm -C app demo
 ```
-
-## Where it stands
-
-Checked so far: the unit tests, the end-to-end tests that run on Windows (the app in demo mode), and the measurements above.
-
-Not checked yet:
-
-- **A real meeting on an installed copy.** The work so far is in the notes pipeline, the settings and the look; recording and transcribing from an installer have not been tried.
-- **The Linux build by hand.** It is built and tested by the workflows in this repository only.
-- **Cloud AI against a real service.** Its tests talk to a stand-in on the same computer.
-- **The new texts in 31 languages.** The sentences for the language and Cloud AI settings were translated by a model and have not been read by native speakers.
-- **Whether the notes are good.** The measurements count what reaches the model, not what it writes.
-
-On the computer this was made on (a 2015 four-core desktop with no usable graphics card), the smallest notes model wrote about 0.3 tokens a second. That is why Cloud AI exists.
 
 <details>
 <summary>Licence and credits</summary>
