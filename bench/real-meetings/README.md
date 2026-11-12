@@ -35,9 +35,10 @@ on one microphone**, where everything is "You" and the whole meeting is one turn
 ## 1. How many tokens is Chinese?
 
 The notes code guesses the size of any text the tokenizer has not counted. Upstream guesses a third of a token a
-character. This fork guesses one token for a Chinese, Japanese or Korean letter and a third of a token for any other
-character. `tokens.mjs` counts every line of every meeting with two of the app's tokenizers: Gemma 4 E4B (the starter
-notes model) and Qwen3 1.7B (the smallest one).
+character. This fork's guess is one token for a Chinese, Japanese or Korean letter and a third of a token for any other
+character, and it is now a last resort: what decides a part's size is counted (section 2). `tokens.mjs` counts every
+line of every meeting with two of the app's tokenizers: Gemma 4 E4B (the starter notes model) and Qwen3 1.7B (the
+smallest one).
 
 | tokenizer | meetings | tokens a character | upstream's guess / real | fork's guess / real |
 |---|---|---|---|---|
@@ -66,28 +67,42 @@ takes as little as 8,192 when memory is short.
 | AISHELL-4 (20) | call, names shown | 13 (1.57) | 13 (1.57) | 0 |
 | | call, no names | 8 (1.25) | 11 (1.30) | 0 |
 | | one microphone | 3 (1.18) | 8 (1.25) | 0 |
+| | one microphone, no punctuation* | 2 (1.10) | 9 (1.29) | 0 |
 | VCSum (239) | call, names shown | 11 (1.84) | 15 (1.86) | 0 |
 | | call, no names | 30 (1.84) | 31 (1.86) | 0 |
 | | one microphone | 119 (1.83) | 125 (1.86) | 0 |
+| | one microphone, no punctuation* | 112 (3.33) | 133 (3.54) | 0 |
 | QMSum (196) | all three | 0 | 0 | 0 |
+
+\* Not something the corpora contain: their own text with every punctuation mark replaced by a space, as speech to
+text may leave Chinese.
 
 **Context 32,768.** No prompt fails to fit, in either build, and the two builds do the same thing: every Mandarin
 meeting is read whole. The difference between the builds exists only below the context the app asks for.
 
-Across all 36 combinations the fork sent no prompt that does not fit and lost no words. Full figures:
+Across all 44 combinations the fork sent no prompt that does not fit and lost no words. Full figures:
 [`results-notes-models.json`](results-notes-models.json).
 
 ### What the real meetings showed
 
-- **The cause is the length guess, not unpunctuated speech.** The guess is used in two places: to decide whether what
-  is left of a meeting fits in one part (so a whole Chinese meeting too big for the context is passed on as a single
-  part: most of the AISHELL-4 rows are this), and to size the pieces of a turn that has to be cut (a room on one
-  microphone: half of the VCSum meetings).
-- **The fork's guess is on the high side, and that costs parts.** At 8,192, with Gemma 4's tokenizer, the fewest parts
-  that could hold the VCSum meetings are 348 to 355. The fork used 409 (names shown), 462 (no names) and 536 (one
-  microphone): up to 54% more, each one more call to the model. English has the same slack in both builds on one
-  microphone: 396 parts where 279 could hold it. Counting the cut pieces with the tokenizer instead of guessing would
-  remove it; that is not done.
+- **In these corpora the cause is the length guess, not unpunctuated speech.** The guess is used in two places: to
+  decide whether what is left of a meeting fits in one part (so a whole Chinese meeting too big for the context is
+  passed on as a single part: most of the AISHELL-4 rows are this), and to size the pieces of a turn that has to be
+  cut (a room on one microphone: half of the VCSum meetings). The fork adds up the turns' own counts for the first.
+- **Without punctuation upstream cannot cut a turn at all.** It cuts only between sentences, so a room on one
+  microphone with no sentence marks goes out as one part: up to 3.5 contexts.
+- **A guess on the high side costs parts, so the fork stopped guessing.** Its first fix guessed one token a Chinese
+  letter for the pieces of a cut turn, and these checks showed the price: 536 parts for the VCSum meetings on one
+  microphone where 348 could hold them (Gemma 4, 8,192), each one more call to the model. Now the tokenizer counts
+  the sentences of a turn that has to be cut, and the fork uses 348. English gained the same way, in a place upstream
+  has the slack too: 280 parts on one microphone where upstream uses 396 and 279 could hold it. In calls the fork
+  uses about 14% more than the fewest (404 for 355, 400 for 350): a turn that fits a part is never cut, so parts are
+  not filled to the brim.
+- **Sentences counted one at a time do not add up to their turn.** A tokenizer reads a space or a mark at the end of
+  a text differently from one in the middle: short English sentences came to a third more than their turn, Chinese
+  ones to a little less, and with sizes simply added 4 VCSum meetings went over by up to 3% on Qwen3's tokenizer. So
+  each sentence gets its share of the turn's real size, and every finished piece is counted once more before it is
+  sent; one too big, and all are cut again with less room.
 - **A sentence splitter dropped punctuation.** When a turn is cut between sentences, a mark standing on its own
   ("the ? ? You know") fell between two sentences: upstream drops 158 marks in 41 QMSum meetings (Gemma 4, one
   microphone, 8,192), no words. Fixed in the fork, with a test.
@@ -171,7 +186,8 @@ figures are in [`results-search.json`](results-search.json) and agree with the g
 - **How often the app runs at 8,192.** It depends on the memory of the computer and the model chosen; no figures
   for real users.
 - **How whisper writes Chinese.** These transcripts were written by people or by another speech-to-text service. How
-  much punctuation whisper leaves in Chinese, which is what cutting a long turn depends on, needs audio.
+  much punctuation whisper leaves in Chinese needs audio; the rows without punctuation are made from the corpora's
+  text, not recorded.
 - **Who is "You".** The three ways of hearing a meeting are built from the corpus's speaker labels, not recorded.
 - **Whether the notes are any good**, which 30 meetings a common word should show first, and Japanese or Korean:
   no open meeting corpus was found for either.

@@ -67,7 +67,7 @@ const longestTurn = (m, mode) => Math.max(...builds.fork.transcriptText(segments
 const about = SETS.map(({ set, lang, meetings }) => ({
   set, lang, meetings: meetings.length, lines: meetings.reduce((n, m) => n + m.lines.length, 0),
   medianCharacters: median(meetings.map(characters)), mostCharacters: Math.max(...meetings.map(characters)),
-  longestTurnCharacters: Object.fromEntries(Object.keys(MODES).map((mode) => [mode, { median: median(meetings.map((m) => longestTurn(m, mode))), most: Math.max(...meetings.map((m) => longestTurn(m, mode))) }])),
+  longestTurnCharacters: Object.fromEntries(Object.keys(MODES).filter((m) => !m.endsWith('no punctuation')).map((mode) => [mode, { median: median(meetings.map((m) => longestTurn(m, mode))), most: Math.max(...meetings.map((m) => longestTurn(m, mode))) }])),
 }))
 
 // --models: the tokenizers of two of the app's models in place of the stand-in (fetch.mjs --models first)
@@ -81,7 +81,7 @@ const started = performance.now()
 for (const { set, lang, meetings } of SETS) {
   for (const counter of counters.filter((c) => c.langs.includes(lang))) {
     const count = (s) => counter.count(s)
-    for (const mode of Object.keys(MODES)) for (const contextSize of [32_768, 8192]) for (const [name, build] of Object.entries(builds)) {
+    for (const mode of Object.keys(MODES).filter((m) => lang === 'zh' || !m.endsWith('no punctuation'))) for (const contextSize of [32_768, 8192]) for (const [name, build] of Object.entries(builds)) {
       const row = { set, mode, contextSize, tokenizer: counter.name, build: name, meetings: meetings.length, readWhole: 0, readInParts: 0, parts: 0, fewestPartsThatFit: 0, promptsThatDoNotFit: 0, meetingsWithOne: 0, worstTimesContext: 0, meetingsWithWordsLost: 0, meetingsWithMarksDropped: 0, marksDropped: 0 }
       for (const m of meetings) {
         const r = await one(build, segmentsOf(m, mode), lang, contextSize, count)

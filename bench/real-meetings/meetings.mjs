@@ -36,9 +36,16 @@ export const MODES = {
   'call, names shown': (l, me) => (l.speaker === me ? { track: 'me', speaker: null } : { track: 'them', speaker: l.speaker }),
   'call, no names': (l, me) => ({ track: l.speaker === me ? 'me' : 'them', speaker: null }),
   'one microphone': () => ({ track: 'me', speaker: null }),
+  // Not something these corpora contain: their own text with every punctuation mark taken out (a space in its place),
+  // as speech to text may leave Chinese. For the Mandarin sets only.
+  'one microphone, no punctuation': () => ({ track: 'me', speaker: null }),
 }
+const MARKS = /[，。！？、；：,.!?;:]+/g
 /** the meeting's lines as the Store's segments */
-export const segmentsOf = (m, mode) => m.lines.map((l, i) => ({ id: i, meetingId: m.id, startMs: l.startMs, endMs: l.endMs, text: l.text, ...MODES[mode](l, m.lines[0].speaker) }))
+export const segmentsOf = (m, mode) => m.lines
+  .map((l) => (mode.endsWith('no punctuation') ? { ...l, text: l.text.replace(MARKS, ' ').replace(/\s+/g, ' ').trim() } : l))
+  .filter((l) => l.text)
+  .map((l, i) => ({ id: i, meetingId: m.id, startMs: l.startMs, endMs: l.endMs, text: l.text, ...MODES[mode](l, m.lines[0].speaker) }))
 
 /** AISHELL-4, test set: 20 meetings in Mandarin, written down by people, with who spoke and when */
 export function aishell4() {
