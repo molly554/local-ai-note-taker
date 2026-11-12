@@ -218,6 +218,8 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource }: {
   /** in the Trash: it can be read and restored, not recorded into */
   const trashed = m.trashedAt != null
   const minutes = m.endedAt ? Math.max(1, Math.round((m.durationMs ?? (m.endedAt - m.startedAt)) / 60_000)) : null
+  /** the meeting is over, so there can be notes the model wrote */
+  const written = !recording && m.state !== 'prepared'
   const shown = hasEnhanced ? view : 'mine'
 
   const pick = (v: 'mine' | 'enhanced') => { picked.current = true; setView(v); mineSave.flush(); enhancedSave.flush() }
@@ -436,10 +438,11 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource }: {
                 <Lock size={10} aria-hidden="true" />
                 <span>{saveStatus === 'saving' ? t('Saving…') : osWords({ mac: t('Saved on this Mac'), other: t('Saved on this computer') })}</span>
               </p>
-              <span aria-hidden="true">·</span>
+              {(minutes != null || written) && <span aria-hidden="true">·</span>}
             </>}
-            {minutes != null && <><span data-testid="note-duration">{t('{count} min', { count: minutes })}</span><span aria-hidden="true">·</span></>}
-            {t('Yogurt can make mistakes.')}
+            {minutes != null && <><span data-testid="note-duration">{t('{count} min', { count: minutes })}</span>{written && <span aria-hidden="true">·</span>}</>}
+            {/* only once there can be notes the model wrote: while recording, nothing here is its work yet */}
+            {written && t('Yogurt can make mistakes.')}
             <NotesSetup />
           </div>
           <Ask id={id} recording={recording} anchor={chatAnchor} onSource={onSource} />

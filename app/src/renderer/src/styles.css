@@ -1,15 +1,12 @@
 @import "tailwindcss";
-
-/* Brand type is bundled. Utility text follows macOS for a crisp native rhythm. */
-@font-face {
-  font-family: "Bricolage Grotesque";
-  src: url("./assets/bricolage-grotesque.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
+/* The text faces come with the app, so it reads the same on every computer: Inter, and Noto Sans SC for Chinese
+   (in pieces by range of characters; a window only loads the ones its text needs). */
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/noto-sans-sc";
 
 :root {
+  /* times and counts: a face whose figures all have one width */
+  --font-number: "DIN Alternate", "Bahnschrift", ui-sans-serif, system-ui, sans-serif;
   --bg: #FFFFFF;
   --card: #F6F6F8;
   --ink: #1C1F23;
@@ -130,7 +127,7 @@
 .wordmark-name span { font-weight:500;color:var(--muted); }
 
 @theme inline {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Noto Sans SC Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-brand: var(--font-sans);
   --color-bg: var(--bg);
   --color-card: var(--card);
@@ -194,7 +191,7 @@ html.widget { --pill:#232326;--pill-ink:#F7F7FA;--accent:#B780FF;--pill-accent:v
 .widget-morph[data-open=true] { cursor:grab; }
 .widget-details { position:absolute;left:0;top:0;z-index:2; }
 .widget-details>* { position:absolute;left:0;top:0;margin:0; }
-.widget-time { white-space:nowrap;font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;line-height:15px;opacity:.8; }
+.widget-time { font-family:var(--font-number);white-space:nowrap;font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;line-height:15px;opacity:.8; }
 .widget-preview { position:absolute;left:0;top:52px;display:flex;flex-direction:column;padding:0 4px 12px 12px;color:var(--pill-ink);font-size:14px;line-height:21px;transform-origin:50% 0;cursor:default; }
 /* closed: the transcript stays mounted but unpainted (hidden once the close has played, its live dots paused); the meter repaints only itself */
 .widget-preview[aria-hidden=true] { visibility:hidden;transition:visibility 0s linear 250ms; }
@@ -534,7 +531,7 @@ input::selection, textarea::selection, .note-prose ::selection { background: var
 .note-meta-row { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:16px; }
 .note-header-actions { display:flex;align-items:center;flex-wrap:wrap;gap:12px; }
 .note-recording-status { display:flex;align-items:center;gap:8px;padding-inline:10px;color:var(--muted);white-space:nowrap; }
-.note-elapsed { min-width:36px;margin-inline:4px 8px;font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted);text-align:end; }
+.note-elapsed { font-family:var(--font-number);min-width:36px;margin-inline:4px 8px;font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted);text-align:end; }
 .note-primary-tabs { position:relative;display:flex;gap:24px;margin-top:22px;border-bottom:1px solid var(--line); }
 .note-primary-tabs [role=tab] { display:flex;align-items:center;gap:7px;height:36px;padding-inline:1px;border-bottom:2px solid transparent;color:var(--muted);font-size:13px;font-weight:500; }
 .note-primary-tabs [role=tab][aria-selected=true] { color:var(--ink); }

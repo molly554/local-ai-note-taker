@@ -10,6 +10,7 @@ import { dayLabel, timeOf, useDay } from '../dates'
 import { useLanguage } from '../i18n'
 import { toasts } from '../components/TrashToast'
 import { MeetingRow } from '../components/MeetingRow'
+import { SpokenSelect } from '../components/SpokenSetting'
 import { Agenda } from '../components/Agenda'
 import { MEETING_DRAG } from '../folders'
 import { peopleSummary, useMyName } from '../components/People'
@@ -34,13 +35,19 @@ export function Home({ open, openFolder }: { open: (id: string) => void; openFol
   const calendar = window.yogurt.capabilities.calendar
   return <div data-testid="home" className={calendar ? 'native-home' : 'native-home no-agenda'}>
     <div className="home-toolbar-action no-drag">
-      {!recording && <button data-testid="new-note" onClick={() => start(null)} className="workspace-button primary"><Mic size={14} aria-hidden="true" />{t('Start recording')}</button>}
+      {/* with no meetings yet the one button is in the middle of the page, beside the language it will listen for */}
+      {!recording && past.cards && !noMeetings && <button data-testid="new-note" onClick={() => start(null)} className="workspace-button primary"><Mic size={14} aria-hidden="true" />{t('Start recording')}</button>}
     </div>
     <div className="native-library" ref={past.setRoot}>
       <h1>{t('Your meetings')}</h1>
       <LoadingContent pending={!past.cards} testId="meetings-loading" skeleton={<MeetingListLoading />} className="library-load">{noMeetings ? <section data-testid="past-empty" className="library-empty empty-state"><div className="empty-state-content">
         <div className="empty-tile"><FileText size={28} strokeWidth={1.5} aria-hidden="true" /></div><h2>{t('Your notes will show up here')}</h2>
         <p>{t('Start recording, add a few notes, and Yogurt writes the rest when you stop.')}</p>
+        {/* the first step, where the eye already is: the language to listen for, which decides whether the words come out right, and the button */}
+        {!recording && <div data-testid="empty-guide" className="empty-guide no-drag">
+          <label htmlFor="home-spoken" className="empty-guide-language"><span>{t('Spoken language')}</span><SpokenSelect id="home-spoken" testId="home-spoken" /></label>
+          <button data-testid="new-note" onClick={() => start(null)} className="workspace-button primary"><Mic size={14} aria-hidden="true" />{t('Start recording')}</button>
+        </div>}
       </div></section> : <PastNotes cards={past.cards ?? []} day={day} more={past.more} sentinel={past.setSentinel} onOpen={open} openFolder={openFolder} />}</LoadingContent>
     </div>
     {calendar && <Agenda revision={calendarRevision} recording={recording} onStart={start} onOpen={open} />}

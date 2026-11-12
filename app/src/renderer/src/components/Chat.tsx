@@ -127,7 +127,7 @@ export function Ask({ id, recording, anchor, onSource }: { id: string; recording
         if (closing.current) { closing.current = false; morph(true, true) }
         animateOpen.current = true; setError(false); setOpen(true)
         panel.current?.querySelector('textarea')?.focus({ preventScroll: true })
-      }}><MessageCircle size={16} strokeWidth={1.75} aria-hidden="true" /><span>{t('Ask Yogurt')}</span><kbd aria-hidden="true">{keys('⌘J')}</kbd></button>
+      }}><MessageCircle size={16} strokeWidth={1.75} aria-hidden="true" /><span>{t('Ask')}</span><kbd aria-hidden="true">{keys('⌘J')}</kbd></button>
     {anchor && createPortal(conversation, anchor)}
   </>
 }

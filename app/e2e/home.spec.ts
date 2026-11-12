@@ -200,13 +200,15 @@ test('New note records with no event, and nothing records before the click', asy
   } finally { await app.close() }
 })
 
-test('no meetings yet: plain words and one button', async () => {
+test('no meetings yet: plain words, the language it will listen for, and one button, in the middle of the page', async () => {
   const { app, page } = await launch()
   try {
     const empty = page.getByTestId('past-empty')
     await expect(empty).toBeVisible()
-    await expect(empty.getByRole('button')).toHaveCount(0)
+    // the one way to start is where the eye already is, with the spoken language beside it; the toolbar has none until there are meetings
+    await expect(empty.getByRole('button')).toHaveCount(1)
     await expect(page.getByRole('button', { name: 'Start recording', exact: true })).toHaveCount(1)
+    await expect(empty.getByTestId('home-spoken')).toHaveValue('en')
     await page.getByTestId('new-note').click()
     await expect(page.getByTestId('note-state')).toHaveAttribute('data-state', 'recording')
   } finally { await app.close() }

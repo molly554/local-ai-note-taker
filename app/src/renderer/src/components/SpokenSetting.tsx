@@ -6,26 +6,33 @@ import { t } from '../../../shared/i18n'
 
 const label = (s: Spoken) => (s === 'en' ? t('English only') : s === 'multi' ? t('Multi-language') : autonym(s))
 
-/** Settings → Language: the language people speak in meetings, the same choice as the picker under a note */
-export function SpokenSetting() {
+/** The spoken language as a select: in Settings, and on the empty home, where it is seen before the first recording */
+export function SpokenSelect({ id, testId }: { id: string; testId: string }) {
   const [spoken, setSpoken] = useState<Spoken>()
   useEffect(() => { void window.yogurt.settings.get().then((p) => setSpoken(p.spoken)) }, [])
   const choose = (v: Spoken) => { setSpoken(v); void window.yogurt.settings.setSpoken(v) }
   return (
-    <LoadingContent pending={!spoken}><div className="settings-row" data-kind="spoken">
+    <span className="settings-select-wrap">
+      <select id={id} data-testid={testId} value={spoken ?? 'en'} disabled={!spoken} onChange={(e) => choose(e.target.value as Spoken)} className="settings-select">
+        {/* a language in its own name, so anyone can find theirs */}
+        {SPOKEN.map((v) => <option key={v} value={v} lang={v === 'en' || v === 'multi' ? undefined : v}>{label(v)}</option>)}
+      </select>
+      <ChevronDown size={14} aria-hidden="true" />
+    </span>
+  )
+}
+
+/** Settings → Language: the language people speak in meetings, the same choice as the picker under a note */
+export function SpokenSetting() {
+  return (
+    <div className="settings-row" data-kind="spoken">
       <span className="settings-permission-icon"><Languages size={17} strokeWidth={1.75} aria-hidden="true" /></span>
       <div className="settings-row-copy">
         <label htmlFor="settings-spoken" className="settings-label">{t('Spoken language')}</label>
         <p className="settings-description">{t('Pick the language of your meetings. Multi-language listens for whichever is spoken.')}</p>
       </div>
-      <span className="settings-select-wrap">
-      <select id="settings-spoken" data-testid="settings-spoken" value={spoken ?? 'en'} disabled={!spoken} onChange={(e) => choose(e.target.value as Spoken)} className="settings-select">
-        {/* a language in its own name, so anyone can find theirs */}
-        {SPOKEN.map((v) => <option key={v} value={v} lang={v === 'en' || v === 'multi' ? undefined : v}>{label(v)}</option>)}
-      </select>
-      <ChevronDown size={14} aria-hidden="true" />
-      </span>
-    </div></LoadingContent>
+      <SpokenSelect id="settings-spoken" testId="settings-spoken" />
+    </div>
   )
 }
 

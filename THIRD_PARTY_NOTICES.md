@@ -3,7 +3,7 @@
 Yogurt is MIT licensed (see [LICENSE](LICENSE)). It includes or uses third-party software under its own licences.
 
 - Licence texts for bundled and statically linked code are in [app/resources/licenses](app/resources/licenses). Installers ship them in a `licenses` folder.
-  - Fonts: Bricolage Grotesque (OFL).
+  - Fonts: Inter and Noto Sans SC (OFL).
   - UI: Base UI, Motion, Hugeicons, and `@animate-ui/react` (MIT + Commons Clause, not covered by Yogurt's MIT licence).
   - Speech: whisper.cpp / ggml, Silero VAD, cpp-httplib, nlohmann/json.
   - Audio recorders: libopus and the `ogg` crate (BSD-3-Clause).
