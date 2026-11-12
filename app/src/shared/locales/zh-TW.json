@@ -603,5 +603,17 @@
   "Server address": "服務位址",
   "Model": "模型",
   "API key": "API 金鑰",
-  "Saved. Type a new key to replace it.": "已儲存。輸入新的金鑰即可取代。"
+  "Saved. Type a new key to replace it.": "已儲存。輸入新的金鑰即可取代。",
+  "Any meeting": "通用",
+  "Template": "範本",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "摘要依哪種會議來編排。單場會議可以另選：在它的摘要選單裡挑。",
+  "Team meeting": "團隊會議",
+  "One-on-one": "一對一",
+  "Customer call": "客戶通話",
+  "Interview": "面試",
+  "Next steps first": "下一步放最前",
+  "Who will do what goes at the top of the summary.": "誰要做什麼，放在摘要最上面。",
+  "Extra instructions": "附加要求",
+  "Anything else you want in every summary, in your own words.": "希望每份摘要都做到的其他事，用你自己的話寫。",
+  "Like: keep it under ten bullets": "例如：控制在十條以內"
 }

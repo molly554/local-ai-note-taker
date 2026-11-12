@@ -668,5 +668,17 @@
   "Server address": "Адреса сервера",
   "Model": "Модель",
   "API key": "Ключ API",
-  "Saved. Type a new key to replace it.": "Збережено. Введіть новий ключ, щоб замінити його."
+  "Saved. Type a new key to replace it.": "Збережено. Введіть новий ключ, щоб замінити його.",
+  "Any meeting": "Будь-яка зустріч",
+  "Template": "Шаблон",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Для якого типу зустрічей будуються підсумки. Зустріч може мати власний шаблон: виберіть його в меню її підсумку.",
+  "Team meeting": "Зустріч команди",
+  "One-on-one": "Зустріч сам на сам",
+  "Customer call": "Дзвінок із клієнтом",
+  "Interview": "Співбесіда",
+  "Next steps first": "Спершу наступні кроки",
+  "Who will do what goes at the top of the summary.": "Хто що зробить — на початку підсумку.",
+  "Extra instructions": "Додаткові вказівки",
+  "Anything else you want in every summary, in your own words.": "Що ще ви хочете бачити в кожному підсумку — своїми словами.",
+  "Like: keep it under ten bullets": "Наприклад: не більше десяти пунктів"
 }

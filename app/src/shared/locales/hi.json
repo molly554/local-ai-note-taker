@@ -642,5 +642,17 @@
   "Server address": "सर्वर का पता",
   "Model": "मॉडल",
   "API key": "API कुंजी",
-  "Saved. Type a new key to replace it.": "सहेज ली गई। बदलने के लिए नई कुंजी टाइप करें।"
+  "Saved. Type a new key to replace it.": "सहेज ली गई। बदलने के लिए नई कुंजी टाइप करें।",
+  "Any meeting": "कोई भी मीटिंग",
+  "Template": "टेम्पलेट",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "आपके सारांश किस तरह की मीटिंग के हिसाब से बनें। किसी मीटिंग का अपना टेम्पलेट हो सकता है: उसे उसके सारांश के मेन्यू से चुनें।",
+  "Team meeting": "टीम मीटिंग",
+  "One-on-one": "वन-ऑन-वन",
+  "Customer call": "ग्राहक कॉल",
+  "Interview": "इंटरव्यू",
+  "Next steps first": "अगले कदम सबसे पहले",
+  "Who will do what goes at the top of the summary.": "कौन क्या करेगा, यह सारांश में सबसे ऊपर रहेगा।",
+  "Extra instructions": "अतिरिक्त निर्देश",
+  "Anything else you want in every summary, in your own words.": "हर सारांश में आप और जो चाहते हैं, अपने शब्दों में लिखें।",
+  "Like: keep it under ten bullets": "जैसे: दस बिंदुओं से ज़्यादा नहीं"
 }

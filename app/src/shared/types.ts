@@ -126,7 +126,8 @@ export type YogurtApi = {
     /** the open note kept its unsaved edits over notes written again for new people */
     keptEdits(meetingId: string): void
     /** writes the enhanced notes again */
-    writeAgain(meetingId: string): Promise<void>
+    /** writes the Summary again; with a template, that one becomes the meeting's own first */
+    writeAgain(meetingId: string, template?: import('./templates').Template): Promise<void>
     /** status, the draft as it is written, and the saved notes; returns the way to stop listening */
     onChange(cb: (v: NoteView) => void): () => void
   }
@@ -238,7 +239,7 @@ export type YogurtApi = {
   }
   settings: {
     /** myName: what the person is called in meetings (their Mac's full name, macName, when they never changed it) */
-    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken; /** the language notes are written in; '' is each meeting's own */ notesLanguage: import('./spoken').NotesLanguage | ''; /** the cloud model, without its key */ cloud: import('./cloud').CloudView }>
+    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken; /** the language notes are written in; '' is each meeting's own */ notesLanguage: import('./spoken').NotesLanguage | ''; /** the cloud model, without its key */ cloud: import('./cloud').CloudView; /** how Summaries are written: template, next steps first, the person's own request */ notesStyle: import('./templates').NotesStyle }>
     /** blank goes back to the Mac's full name */
     setName(name: string): Promise<void>
     setTheme(v: Theme): Promise<void>
@@ -256,6 +257,8 @@ export type YogurtApi = {
     setSpoken(v: import('./spoken').Spoken): Promise<void>
     /** '' for each meeting's own language */
     setNotesLanguage(v: import('./spoken').NotesLanguage | ''): Promise<void>
+    /** Settings → Summary: only what changed; answers with how notes are written now */
+    setNotesStyle(patch: import('./templates').NotesStylePatch): Promise<import('./templates').NotesStyle | undefined>
     /** turns the cloud model on or off, or changes its address, model or key; answers what is now saved */
     setCloud(v: import('./cloud').CloudPatch): Promise<import('./cloud').CloudView | undefined>
   }
@@ -340,6 +343,8 @@ export type NoteView = {
   rewrittenFrom?: string
   /** latest acknowledged edit revision on each side; failed text is retained in main and overlaid above */
   saves?: Partial<Record<NoteSide, NoteSaveResult>>
+  /** the template this meeting has of its own (picked for it, or the one its Summary was written with); left out: the one in Settings */
+  template?: import('./templates').Template
 }
 
 /** The words of a chunk still being spoken, read quickly: shown at once in a lighter style, replaced by the final line */

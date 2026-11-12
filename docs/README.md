@@ -18,6 +18,16 @@ On first run, Lynote NoteTaker downloads the models it needs. Windows and Linux 
 - **The language of your notes.** Settings → Notes language. "Same as the meeting" writes the Summary in the language that was spoken; any other choice writes every Summary in that language.
 - **The app itself** comes in English and 31 other languages and follows your computer's language (Settings → Language to change it).
 
+## Summary templates
+
+A Summary is laid out for the kind of meeting it was. **Settings → Summary → Template** sets it for every new meeting: Any meeting (the layout as it always was), Team meeting, One-on-one, Customer call or Interview.
+
+- **For one meeting:** open the menu at the top right of its Summary and pick another template. The Summary is written again with it, and that meeting keeps it. If you edited the Summary, you are asked first: your edits would be replaced.
+- **Next steps first** puts who will do what at the top of every Summary.
+- **Extra instructions** is one line of your own that goes to the notes model with every Summary, like "keep it under ten bullets".
+
+A template changes the instructions the notes model gets. It does not change what the model is allowed to use: only what was said, or what you typed.
+
 ## Mac permissions
 
 Microphone and call audio access let Lynote NoteTaker hear both sides of a meeting. Allow them during setup, or open Settings to change them later. macOS lists call audio under Screen & System Audio Recording.

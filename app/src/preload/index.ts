@@ -115,7 +115,7 @@ const api: YogurtApi = {
       return () => { ipcRenderer.removeListener('notes:flush-request', run) }
     },
     keptEdits: (id) => { ipcRenderer.send('notes:kept-edits', id) },
-    writeAgain: (id) => ipcRenderer.invoke('notes:write-again', id),
+    writeAgain: (id, template) => ipcRenderer.invoke('notes:write-again', id, template),
     onChange: (cb) => {
       const on = (_e: unknown, v: NoteView) => cb(v)
       ipcRenderer.on('notes:changed', on)
@@ -224,6 +224,7 @@ const api: YogurtApi = {
     onLanguage: (cb) => { const f = (_e: unknown, locale: string) => cb(locale); ipcRenderer.on('settings:language', f); return () => { ipcRenderer.off('settings:language', f) } },
     setSpoken: (v) => ipcRenderer.invoke('settings:spoken', v),
     setNotesLanguage: (v) => ipcRenderer.invoke('settings:notes-language', v),
+    setNotesStyle: (patch) => ipcRenderer.invoke('settings:notes-style', patch),
     setCloud: (v) => ipcRenderer.invoke('settings:cloud', v),
   },
   search: { query: (q, folder) => ipcRenderer.invoke('search:query', q, folder) },

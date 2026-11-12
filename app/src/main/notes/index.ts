@@ -2,6 +2,7 @@ import { attendeeMembership as stamp } from '../../shared/people'
 import type { Meeting, Store } from '../store'
 import type { NotesModel } from './model'
 import type { NoteSaveResult, NoteSide, NoteStatus, NoteView } from '../../shared/types'
+import type { NotesStyle, Template } from '../../shared/templates'
 import { enhance, type Llm, type PartSummary } from './enhance'
 import { meetingWords } from '../vocab'
 import type { Queue } from './queue'
@@ -33,6 +34,12 @@ export function hookNotes(p: {
   language: (id: string) => string | null
   /** the language picked for notes in Settings; null (or left out): each meeting's own */
   notesLanguage?: () => string | null
+  /** how this meeting's notes are written: its own template (else the one in Settings), next steps first, the person's request */
+  style?: (id: string) => NotesStyle
+  /** the template a meeting has of its own (picked for it, or the one its notes were written with), if any */
+  template?: (id: string) => Template | undefined
+  /** these notes were just written with this template: kept for the meeting, so writing them again uses it too */
+  wroteWith?: (id: string, template: Template) => void
   onStop: (fn: (m: Meeting) => void) => unknown
   /** a meeting's notes changed: status, draft or saved text */
   send: (v: NoteView) => void
@@ -72,9 +79,9 @@ export function hookNotes(p: {
   const view = (id: string): NoteView => {
     const n = currentNotes(id)
     const l = live.get(id)
-    const saved = edits.get(id)
+    const saved = edits.get(id), template = p.template?.(id)
     const saves = saved && Object.fromEntries(Object.entries(saved).map(([side, edit]) => [side, { revision: edit.revision, status: edit.status, ...(edit.reason ? { reason: edit.reason } : {}) }]))
-    return { meetingId: id, mine: n.mine, enhanced: n.enhanced, edited: n.edited, status: l?.status ?? (n.enhanced != null ? 'done' : 'idle'), draft: l?.draft ?? '', peopleChanged: peopleChanged(id, n.enhanced != null) && !rewriteTimers.has(id) && !rewriting.has(id), ...(l?.part ? { part: l.part } : {}), ...(l?.step ? { step: l.step } : {}), ...(saves ? { saves } : {}) }
+    return { meetingId: id, mine: n.mine, enhanced: n.enhanced, edited: n.edited, status: l?.status ?? (n.enhanced != null ? 'done' : 'idle'), draft: l?.draft ?? '', peopleChanged: peopleChanged(id, n.enhanced != null) && !rewriteTimers.has(id) && !rewriting.has(id), ...(l?.part ? { part: l.part } : {}), ...(l?.step ? { step: l.step } : {}), ...(saves ? { saves } : {}), ...(template ? { template } : {}) }
   }
   const set = (id: string, status: NoteStatus, draft = '', part?: { part: number; of: number }, step?: 'loading') => { live.set(id, { status, draft, part, step }); p.send(view(id)) }
 
@@ -128,6 +135,7 @@ export function hookNotes(p: {
     const used = { stamp: stamp(m.attendees) }
     writingPeople.set(id, used)
     const language = p.notesLanguage?.() ?? m.language ?? p.language(id)
+    const style = p.style?.(id)
     let draft = '', last = 0, timer: NodeJS.Timeout | undefined
     // blank lines would show as empty paragraphs while streaming, then vanish once tidied: never shown
     const flush = () => { timer = undefined; last = Date.now(); if (!signal.aborted) set(id, 'writing', draft.replace(/\n[ \t]*(?=\n)/g, '')) }
@@ -139,7 +147,7 @@ export function hookNotes(p: {
       // a generic title (or one made from earlier notes) gets one from these notes; theirs or the calendar's never
       const retitle = (x: Meeting) => x.titleSource === 'generic' || x.titleSource === 'auto'
       let askTitle: ((llm: Llm) => Promise<string>) | undefined
-      const md = await enhance({ meeting: m, mine, segments, language, me: p.me?.(), words: meetingWords(m), ...(retitle(m) ? { titleLater: (ask) => { askTitle = ask } } : {}) }, llm, (t) => {
+      const md = await enhance({ meeting: m, mine, segments, language, style, me: p.me?.(), words: meetingWords(m), ...(retitle(m) ? { titleLater: (ask) => { askTitle = ask } } : {}) }, llm, (t) => {
         if (quiet) return
         draft += t
         if (timer) return
@@ -154,6 +162,7 @@ export function hookNotes(p: {
         stampBefore.set(id, p.store.writtenWith(id))
         p.store.setNotes(id, { enhanced: md, edited: false })
         p.store.setWrittenWith(id, used.stamp)
+        if (style) p.wroteWith?.(id, style.template)
         p.send({ ...view(id), rewrittenFrom: was.enhanced ?? '' })
         queueTitle(id, askTitle)
         p.summarized?.(id)
@@ -163,6 +172,7 @@ export function hookNotes(p: {
       // the person's own notes stay as they typed them, even if they typed on while this was written
       p.store.setNotes(id, { enhanced: md, edited: false })
       p.store.setWrittenWith(id, used.stamp)
+      if (style) p.wroteWith?.(id, style.template)
       finish(m, 'done')
       queueTitle(id, askTitle)
       p.summarized?.(id)
@@ -284,6 +294,11 @@ export function hookNotes(p: {
     retryDrafts,
     pendingDraftId: () => [...edits].find(([, sides]) => Object.values(sides).some((v) => v.text !== undefined))?.[0],
     forgetDrafts: (id: string) => { edits.delete(id) },
+    /** nothing stands in the way of writing these notes again: not being recorded or resumed, not waiting or being written */
+    canWriteAgain(id: string) {
+      const s = live.get(id)?.status
+      return !resuming.has(id) && p.store.meeting(id)?.state !== 'recording' && s !== 'waiting' && s !== 'writing'
+    },
     /** "Write again": the same job, now (after anything already waiting) */
     writeAgain(id: string) {
       if (resuming.has(id) || p.store.meeting(id)?.state === 'recording') return Promise.resolve()

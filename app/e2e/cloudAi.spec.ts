@@ -26,7 +26,7 @@ async function service() {
   return { url: `http://127.0.0.1:${(server.address() as AddressInfo).port}/v1`, asked, close: () => server.close() }
 }
 
-test('Cloud AI: off until turned on; then the notes come from the service, and its key is never kept in plain text', async () => {
+test('@everywhere Cloud AI: off until turned on; then the notes come from the service, and its key is never kept in plain text', async () => {
   const cloud = await service()
   const userData = mkdtempSync(join(tmpdir(), 'yogurt-cloud-'))
   const app = await electron.launch({ args: [main], env: { ...process.env, YOGURT_FAKE: '1', YOGURT_USER_DATA: userData } })

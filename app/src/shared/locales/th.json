@@ -603,5 +603,17 @@
   "Server address": "ที่อยู่เซิร์ฟเวอร์",
   "Model": "โมเดล",
   "API key": "คีย์ API",
-  "Saved. Type a new key to replace it.": "บันทึกแล้ว พิมพ์คีย์ใหม่เพื่อแทนที่"
+  "Saved. Type a new key to replace it.": "บันทึกแล้ว พิมพ์คีย์ใหม่เพื่อแทนที่",
+  "Any meeting": "การประชุมทั่วไป",
+  "Template": "เทมเพลต",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "รูปแบบการประชุมที่ใช้จัดโครงสรุปของคุณ แต่ละการประชุมมีเทมเพลตของตัวเองได้ โดยเลือกจากเมนูที่สรุปของการประชุมนั้น",
+  "Team meeting": "ประชุมทีม",
+  "One-on-one": "คุยตัวต่อตัว",
+  "Customer call": "คุยกับลูกค้า",
+  "Interview": "สัมภาษณ์งาน",
+  "Next steps first": "ขั้นตอนถัดไปขึ้นก่อน",
+  "Who will do what goes at the top of the summary.": "ใครจะทำอะไรจะอยู่บนสุดของสรุป",
+  "Extra instructions": "คำสั่งเพิ่มเติม",
+  "Anything else you want in every summary, in your own words.": "สิ่งอื่นที่อยากให้มีในทุกสรุป เขียนด้วยคำของคุณเอง",
+  "Like: keep it under ten bullets": "เช่น ไม่เกินสิบหัวข้อ"
 }

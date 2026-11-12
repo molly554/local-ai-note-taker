@@ -16,10 +16,11 @@ import { basename, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { isFake, userDataDir } from './paths'
 import { logToFile } from './log'
-import { cloudSetting, loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import { cloudSetting, loadSettings, localeOf, notesLanguageSetting, notesStyleSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
 import { CALL_GONE_MS, useCallApps } from './detect'
 import { systemLocale } from './locale'
 import { APP_ID, PRODUCT } from '../shared/brand'
+import { isTemplate } from '../shared/templates'
 import { onLanguage, setLanguage, t } from '../shared/i18n'
 import bundledCatalog from '../../../catalog/catalog.json'
 import licenses from '../../../catalog/licenses.json'
@@ -576,6 +577,10 @@ app.whenReady().then(() => {
     store, queue, model, language: meetingLanguage, onStop: onMeetingStopSaved, named: (id) => callNames.finished(id), earlier: (id) => readAhead.parts(id), me,
     // Settings → Language → Notes language, read when the notes are written
     notesLanguage: () => notesLanguageSetting(loadSettings(settingsFile)),
+    // Settings → Summary, and the template a meeting has of its own (picked from its Summary's menu, or the one it was written with)
+    style: (id) => notesStyleSetting(loadSettings(settingsFile), store.noteTemplate(id)),
+    template: (id) => { const t = store.noteTemplate(id); return isTemplate(t) ? t : undefined },
+    wroteWith: (id, template) => store.setNoteTemplate(id, template),
     transcribed: async (id) => { await recordingFinished(id); await transcriptFinished(id) },
     send: (v) => win?.webContents.send('notes:changed', v),
     // the notes are written: the meeting goes into the library for chat across meetings
@@ -702,7 +707,12 @@ app.whenReady().then(() => {
   ipcMain.handle('notes:set-enhanced', (_e, id: unknown, md: unknown, revision: unknown) => saveEdit(id, 'enhanced', md, revision))
   ipcMain.on('notes:flush-sync', (e, id: unknown, side: unknown, md: unknown, revision: unknown) => { e.returnValue = saveEdit(id, side, md, revision) })
   ipcMain.on('notes:kept-edits', (_e, id: unknown) => { if (known(id)) notes.keptEdits(id) })
-  ipcMain.handle('notes:write-again', (_e, id: unknown) => { if (known(id)) void notes.writeAgain(id) })
+  // with a template: it becomes the meeting's own, and its Summary is written again with it
+  ipcMain.handle('notes:write-again', (_e, id: unknown, template: unknown) => {
+    if (!known(id)) return
+    if (isTemplate(template) && notes.canWriteAgain(id)) store.setNoteTemplate(id, template)
+    void notes.writeAgain(id)
+  })
   app.on('will-quit', () => engine.dispose())
   // an earlier quit or crash may have left parts unjoined: try again now
   const rejoined = rejoinInterrupted(join(userDataDir(), 'meetings'), async dir => {

@@ -642,5 +642,17 @@
   "Server address": "Serveradresse",
   "Model": "Modell",
   "API key": "API-Schlüssel",
-  "Saved. Type a new key to replace it.": "Gespeichert. Gib einen neuen Schlüssel ein, um ihn zu ersetzen."
+  "Saved. Type a new key to replace it.": "Gespeichert. Gib einen neuen Schlüssel ein, um ihn zu ersetzen.",
+  "Any meeting": "Jede Besprechung",
+  "Template": "Vorlage",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Für welche Art von Besprechung deine Zusammenfassungen aufgebaut sind. Eine Besprechung kann eine eigene haben: Wähle sie im Menü ihrer Zusammenfassung.",
+  "Team meeting": "Teambesprechung",
+  "One-on-one": "Einzelgespräch",
+  "Customer call": "Kundengespräch",
+  "Interview": "Vorstellungsgespräch",
+  "Next steps first": "Nächste Schritte zuerst",
+  "Who will do what goes at the top of the summary.": "Wer was erledigt, steht ganz oben in der Zusammenfassung.",
+  "Extra instructions": "Zusätzliche Anweisungen",
+  "Anything else you want in every summary, in your own words.": "Alles, was du sonst noch in jeder Zusammenfassung haben möchtest, in deinen eigenen Worten.",
+  "Like: keep it under ten bullets": "Zum Beispiel: höchstens zehn Punkte"
 }

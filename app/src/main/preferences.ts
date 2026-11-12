@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain, nativeTheme } from 'electron'
-import { cloudView, loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import { cloudView, loadSettings, localeOf, notesLanguageSetting, notesStyleSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import { cleanExtra, isTemplate, type NotesStylePatch } from '../shared/templates'
 import type { CloudPatch } from '../shared/cloud'
 import { systemLocale } from './locale'
 import { PERMISSION_KINDS, type PermissionKind, type Permissions } from './permissions'
@@ -52,7 +53,7 @@ export function hookPreferences(d: { file: string; permissions: Permissions; ask
     // what the Mac says, so a change in System Settings shows here
     // locale: every window (main, card, widget) shows the interface language
     // language: the one picked ('' is the Mac's); locale: the one in use; systemLocale: the Mac's, for the picker
-    return { theme: s.theme ?? 'system', openAtLogin: d.loginOn(s.openAtLogin), showInMenuBar: s.showInMenuBar !== false, language: isLocale(s.language) ? s.language : '', locale: localeOf(s, systemLocale()), systemLocale: systemLocale(), myName: s.myName?.trim() || d.macName(), macName: d.macName(), stopWhenCallEnds: stopsWhenCallEnds(s), recordingReminder: recordingReminderOn(s), jargon: cleanJargon(s.jargon), spoken: spokenSetting(s, systemLocale()), notesLanguage: notesLanguageSetting(s) ?? '', cloud: cloudView(s) }
+    return { theme: s.theme ?? 'system', openAtLogin: d.loginOn(s.openAtLogin), showInMenuBar: s.showInMenuBar !== false, language: isLocale(s.language) ? s.language : '', locale: localeOf(s, systemLocale()), systemLocale: systemLocale(), myName: s.myName?.trim() || d.macName(), macName: d.macName(), stopWhenCallEnds: stopsWhenCallEnds(s), recordingReminder: recordingReminderOn(s), jargon: cleanJargon(s.jargon), spoken: spokenSetting(s, systemLocale()), notesLanguage: notesLanguageSetting(s) ?? '', cloud: cloudView(s), notesStyle: notesStyleSetting(s) }
   })
   // what the person is called in meetings (who "You" is when naming voices); blank: the Mac's full name again
   ipcMain.handle('settings:name', (_e, v: unknown) => {
@@ -98,6 +99,16 @@ export function hookPreferences(d: { file: string; permissions: Permissions; ask
   ipcMain.handle('settings:notes-language', (_e, v: unknown) => {
     if (v !== '' && !isNotesLanguage(v)) return
     updateSettings(d.file, { notesLanguage: v === '' ? undefined : v })
+  })
+  // How Summaries are written (Settings → Summary): the template, next steps first, the person's own request.
+  // Only what the patch names changes; what it names wrongly is left as it was.
+  ipcMain.handle('settings:notes-style', (_e, v: unknown) => {
+    if (!v || typeof v !== 'object') return
+    const p = v as NotesStylePatch, patch: Parameters<typeof updateSettings>[1] = {}
+    if (isTemplate(p.template)) patch.template = p.template === 'general' ? undefined : p.template
+    if (typeof p.nextStepsFirst === 'boolean') patch.nextStepsFirst = p.nextStepsFirst || undefined
+    if (typeof p.extra === 'string') patch.notesExtra = cleanExtra(p.extra) || undefined
+    return notesStyleSetting(updateSettings(d.file, patch))
   })
   // The cloud model: on or off, its address, its model and its key. The key is sealed before it is written down
   // and never sent back to the window; on a computer that cannot seal one it is not kept at all.

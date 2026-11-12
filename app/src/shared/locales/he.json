@@ -655,5 +655,17 @@
   "Server address": "כתובת השרת",
   "Model": "מודל",
   "API key": "מפתח API",
-  "Saved. Type a new key to replace it.": "נשמר. הקלידו מפתח חדש כדי להחליף אותו."
+  "Saved. Type a new key to replace it.": "נשמר. הקלידו מפתח חדש כדי להחליף אותו.",
+  "Any meeting": "כל פגישה",
+  "Template": "תבנית",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "סוג הפגישה שלפיו מסודרים הסיכומים. לפגישה יכולה להיות תבנית משלה: לבחור אותה בתפריט של הסיכום שלה.",
+  "Team meeting": "פגישת צוות",
+  "One-on-one": "אחד על אחד",
+  "Customer call": "שיחה עם לקוח",
+  "Interview": "ראיון עבודה",
+  "Next steps first": "הצעדים הבאים קודם",
+  "Who will do what goes at the top of the summary.": "מי יעשה מה מופיע בראש הסיכום.",
+  "Extra instructions": "הנחיות נוספות",
+  "Anything else you want in every summary, in your own words.": "כל דבר נוסף שרוצים בכל סיכום, במילים שלך.",
+  "Like: keep it under ten bullets": "למשל: לא יותר מעשר נקודות"
 }

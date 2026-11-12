@@ -642,5 +642,17 @@
   "Server address": "Serveradresse",
   "Model": "Modell",
   "API key": "API-nøkkel",
-  "Saved. Type a new key to replace it.": "Lagret. Skriv inn en ny nøkkel for å erstatte den."
+  "Saved. Type a new key to replace it.": "Lagret. Skriv inn en ny nøkkel for å erstatte den.",
+  "Any meeting": "Alle møter",
+  "Template": "Mal",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Hva slags møte sammendragene dine er lagt opp for. Et møte kan ha sin egen: velg den i menyen ved møtets sammendrag.",
+  "Team meeting": "Teammøte",
+  "One-on-one": "En-til-en",
+  "Customer call": "Kundesamtale",
+  "Interview": "Jobbintervju",
+  "Next steps first": "Neste steg først",
+  "Who will do what goes at the top of the summary.": "Hvem som gjør hva, står øverst i sammendraget.",
+  "Extra instructions": "Ekstra instruksjoner",
+  "Anything else you want in every summary, in your own words.": "Alt annet du vil ha med i hvert sammendrag, med dine egne ord.",
+  "Like: keep it under ten bullets": "For eksempel: høyst ti punkter"
 }

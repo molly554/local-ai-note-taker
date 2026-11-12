@@ -658,5 +658,17 @@
   "Server address": "Indirizzo del server",
   "Model": "Modello",
   "API key": "Chiave API",
-  "Saved. Type a new key to replace it.": "Salvata. Digita una nuova chiave per sostituirla."
+  "Saved. Type a new key to replace it.": "Salvata. Digita una nuova chiave per sostituirla.",
+  "Any meeting": "Qualsiasi riunione",
+  "Template": "Modello",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Il tipo di riunione per cui sono organizzati i tuoi riepiloghi. Una riunione può averne uno suo: sceglilo dal menu del suo riepilogo.",
+  "Team meeting": "Riunione di team",
+  "One-on-one": "Colloquio individuale",
+  "Customer call": "Chiamata con cliente",
+  "Interview": "Colloquio di lavoro",
+  "Next steps first": "Prima i prossimi passi",
+  "Who will do what goes at the top of the summary.": "Chi farà cosa va in cima al riepilogo.",
+  "Extra instructions": "Istruzioni aggiuntive",
+  "Anything else you want in every summary, in your own words.": "Qualsiasi altra cosa vuoi in ogni riepilogo, con parole tue.",
+  "Like: keep it under ten bullets": "Per esempio: non più di dieci punti"
 }

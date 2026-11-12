@@ -16,7 +16,7 @@ const fake = <T>(app: ElectronApplication, fn: string, arg?: unknown): Promise<T
 const languages = async (app: ElectronApplication) => (await fake<{ languages: string[] }>(app, 'prompts')).languages
 const saved = (userData: string) => JSON.parse(readFileSync(join(userData, 'settings.json'), 'utf8')).spoken
 
-test('the spoken language picker: English only by default, Multi-language for the recording going on, remembered and shown in Settings', async () => {
+test('@everywhere the spoken language picker: English only by default, Multi-language for the recording going on, remembered and shown in Settings', async () => {
   const a = await launch()
   const { app, page } = a
   try {
@@ -77,7 +77,7 @@ test('the spoken language picker: English only by default, Multi-language for th
   } finally { await b.app.close() }
 })
 
-test('a computer in Chinese starts in Chinese; a language picked by name is what whisper is told; notes can be asked for in another language', async () => {
+test('@everywhere a computer in Chinese starts in Chinese; a language picked by name is what whisper is told; notes can be asked for in another language', async () => {
   const userData = mkdtempSync(join(tmpdir(), 'yogurt-spoken-zh-'))
   const app = await electron.launch({ args: [main], env: { ...process.env, YOGURT_FAKE: '1', YOGURT_USER_DATA: userData, YOGURT_SYSTEM_LANGUAGES: 'zh-CN' } })
   const page = await app.firstWindow()

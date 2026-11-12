@@ -44,7 +44,7 @@ export class FakeEngine implements Engine {
     // who was there, as the prompt says: shown, so a note written again for new people can be told apart
     const invited = /People invited: (.*)\. "You"/.exec(prompt)?.[1]
     const own = /<notes>\n([\s\S]*?)\n<\/notes>/.exec(prompt)?.[1].split('\n')[0].replace(/^\s*[-*]\s+/, '').trim()
-    const md = [
+    const topics = [
       '## Launch plan',
       ...(own ? [`- <mine>${own}</mine>`] : []),
       '- The site goes live on **Tuesday**.',
@@ -52,12 +52,16 @@ export class FakeEngine implements Engine {
       ...(invited && invited !== 'not known' ? [`- With ${invited}.`] : []),
       '## Release notes',
       '- A draft is due by Friday.',
+    ]
+    const steps = [
       '## Next steps',
       // the name from the call when the transcript has it, plain words when it is Them
       `- **${prompt.includes('Bo Park: She will send a draft') ? 'Bo Park' : 'The others'}:** Send the release notes draft by Friday.`,
       '- **You:** Share the launch plan with the team.',
-    ].join('\n')
-    return this.stream(md, onToken, signal)
+    ]
+    // asked for the next steps first (Settings → Summary): it puts them first, as a real model is asked to
+    const first = prompt.includes('- First, before any topic, "## Next steps"')
+    return this.stream((first ? [...steps, ...topics] : [...topics, ...steps]).join('\n'), onToken, signal)
   }
   private async stream(md: string, onToken: (text: string) => void, signal?: AbortSignal): Promise<string> {
     const pause = Number(process.env.YOGURT_FAKE_LLM_MS ?? 60)

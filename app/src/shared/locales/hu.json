@@ -642,5 +642,17 @@
   "Server address": "Szerver címe",
   "Model": "Modell",
   "API key": "API-kulcs",
-  "Saved. Type a new key to replace it.": "Mentve. A cseréhez írj be egy új kulcsot."
+  "Saved. Type a new key to replace it.": "Mentve. A cseréhez írj be egy új kulcsot.",
+  "Any meeting": "Bármilyen megbeszélés",
+  "Template": "Sablon",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Milyen megbeszéléshez igazodjon az összefoglalók felépítése. Egy megbeszélésnek saját sablonja is lehet: válaszd ki az összefoglalója menüjében.",
+  "Team meeting": "Csapatmegbeszélés",
+  "One-on-one": "Négyszemközti",
+  "Customer call": "Ügyfélhívás",
+  "Interview": "Állásinterjú",
+  "Next steps first": "Teendők elöl",
+  "Who will do what goes at the top of the summary.": "Az összefoglaló tetejére kerül, hogy ki mit csinál.",
+  "Extra instructions": "További utasítások",
+  "Anything else you want in every summary, in your own words.": "Bármi más, amit minden összefoglalóban szeretnél, a saját szavaiddal.",
+  "Like: keep it under ten bullets": "Például: legfeljebb tíz pont"
 }

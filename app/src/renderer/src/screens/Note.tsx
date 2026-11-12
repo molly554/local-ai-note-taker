@@ -10,6 +10,7 @@ import { useScrollMemory } from '../useScrollMemory'
 import { AudioLines, Lock, RotateCcw, Trash2, TextAlignStart, TriangleAlert } from 'lucide-react'
 import type { MeetingView, NoteSaveResult, NoteSide, NoteView, WidgetView } from '../../../shared/types'
 import { t } from '../../../shared/i18n'
+import type { Template } from '../../../shared/templates'
 import { osWords } from '../keys'
 import { Modal, ModalClose } from '../components/Modal'
 import { NotesSetup } from '../components/NotesSetup'
@@ -108,6 +109,11 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource }: {
   const summaryButton = useRef<HTMLButtonElement>(null)
   const [confirming, setConfirming] = useState(false)
   const rewriteButton = useRef<HTMLButtonElement>(null)
+  /** the template picked in the Summary's menu, while the question about replacing edits is open */
+  const pickedTemplate = useRef<Template | undefined>(undefined)
+  /** the template in Settings, for a meeting that has none of its own yet */
+  const [settingsTemplate, setSettingsTemplate] = useState<Template>('general')
+  useEffect(() => { void window.yogurt.settings.get().then((p) => setSettingsTemplate(p.notesStyle.template)) }, [id])
   const [editedHere, setEditedHere] = useState(false)
   const [renaming, setRenaming] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -286,15 +292,19 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource }: {
   const saveStatus = mineSave.status === 'failed' || enhancedSave.status === 'failed' ? 'failed'
     : mineSave.status === 'saving' || enhancedSave.status === 'saving' ? 'saving' : 'saved'
   const dismissRewrite = () => { setConfirming(false); rewriteButton.current?.focus({ preventScroll: true }) }
-  const writeAgain = async () => {
+  /** template: another one picked from the menu, which the Summary is then written with; left out, the one it has */
+  const writeAgain = async (template?: Template) => {
     const confirmed = confirming
+    // a new request says which template it is for; confirming one keeps what it asked
+    if (!confirmed) pickedTemplate.current = template
     // Confirm is a completed choice; do not offer a Cancel UI while its save is still pending.
     if (confirmed) dismissRewrite()
     if (!await saveAll()) return
     if ((notes.edited || editedHere) && !confirmed) { setConfirming(true); return }
     if (!confirmed) dismissRewrite()
     setEditedHere(false)
-    void window.yogurt.notes.writeAgain(id)
+    void window.yogurt.notes.writeAgain(id, pickedTemplate.current)
+    pickedTemplate.current = undefined
   }
 
   return (
@@ -375,7 +385,8 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource }: {
             </div>
             {primary === 'transcript' && <div ref={setTranscriptToolbar} className="note-primary-tools" />}
             <span data-testid="note-tab-indicator" className="note-tab-indicator" aria-hidden="true" />
-            {hasEnhanced && primary === 'notes' && <SummaryActions menuButton={rewriteButton} hasSummary={notes.enhanced != null} canWriteAgain={notes.status === 'done' || notes.status === 'failed' || notes.status === 'empty'} onWriteAgain={() => { pick('enhanced'); writeAgain() }} />}
+            {hasEnhanced && primary === 'notes' && <SummaryActions menuButton={rewriteButton} hasSummary={notes.enhanced != null} canWriteAgain={notes.status === 'done' || notes.status === 'failed' || notes.status === 'empty'} onWriteAgain={() => { pick('enhanced'); writeAgain() }}
+              template={notes.template ?? settingsTemplate} onTemplate={(v) => { pick('enhanced'); writeAgain(v) }} />}
           </div>
         </header>
         <div ref={setChatAnchor} className="note-reading-area">
@@ -408,7 +419,7 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource }: {
           {primary === 'notes' && shown === 'enhanced' && notes.status === 'done' && notes.peopleChanged && !confirming && (
             <div data-testid="note-people-changed" className="pointer-events-auto mx-auto mt-3 flex w-fit max-w-[calc(100%-32px)] flex-wrap items-center gap-3 rounded-xl border border-line bg-float px-4 py-2 text-[13px] shadow-[var(--shadow)]">
               <span>{t('People changed. Regenerate summary?')}</span>
-              <button data-testid="note-people-write-again" onClick={writeAgain} className="workspace-button primary">{t('Regenerate summary')}</button>
+              <button data-testid="note-people-write-again" onClick={() => writeAgain()} className="workspace-button primary">{t('Regenerate summary')}</button>
             </div>
           )}
           {confirming && (
@@ -417,7 +428,7 @@ export function Note({ id, onTitleChange, at, folderSuggestion, onSource }: {
               className="pointer-events-auto mx-auto mt-3 flex w-fit max-w-[calc(100%-32px)] flex-wrap items-center gap-3 rounded-xl border border-line bg-float px-4 py-2.5 text-sm shadow-[var(--shadow)]">
               <span id="note-rewrite-description">{t('Regenerate summary? Your edits to the summary will be replaced.')}</span>
               <button data-testid="note-write-again-cancel" autoFocus onClick={dismissRewrite} className="workspace-button">{t('Cancel')}</button>
-              <button data-testid="note-write-again-confirm" onClick={writeAgain} className="workspace-button primary">{t('Regenerate summary')}</button>
+              <button data-testid="note-write-again-confirm" onClick={() => writeAgain()} className="workspace-button primary">{t('Regenerate summary')}</button>
             </div>
           )}
           {saveStatus === 'failed' && (

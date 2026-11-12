@@ -216,6 +216,8 @@ export class Store {
     }
     // who was at the meeting when its notes were written (a "names" column from voice naming is left as it is, unread)
     if (!(this.db.prepare('PRAGMA table_info(notes)').all() as Row[]).some((r) => r.name === 'written_with')) this.db.exec('ALTER TABLE notes ADD COLUMN written_with TEXT')
+    // the template this meeting's Summary is written with (shared/templates.ts); null: the one in Settings
+    if (!(this.db.prepare('PRAGMA table_info(notes)').all() as Row[]).some((r) => r.name === 'template')) this.db.exec('ALTER TABLE notes ADD COLUMN template TEXT')
     const segmentCols = (this.db.prepare('PRAGMA table_info(segments)').all() as Row[]).map((r) => String(r.name))
     if (!segmentCols.includes('hidden')) this.db.exec('ALTER TABLE segments ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0')
     if (!segmentCols.includes('echo_confident')) {
@@ -455,6 +457,16 @@ export class Store {
   }
   setWrittenWith(meetingId: string, people: string) {
     this.db.prepare('UPDATE notes SET written_with = ? WHERE meeting_id = ?').run(people, meetingId)
+  }
+
+  /** The template this meeting's Summary is written with, as it was stored (null: none of its own, the one in Settings) */
+  noteTemplate(meetingId: string): string | null {
+    const r = this.db.prepare('SELECT template FROM notes WHERE meeting_id = ?').get(meetingId) as Row | undefined
+    return r?.template == null ? null : String(r.template)
+  }
+  /** Picked for this meeting, or the one its Summary was just written with. A meeting with no notes yet gets its row. */
+  setNoteTemplate(meetingId: string, template: string) {
+    this.db.prepare('INSERT INTO notes (meeting_id, template) VALUES (?, ?) ON CONFLICT(meeting_id) DO UPDATE SET template = excluded.template').run(meetingId, template)
   }
 
   /** Stopped meetings with no enhanced notes: a quit or crash came before they were written */

@@ -642,5 +642,17 @@
   "Server address": "সার্ভারের ঠিকানা",
   "Model": "মডেল",
   "API key": "API কী",
-  "Saved. Type a new key to replace it.": "সংরক্ষিত। বদলাতে নতুন কী লিখুন।"
+  "Saved. Type a new key to replace it.": "সংরক্ষিত। বদলাতে নতুন কী লিখুন।",
+  "Any meeting": "যেকোনো মিটিং",
+  "Template": "টেমপ্লেট",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "আপনার সারাংশ কোন ধরনের মিটিংয়ের জন্য সাজানো হবে। কোনো মিটিংয়ের নিজস্ব টেমপ্লেট থাকতে পারে: তার সারাংশের মেনু থেকে বেছে নিন।",
+  "Team meeting": "টিম মিটিং",
+  "One-on-one": "একান্ত বৈঠক",
+  "Customer call": "গ্রাহকের সঙ্গে কল",
+  "Interview": "ইন্টারভিউ",
+  "Next steps first": "পরবর্তী পদক্ষেপ আগে",
+  "Who will do what goes at the top of the summary.": "কে কী করবেন তা সারাংশের শুরুতে থাকবে।",
+  "Extra instructions": "বাড়তি নির্দেশনা",
+  "Anything else you want in every summary, in your own words.": "প্রতিটি সারাংশে আর যা চান, নিজের ভাষায় লিখুন।",
+  "Like: keep it under ten bullets": "যেমন: দশটি পয়েন্টের মধ্যে রাখুন"
 }

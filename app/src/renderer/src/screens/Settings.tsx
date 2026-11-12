@@ -9,6 +9,7 @@ import { applyLanguage } from '../i18n'
 import { flushOpenNotes } from '../noteAutosave'
 import { Jargon } from '../components/Jargon'
 import { NotesLanguageSetting, SpokenSetting } from '../components/SpokenSetting'
+import { SummarySettings } from '../components/SummarySettings'
 import type { CloudPatch, CloudView } from '../../../shared/cloud'
 import { useScrollMemory } from '../useScrollMemory'
 import { appShortcuts } from '../components/Shortcuts'
@@ -136,6 +137,8 @@ export function Settings({ revision = 0 }: { revision?: number }) {
             <NotesLanguageSetting />
             <Jargon />
           </div>
+
+          <SummarySettings />
 
           <Backup />
 

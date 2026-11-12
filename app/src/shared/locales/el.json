@@ -642,5 +642,17 @@
   "Server address": "Διεύθυνση διακομιστή",
   "Model": "Μοντέλο",
   "API key": "Κλειδί API",
-  "Saved. Type a new key to replace it.": "Αποθηκεύτηκε. Πληκτρολογήστε νέο κλειδί για να το αντικαταστήσετε."
+  "Saved. Type a new key to replace it.": "Αποθηκεύτηκε. Πληκτρολογήστε νέο κλειδί για να το αντικαταστήσετε.",
+  "Any meeting": "Κάθε συνάντηση",
+  "Template": "Πρότυπο",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Το είδος συνάντησης για το οποίο διαμορφώνονται οι συνόψεις σας. Μια συνάντηση μπορεί να έχει το δικό της: επιλέξτε το από το μενού της σύνοψής της.",
+  "Team meeting": "Συνάντηση ομάδας",
+  "One-on-one": "Κατ’ ιδίαν συνάντηση",
+  "Customer call": "Κλήση με πελάτη",
+  "Interview": "Συνέντευξη",
+  "Next steps first": "Πρώτα τα επόμενα βήματα",
+  "Who will do what goes at the top of the summary.": "Το ποιος θα κάνει τι μπαίνει στην αρχή της σύνοψης.",
+  "Extra instructions": "Πρόσθετες οδηγίες",
+  "Anything else you want in every summary, in your own words.": "Ό,τι άλλο θέλετε σε κάθε σύνοψη, με δικά σας λόγια.",
+  "Like: keep it under ten bullets": "Για παράδειγμα: έως δέκα κουκκίδες"
 }

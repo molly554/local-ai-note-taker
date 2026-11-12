@@ -642,5 +642,17 @@
   "Server address": "Serveradres",
   "Model": "Model",
   "API key": "API-sleutel",
-  "Saved. Type a new key to replace it.": "Opgeslagen. Typ een nieuwe sleutel om deze te vervangen."
+  "Saved. Type a new key to replace it.": "Opgeslagen. Typ een nieuwe sleutel om deze te vervangen.",
+  "Any meeting": "Elke vergadering",
+  "Template": "Sjabloon",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Het soort vergadering waarvoor je samenvattingen zijn opgebouwd. Een vergadering kan een eigen sjabloon hebben: kies het in het menu bij de samenvatting.",
+  "Team meeting": "Teamvergadering",
+  "One-on-one": "Een-op-een",
+  "Customer call": "Klantgesprek",
+  "Interview": "Sollicitatiegesprek",
+  "Next steps first": "Volgende stappen eerst",
+  "Who will do what goes at the top of the summary.": "Wie wat gaat doen, staat bovenaan de samenvatting.",
+  "Extra instructions": "Extra instructies",
+  "Anything else you want in every summary, in your own words.": "Wat je verder in elke samenvatting wilt, in je eigen woorden.",
+  "Like: keep it under ten bullets": "Bijvoorbeeld: hooguit tien punten"
 }

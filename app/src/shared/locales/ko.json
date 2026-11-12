@@ -603,5 +603,17 @@
   "Server address": "서버 주소",
   "Model": "모델",
   "API key": "API 키",
-  "Saved. Type a new key to replace it.": "저장됐어요. 바꾸려면 새 키를 입력하세요."
+  "Saved. Type a new key to replace it.": "저장됐어요. 바꾸려면 새 키를 입력하세요.",
+  "Any meeting": "모든 회의",
+  "Template": "템플릿",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "요약을 어떤 종류의 회의에 맞춰 정리할지 정합니다. 회의마다 따로 정하려면 해당 요약의 메뉴에서 고르세요.",
+  "Team meeting": "팀 회의",
+  "One-on-one": "1:1 미팅",
+  "Customer call": "고객 통화",
+  "Interview": "면접",
+  "Next steps first": "다음 할 일을 맨 위에",
+  "Who will do what goes at the top of the summary.": "누가 무엇을 할지를 요약 맨 위에 둡니다.",
+  "Extra instructions": "추가 지시",
+  "Anything else you want in every summary, in your own words.": "모든 요약에 바라는 점을 직접 적어 주세요.",
+  "Like: keep it under ten bullets": "예: 항목은 열 개 이내로"
 }

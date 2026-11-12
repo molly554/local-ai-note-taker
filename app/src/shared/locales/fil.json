@@ -642,5 +642,17 @@
   "Server address": "Address ng server",
   "Model": "Model",
   "API key": "API key",
-  "Saved. Type a new key to replace it.": "Na-save. Mag-type ng bagong key para palitan ito."
+  "Saved. Type a new key to replace it.": "Na-save. Mag-type ng bagong key para palitan ito.",
+  "Any meeting": "Kahit anong meeting",
+  "Template": "Template",
+  "The kind of meeting your summaries are laid out for. A meeting can have its own: pick it from the menu on its Summary.": "Ang uri ng meeting na pinagbabatayan ng ayos ng mga buod mo. Puwedeng may sarili ang isang meeting: piliin ito sa menu ng buod nito.",
+  "Team meeting": "Meeting ng team",
+  "One-on-one": "One-on-one",
+  "Customer call": "Tawag sa customer",
+  "Interview": "Interview",
+  "Next steps first": "Unahin ang mga susunod na hakbang",
+  "Who will do what goes at the top of the summary.": "Nasa itaas ng buod kung sino ang gagawa ng ano.",
+  "Extra instructions": "Dagdag na tagubilin",
+  "Anything else you want in every summary, in your own words.": "Anumang iba pang gusto mo sa bawat buod, sa sarili mong salita.",
+  "Like: keep it under ten bullets": "Halimbawa: hindi hihigit sa sampung punto"
 }

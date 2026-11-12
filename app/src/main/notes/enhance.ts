@@ -1,4 +1,5 @@
 import type { Person, Segment } from '../store'
+import { PLAIN_STYLE, type NotesStyle, type Template } from '../../shared/templates'
 import { respell, spellingLine, type MeetingWords } from '../vocab'
 
 /**
@@ -64,6 +65,29 @@ type PromptInput = {
   spelling?: string
   /** everyone was heard on the one mic (a meeting in a room): every line says "You" whoever spoke */
   oneMic?: boolean
+  /** the template, next steps at the top, the person's own request (shared/templates.ts); left out: as it always was */
+  style?: NotesStyle
+}
+
+/**
+ * What each template adds to the rules every Summary is written by: what that kind of meeting's notes need that a
+ * general meeting's don't. 'general' adds nothing, so its prompt is the one every Summary had before templates.
+ * They go after the general rules and before "use only what was said", which stays the last word on content.
+ */
+export const TEMPLATE_LINES: Record<Template, string[]> = {
+  general: [],
+  team: [
+    '- This was a team meeting. Under each topic, lead with what was decided, then what is still open. Say who is blocked and on what, as "Blocked: ...". When people gave updates in turn, give each person a section.',
+  ],
+  'one-on-one': [
+    '- This was a one-on-one between two people. Give a section, when it came up, to what each of them is working on, feedback given (who told whom what, close to their words), worries and questions raised, and what they agreed. How someone is doing, their workload and their career are the work here: keep them, said plainly and without judging.',
+  ],
+  customer: [
+    '- This was a call with a customer or a possible customer. Give a section, when it came up, to what they need and why, their objections and questions with the answer they got, the numbers (prices, volumes, budget, dates), who decides on their side and how, and other suppliers they named. Keep their own words for a need or an objection.',
+  ],
+  interview: [
+    '- This was a job interview. Give a section to each subject the candidate was asked about, with what they answered and the examples they gave (employers, projects, numbers), then a section for the questions the candidate asked. Report what was said and nothing else: no verdict, no score, no adjectives about the candidate.',
+  ],
 }
 
 /**
@@ -93,6 +117,9 @@ export function enhancePrompt(i: PromptInput): string {
   const other = onlyOther(i.attendees, i.me)
   const mine = i.mine.trim()
   const mins = i.minutes != null ? Math.max(1, Math.round(i.minutes)) : undefined
+  const style = i.style ?? PLAIN_STYLE
+  const steps = `"## Next steps" (in ${lang}) only if someone said they would do something after the meeting: one bullet each, as "- **Name:** what they will do, by when" (when only if it was said), "**You:**" for the person these notes are for, plain words for someone without a name, like "**The designer:**". Leave out jokes and personal errands. Otherwise leave the section out.`
+  const topics = ['## <topic>', '- <point>', '  - <detail>', '## <topic>', '- <point>'], stepsShape = ['## Next steps', '- **<Name>:** <task>, by <when>']
   return [
     ...(i.parts ? [
       'You will write the notes for a meeting that just ended. It was long, so here are notes on each part of it, in order, written from its transcript ("You" is the person these notes are for):',
@@ -111,7 +138,7 @@ export function enhancePrompt(i: PromptInput): string {
     `- Write in ${lang}, headings too.`,
     peopleRule,
     ...(i.spelling ? [i.spelling] : []),
-    '- Markdown only. Start right away with the first "## " topic: no title, no introduction, nothing after the last bullet.',
+    `- Markdown only. Start right away with the first "## " ${style.nextStepsFirst ? 'heading' : 'topic'}: no title, no introduction, nothing after the last bullet.`,
     '- Notes are about the work: customers, deals and prices, numbers, plans, problems, launches, what each person is working on, what was decided. Leave out what was off topic: small talk, greetings, weekends and trips, hobbies, side projects, jokes, gear, errands and other personal chat, and talk about the call itself. Something personal goes in only if the meeting was about it.',
     '- One "## " section per topic, most important first, each named after what it is about in a few specific words (like "Pricing for Acme renewal" or "Desktop app launch", never "Discussion", "Updates" or "Topic 1"). Bring together what was said about one topic at different times. When people took turns giving their own updates, a section per person, like "## Maya\'s updates", works well.',
     '- Under each topic, "- " bullets with real substance: what was said, found, proposed or decided, and why. Keep the concrete details: names of customers and companies, numbers, prices, dates, tools, and who said it when that matters. A bullet is one full point of up to about 20 words, starting with the point (never "The team discussed"). More detail goes in "  - " bullets under it.',
@@ -123,17 +150,14 @@ export function enhancePrompt(i: PromptInput): string {
       '- Write it all in your own words and in the shape below, blended into the topics: never copy their lines, labels (like "GOAL", "WHO" or "CLOSE"), headings or numbering, and never give their notes a section of their own.',
       '- Their notes can be a plan or a script made before the meeting: a question or step in it goes in only if the transcript shows it was asked or done, with what came of it.',
     ] : []),
+    ...TEMPLATE_LINES[style.template],
+    // their own words, as a request: what may go into the notes is still only what was said (the next line)
+    ...(style.extra ? [`- The person these notes are for asks this of every summary: ${style.extra}`] : []),
     '- Use only what was said or typed. Never make anything up.',
-    `- Last, "## Next steps" (in ${lang}) only if someone said they would do something after the meeting: one bullet each, as "- **Name:** what they will do, by when" (when only if it was said), "**You:**" for the person these notes are for, plain words for someone without a name, like "**The designer:**". Leave out jokes and personal errands. Otherwise leave the section out.`,
+    style.nextStepsFirst ? `- First, before any topic, ${steps}` : `- Last, ${steps}`,
     '',
     'The shape, with made-up placeholders:',
-    '## <topic>',
-    '- <point>',
-    '  - <detail>',
-    '## <topic>',
-    '- <point>',
-    '## Next steps',
-    '- **<Name>:** <task>, by <when>',
+    ...(style.nextStepsFirst ? [...stepsShape, ...topics] : [...topics, ...stepsShape]),
   ].join('\n')
 }
 
@@ -371,6 +395,8 @@ export type EnhanceInput = {
   me?: string
   /** the meeting's names and companies: the transcript is respelled with them, and the model told how they are spelled */
   words?: MeetingWords
+  /** the template, next steps at the top, the person's own request; left out: as it always was */
+  style?: NotesStyle
   /**
    * Gets a way to ask for a title from these notes, once they are written: called after they are saved (as a job of its
    * own, with that job's model), so the title never holds them back. It answers '' when the model gives nothing useful or fails.
@@ -437,7 +463,7 @@ export async function enhance(input: EnhanceInput, llm: Llm, onToken: (text: str
   let first = Infinity, last = -Infinity
   for (const s of input.segments) { first = Math.min(first, s.startMs); last = Math.max(last, s.endMs) }
   const minutes = input.segments.length ? (last - first) / 60_000 : undefined
-  const base = { title: input.meeting.title, attendees: input.meeting.attendees, mine: input.mine, language, minutes, me: input.me, spelling: input.words && spellingLine(input.words), oneMic: oneMic(input.segments) }
+  const base = { title: input.meeting.title, attendees: input.meeting.attendees, mine: input.mine, language, minutes, me: input.me, spelling: input.words && spellingLine(input.words), oneMic: oneMic(input.segments), style: input.style }
   const segments = input.words ? input.segments.map((x) => ({ ...x, text: respell(x.text, input.words!) })) : input.segments
   let transcript = transcriptText(segments)
   let parts = false
@@ -511,8 +537,8 @@ export async function enhance(input: EnhanceInput, llm: Llm, onToken: (text: str
       if (held.trimStart().startsWith('#')) { showing = true; onToken(`\n${held.trimStart()}`) }
     }
     const more = tidyNotes(await llm.chat(nextStepsPrompt(language), show, { maxTokens: 400, before: [prompt, md] }))
-    // only a real next-steps list is kept; anything else it said is dropped
-    if (OWNER.test(more)) md = `${md}\n${more}`
+    // only a real next-steps list is kept; anything else it said is dropped. It goes where the notes were asked to have it
+    if (OWNER.test(more)) md = input.style?.nextStepsFirst ? `${more}\n${md}` : `${md}\n${more}`
   }
   // a title is nice to have: one that fails or comes out empty leaves the meeting's as it is
   if (written) input.titleLater?.((model) => model.chat(titlePrompt(language), () => {}, { maxTokens: 40, before: [prompt, written], temperature: 0.3 })

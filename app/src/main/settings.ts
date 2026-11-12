@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { isLocale } from '../shared/i18n'
 import { isNotesLanguage, spokenOf, type NotesLanguage, type Spoken } from '../shared/spoken'
+import { cleanExtra, isTemplate, type NotesStyle, type Template } from '../shared/templates'
 import { cloudAddress, type Cloud, type CloudView } from '../shared/cloud'
 
 /** theme: light or dark regardless of the system; follows the system when left out. language: the interface's, the computer's when left out */
@@ -37,6 +38,12 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
   spoken?: Spoken
   /** the language notes are written in (shared/spoken.ts); the meeting's own when left out */
   notesLanguage?: NotesLanguage
+  /** the template Summaries are written with (shared/templates.ts); 'general' when left out */
+  template?: Template
+  /** what people will do goes at the top of a Summary; at the end when left out */
+  nextStepsFirst?: boolean
+  /** what the person asks of every Summary, in their own words */
+  notesExtra?: string
   /** a cloud model for the writing (shared/cloud.ts): off unless turned on. key: as the system's store sealed it, never the key itself */
   cloud?: { on?: boolean; url?: string; model?: string; key?: string }
   /** new versions download by themselves; on unless turned off */
@@ -46,6 +53,10 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
 export const spokenSetting = (s: Settings, system = ''): Spoken => spokenOf(s.spoken, system)
 /** the language notes are to be written in; null: each meeting's own */
 export const notesLanguageSetting = (s: Settings): NotesLanguage | null => (isNotesLanguage(s.notesLanguage) ? s.notesLanguage : null)
+/** how Summaries are written. own: the template a meeting has of its own, which wins over the one picked here */
+export const notesStyleSetting = (s: Settings, own?: string | null): NotesStyle => ({
+  template: isTemplate(own) ? own : isTemplate(s.template) ? s.template : 'general', nextStepsFirst: s.nextStepsFirst === true, extra: cleanExtra(s.notesExtra),
+})
 /** the cloud model to write with: only when it is turned on, its address can be sent to, and its model and key are there. open: unseals the key */
 export const cloudSetting = (s: Settings, open: (kept: string) => string | null): Cloud | null => {
   const c = s.cloud, url = cloudAddress(c?.url), model = c?.model?.trim()
