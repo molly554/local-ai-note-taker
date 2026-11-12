@@ -351,7 +351,7 @@ final class SystemAudio {
   func start() -> Bool {
     let desc = CATapDescription(stereoGlobalTapButExcludeProcesses: yogurtProcesses())
     desc.uuid = UUID()
-    desc.name = "Yogurt"
+    desc.name = "Lynote NoteTaker"
     desc.isPrivate = true
     desc.muteBehavior = .unmuted
     var err = AudioHardwareCreateProcessTap(desc, &tap)
@@ -365,7 +365,7 @@ final class SystemAudio {
     // A device with only the tap in it never runs, and with tap auto-start it only runs while something plays.
     guard let outUID = defaultOutputUID() else { log("no output device"); stop(); return false }
     let dict: [String: Any] = [
-      kAudioAggregateDeviceNameKey: "Yogurt", kAudioAggregateDeviceUIDKey: UUID().uuidString,
+      kAudioAggregateDeviceNameKey: "Lynote NoteTaker", kAudioAggregateDeviceUIDKey: UUID().uuidString,
       kAudioAggregateDeviceMainSubDeviceKey: outUID, kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: outUID]],
       kAudioAggregateDeviceIsPrivateKey: true, kAudioAggregateDeviceIsStackedKey: false, kAudioAggregateDeviceTapAutoStartKey: false,
       kAudioAggregateDeviceTapListKey: [[kAudioSubTapUIDKey: desc.uuid.uuidString, kAudioSubTapDriftCompensationKey: true]],
@@ -1164,7 +1164,7 @@ case .notDetermined:
   s.wait()
   if !ok { send(["t": "warn", "code": "no-mic"]) }
 case .denied, .restricted:
-  log("no microphone access: allow Yogurt in System Settings, Privacy & Security, Microphone")
+  log("no microphone access: allow Lynote NoteTaker in System Settings, Privacy & Security, Microphone")
   send(["t": "warn", "code": "no-mic"])
 default: break
 }

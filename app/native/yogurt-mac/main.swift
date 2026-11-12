@@ -51,7 +51,7 @@ func status() -> String {
   }
 }
 
-func needAccess() { if status() != "granted" { fail("Yogurt doesn't have access to Calendar yet. Allow it in System Settings → Privacy & Security → Calendars.") } }
+func needAccess() { if status() != "granted" { fail("Lynote NoteTaker doesn't have access to Calendar yet. Allow it in System Settings → Privacy & Security → Calendars.") } }
 
 // MARK: Core Audio
 

@@ -1,5 +1,5 @@
 // The packaged app holds only the built code: a source folder inside app.asar means the build settings weren't applied.
-// node scripts/asar-check.mjs dist/mac-arm64/Yogurt.app/Contents/Resources/app.asar (exits 1 and names them)
+// node scripts/asar-check.mjs "dist/mac-arm64/Lynote NoteTaker.app/Contents/Resources/app.asar" (exits 1 and names them)
 import asar from '@electron/asar'
 import { fileURLToPath } from 'node:url'
 

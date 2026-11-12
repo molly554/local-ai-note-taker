@@ -12,8 +12,8 @@ const here = dirname(fileURLToPath(import.meta.url))
 const win = process.platform === 'win32'
 // SMOKE_NO_LAUNCH=1 leaves out the starting of Yogurt (to try this script on the Mac helper, which would open the real Yogurt)
 const launches = process.env.SMOKE_NO_LAUNCH !== '1'
-const NOT_RUNNING = "Yogurt isn't running, and it couldn't be opened. Open Yogurt, then try again.\n"
-const TOO_LONG = "Yogurt's folder path is too long for its connection.\n"
+const NOT_RUNNING = "Lynote NoteTaker isn't running, and it couldn't be opened. Open Lynote NoteTaker, then try again.\n"
+const TOO_LONG = "Lynote NoteTaker's folder path is too long for its connection.\n"
 
 let failed = 0
 const check = (ok, what) => { console.log(`${ok ? 'ok  ' : 'FAIL'} ${what}`); if (!ok) failed++ }

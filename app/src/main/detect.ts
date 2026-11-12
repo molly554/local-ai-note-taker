@@ -1,3 +1,4 @@
+import { PRODUCT, PROGRAM } from '../shared/brand'
 import type { CalEvent } from './calendar'
 
 export type MicApp = { bundleId: string; name: string; /** the window's title, when known */ title?: string }
@@ -65,7 +66,11 @@ const HELPERS_BY_OS: Record<string, Record<string, string>> = {
   linux: {},
 }
 /** Yogurt's own recorder holds the mic while it records; yogurt-system lists it like any app off a Mac */
-const OWN_BY_OS: Record<string, string[]> = { darwin: [], win32: ['yogurt-audio.exe', 'yogurt.exe'], linux: ['yogurt-audio', 'yogurt', 'Yogurt'] }
+const OWN_BY_OS: Record<string, string[]> = {
+  darwin: [], win32: ['yogurt-audio.exe', `${PRODUCT.toLowerCase()}.exe`],
+  // the launcher starts Electron as <program>-bin (scripts/linux-launcher.cjs); a stream with no program is listed by its name
+  linux: ['yogurt-audio', PROGRAM, `${PROGRAM}-bin`, PRODUCT],
+}
 let APPS = MAC_APPS
 let HELPERS = MAC_HELPERS
 let OWN: string[] = []

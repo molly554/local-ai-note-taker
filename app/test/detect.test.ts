@@ -196,7 +196,7 @@ describe('call apps on Windows and Linux', () => {
     expect(decide(sig({ micApps: [{ bundleId: 'org.mozilla.firefox', name: 'Firefox', title: 'Zoom Meeting — Mozilla Firefox' }] }), NOW, none)?.app).toBe('Firefox')
   }))
   it("Yogurt's own recorder on the mic is never a call", () => {
-    for (const [p, ids] of [['win32', ['yogurt-audio.exe', 'yogurt.exe']], ['linux', ['yogurt-audio', 'yogurt', 'Yogurt']]] as const) on(p, () => {
+    for (const [p, ids] of [['win32', ['yogurt-audio.exe', 'lynote notetaker.exe']], ['linux', ['yogurt-audio', 'lynote-notetaker', 'lynote-notetaker-bin', 'Lynote NoteTaker']]] as const) on(p, () => {
       for (const id of ids) {
         expect(isOwnMicApp(id)).toBe(true)
         expect(decide(sig({ micApps: [{ bundleId: id, name: id, title: 'Zoom meeting' }] }), NOW, none)).toBeNull()

@@ -1,5 +1,5 @@
 {
-  "name": "yogurt",
+  "name": "local-ai-note-taker",
   "private": true,
   "packageManager": "pnpm@10.7.0",
   "scripts": {

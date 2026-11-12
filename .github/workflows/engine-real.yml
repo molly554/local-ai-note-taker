@@ -51,19 +51,19 @@ jobs:
         if: inputs.run_id != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh run download "${{ inputs.run_id }}" -R "${{ github.repository }}" -n "yogurt-preview-${{ runner.os }}" -D "$RUNNER_TEMP/preview"
+        run: gh run download "${{ inputs.run_id }}" -R "${{ github.repository }}" -n "notetaker-preview-${{ runner.os }}" -D "$RUNNER_TEMP/preview"
       - name: Install it
         if: inputs.run_id != ''
         run: |
           if [ "$RUNNER_OS" = Windows ]; then
-            "$RUNNER_TEMP"/preview/Yogurt-windows-x64.exe //S
-            dir="$LOCALAPPDATA/Programs/Yogurt/resources"
+            "$RUNNER_TEMP"/preview/Lynote-NoteTaker-windows-x64.exe //S
+            dir="$LOCALAPPDATA/Programs/lynote-notetaker/resources"
             for i in $(seq 1 90); do [ -f "$dir/app.asar" ] && [ -d "$dir/app.asar.unpacked/node_modules/@node-llama-cpp" ] && break; sleep 2; done
             sleep 5
           else
             mkdir -p "$RUNNER_TEMP/appimage" && cd "$RUNNER_TEMP/appimage"
-            chmod +x "$RUNNER_TEMP"/preview/Yogurt-linux-x86_64.AppImage
-            "$RUNNER_TEMP"/preview/Yogurt-linux-x86_64.AppImage --appimage-extract >/dev/null
+            chmod +x "$RUNNER_TEMP"/preview/Lynote-NoteTaker-linux-x86_64.AppImage
+            "$RUNNER_TEMP"/preview/Lynote-NoteTaker-linux-x86_64.AppImage --appimage-extract >/dev/null
             dir="$RUNNER_TEMP/appimage/squashfs-root/resources"
           fi
           ls "$dir/app.asar.unpacked/node_modules/@node-llama-cpp"

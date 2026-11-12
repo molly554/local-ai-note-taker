@@ -2,6 +2,7 @@ import { app, dialog } from 'electron'
 import { execFile } from 'node:child_process'
 import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { PRODUCT } from '../shared/brand'
 import { t } from '../shared/i18n'
 
 /**
@@ -16,7 +17,7 @@ export async function offerInstallerEject(): Promise<void> {
   if (process.platform !== 'darwin' || !app.isPackaged) return
   let names: string[]
   try { names = readdirSync('/Volumes') } catch { return }
-  const volumes = installerVolumes(app.getPath('exe'), names.map((n) => join('/Volumes', n)), (v) => existsSync(join(v, 'Yogurt.app')))
+  const volumes = installerVolumes(app.getPath('exe'), names.map((n) => join('/Volumes', n)), (v) => existsSync(join(v, `${PRODUCT}.app`)))
   if (!volumes.length) return
   const { response } = await dialog.showMessageBox({
     message: t('Eject the Yogurt installer?'), buttons: [t('Eject'), t('Not now')], defaultId: 0, cancelId: 1, noLink: true,

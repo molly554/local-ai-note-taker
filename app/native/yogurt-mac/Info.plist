@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-  <key>CFBundleIdentifier</key><string>so.yogurt.mac-helper</string>
-  <key>CFBundleName</key><string>Yogurt</string>
-  <key>NSCalendarsFullAccessUsageDescription</key><string>Yogurt reads your calendar to name your notes after the meeting and to know who is in it. Nothing leaves your Mac.</string>
-  <key>NSCalendarsUsageDescription</key><string>Yogurt reads your calendar to name your notes after the meeting and to know who is in it. Nothing leaves your Mac.</string>
-  <key>NSAppleEventsUsageDescription</key><string>Yogurt checks the browser tab's name to tell when you're in a call, and pauses your music while it records.</string>
-  <key>NSMicrophoneUsageDescription</key><string>Yogurt records your voice in meetings so it can write the transcript and your notes. Nothing leaves your Mac.</string>
-  <key>NSAudioCaptureUsageDescription</key><string>Yogurt records the sound of your calls so it can write down what others say. Nothing leaves your Mac.</string>
+  <key>CFBundleIdentifier</key><string>ai.lynote.notetaker.mac-helper</string>
+  <key>CFBundleName</key><string>Lynote NoteTaker</string>
+  <key>NSCalendarsFullAccessUsageDescription</key><string>Lynote NoteTaker reads your calendar to name your notes after the meeting and to know who is in it. It stays on your Mac unless you turn on Cloud AI.</string>
+  <key>NSCalendarsUsageDescription</key><string>Lynote NoteTaker reads your calendar to name your notes after the meeting and to know who is in it. It stays on your Mac unless you turn on Cloud AI.</string>
+  <key>NSAppleEventsUsageDescription</key><string>Lynote NoteTaker checks the browser tab's name to tell when you're in a call, and pauses your music while it records.</string>
+  <key>NSMicrophoneUsageDescription</key><string>Lynote NoteTaker records your voice in meetings so it can write the transcript and your notes. The recording stays on your Mac.</string>
+  <key>NSAudioCaptureUsageDescription</key><string>Lynote NoteTaker records the sound of your calls so it can write down what others say. The recording stays on your Mac.</string>
 </dict></plist>

@@ -13,9 +13,9 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-const NOT_RUNNING: &str = "Yogurt isn't running, and it couldn't be opened. Open Yogurt, then try again.";
+const NOT_RUNNING: &str = "Lynote NoteTaker isn't running, and it couldn't be opened. Open Lynote NoteTaker, then try again.";
 #[cfg_attr(windows, allow(dead_code))]
-const TOO_LONG: &str = "Yogurt's folder path is too long for its connection.";
+const TOO_LONG: &str = "Lynote NoteTaker's folder path is too long for its connection.";
 #[cfg_attr(unix, allow(dead_code))]
 const PIPE_PREFIX: &str = r"\\.\pipe\yogurt-mcp-";
 #[cfg_attr(windows, allow(dead_code))]
@@ -27,20 +27,20 @@ fn fail(s: &str) -> ! {
     exit(1)
 }
 
-/// The profile folder, where Electron puts it (appData + "Yogurt"): %APPDATA%\Yogurt on Windows,
-/// $XDG_CONFIG_HOME/Yogurt or ~/.config/Yogurt on Linux. YOGURT_USER_DATA uses a separate one (tests).
+/// The profile folder, where the app puts it (appData + its name, src/main/paths.ts): %APPDATA%\Lynote NoteTaker on Windows,
+/// $XDG_CONFIG_HOME/Lynote NoteTaker or ~/.config/Lynote NoteTaker on Linux. YOGURT_USER_DATA uses a separate one (tests).
 fn profile(windows: bool, var: impl Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
     let set = |k: &str| var(k).filter(|v| !v.is_empty());
     if let Some(p) = set("YOGURT_USER_DATA") {
         return Some(p.into());
     }
     if windows {
-        return set("APPDATA").map(|a| PathBuf::from(a).join("Yogurt"));
+        return set("APPDATA").map(|a| PathBuf::from(a).join("Lynote NoteTaker"));
     }
     set("XDG_CONFIG_HOME")
         .map(PathBuf::from)
         .or_else(|| set("HOME").map(|h| PathBuf::from(h).join(".config")))
-        .map(|c| c.join("Yogurt"))
+        .map(|c| c.join("Lynote NoteTaker"))
 }
 
 #[cfg_attr(unix, allow(dead_code))]
@@ -65,7 +65,7 @@ fn launch_target(windows: bool, recorded: Option<String>, exe: Option<PathBuf>) 
     let bin = exe.parent()?;
     let resources = bin.parent()?;
     let named = |p: &Path, n: &str| p.file_name().is_some_and(|f| f.eq_ignore_ascii_case(n));
-    (named(bin, "bin") && named(resources, "resources")).then(|| resources.parent().map(|app| app.join("Yogurt.exe")))?
+    (named(bin, "bin") && named(resources, "resources")).then(|| resources.parent().map(|app| app.join("Lynote NoteTaker.exe")))?
 }
 
 #[cfg_attr(windows, allow(dead_code))]
@@ -327,11 +327,11 @@ mod tests {
     #[test]
     fn profile_is_where_electron_puts_it() {
         let win = env_of(&[("APPDATA", r"C:\Users\sam\AppData\Roaming"), ("HOME", "/h")]);
-        assert_eq!(profile(true, &win), Some(PathBuf::from(r"C:\Users\sam\AppData\Roaming").join("Yogurt")));
-        assert_eq!(profile(false, env_of(&[("HOME", "/home/sam")])), Some(PathBuf::from("/home/sam/.config/Yogurt")));
-        assert_eq!(profile(false, env_of(&[("HOME", "/home/sam"), ("XDG_CONFIG_HOME", "/cfg")])), Some(PathBuf::from("/cfg/Yogurt")));
+        assert_eq!(profile(true, &win), Some(PathBuf::from(r"C:\Users\sam\AppData\Roaming").join("Lynote NoteTaker")));
+        assert_eq!(profile(false, env_of(&[("HOME", "/home/sam")])), Some(PathBuf::from("/home/sam/.config/Lynote NoteTaker")));
+        assert_eq!(profile(false, env_of(&[("HOME", "/home/sam"), ("XDG_CONFIG_HOME", "/cfg")])), Some(PathBuf::from("/cfg/Lynote NoteTaker")));
         // empty means not set, as for Electron
-        assert_eq!(profile(false, env_of(&[("HOME", "/home/sam"), ("XDG_CONFIG_HOME", "")])), Some(PathBuf::from("/home/sam/.config/Yogurt")));
+        assert_eq!(profile(false, env_of(&[("HOME", "/home/sam"), ("XDG_CONFIG_HOME", "")])), Some(PathBuf::from("/home/sam/.config/Lynote NoteTaker")));
         assert_eq!(profile(true, env_of(&[])), None);
     }
 
@@ -364,8 +364,8 @@ mod tests {
     #[cfg(windows)]
     #[test]
     fn windows_falls_back_to_the_install_folder() {
-        let exe = PathBuf::from(r"C:\Users\sam\AppData\Local\Programs\Yogurt\resources\bin\yogurt-mcp.exe");
-        assert_eq!(launch_target(true, None, Some(exe)), Some(PathBuf::from(r"C:\Users\sam\AppData\Local\Programs\Yogurt\Yogurt.exe")));
+        let exe = PathBuf::from(r"C:\Users\sam\AppData\Local\Programs\lynote-notetaker\resources\bin\yogurt-mcp.exe");
+        assert_eq!(launch_target(true, None, Some(exe)), Some(PathBuf::from(r"C:\Users\sam\AppData\Local\Programs\lynote-notetaker\Lynote NoteTaker.exe")));
         assert_eq!(launch_target(true, None, Some(PathBuf::from(r"C:\tools\yogurt-mcp.exe"))), None);
     }
 

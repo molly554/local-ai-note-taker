@@ -5,14 +5,14 @@ import { join } from 'node:path'
 import { expect, it } from 'vitest'
 import { wrapLinuxBinary } from '../scripts/linux-launcher.cjs'
 
-// The AppImage starts build/linux-launcher.sh as `yogurt`, which picks X11 before Electron starts (#8):
+// The AppImage starts build/linux-launcher.sh under the program's name, which picks X11 before Electron starts (#8):
 // an in-app relaunch couldn't mount the AppImage again on Wayland
 function launch(env: Record<string, string>, args: string[] = []): string[] {
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-launcher-'))
-  writeFileSync(join(dir, 'yogurt'), '#!/bin/sh\nfor a in "$@"; do echo "$a"; done\n')
-  chmodSync(join(dir, 'yogurt'), 0o755)
-  wrapLinuxBinary(dir, 'yogurt')
-  const out = execFileSync(join(dir, 'yogurt'), args, { env: { PATH: process.env.PATH!, ...env }, encoding: 'utf8' })
+  writeFileSync(join(dir, 'lynote-notetaker'), '#!/bin/sh\nfor a in "$@"; do echo "$a"; done\n')
+  chmodSync(join(dir, 'lynote-notetaker'), 0o755)
+  wrapLinuxBinary(dir, 'lynote-notetaker')
+  const out = execFileSync(join(dir, 'lynote-notetaker'), args, { env: { PATH: process.env.PATH!, ...env }, encoding: 'utf8' })
   return out.split('\n').filter(Boolean)
 }
 
@@ -28,7 +28,7 @@ it.skipIf(process.platform === 'win32')('X11 alone, Wayland without XWayland, or
 
 it.skipIf(process.platform === 'win32')('wrapping twice keeps the real binary', () => {
   const dir = mkdtempSync(join(tmpdir(), 'yogurt-launcher-'))
-  copyFileSync('/bin/echo', join(dir, 'yogurt'))
-  wrapLinuxBinary(dir, 'yogurt')
-  expect(() => wrapLinuxBinary(dir, 'yogurt')).toThrow()
+  copyFileSync('/bin/echo', join(dir, 'lynote-notetaker'))
+  wrapLinuxBinary(dir, 'lynote-notetaker')
+  expect(() => wrapLinuxBinary(dir, 'lynote-notetaker')).toThrow()
 })

@@ -58,7 +58,7 @@ pub fn changes(a: &Snapshot, b: &Snapshot) -> Vec<Change> {
 
 fn connect() -> Option<(Mainloop, Context)> {
     let mut ml = Mainloop::new()?;
-    let mut ctx = Context::new(&ml, "Yogurt")?;
+    let mut ctx = Context::new(&ml, "Lynote NoteTaker")?;
     ctx.connect(None, CtxFlags::NOFLAGS, None).ok()?;
     loop {
         match ml.iterate(true) { IterateResult::Success(_) => {}, _ => return None }
@@ -158,7 +158,7 @@ pub fn capture(device: Option<String>, stream_name: &'static str, on_audio: impl
         let spec = Spec { format: Format::F32le, channels: 1, rate: 48000 };
         let bytes = (CHUNK * 4) as u32;
         let attr = BufferAttr { maxlength: u32::MAX, tlength: u32::MAX, prebuf: u32::MAX, minreq: u32::MAX, fragsize: bytes };
-        let s = match Simple::new(None, "Yogurt", Direction::Record, device.as_deref(), stream_name, &spec, None, Some(&attr)) {
+        let s = match Simple::new(None, "Lynote NoteTaker", Direction::Record, device.as_deref(), stream_name, &spec, None, Some(&attr)) {
             Ok(s) => s,
             Err(e) => { let _ = tx.send(Err(e.to_string().unwrap_or_else(|| "unknown error".into()))); return }
         };

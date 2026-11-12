@@ -1,16 +1,19 @@
-appId: so.yogurt.app
-productName: Yogurt
-copyright: Copyright © 2026 Frigade
+# the id, the name and the program's file name are also in src/shared/brand.ts (test/builderConfig.test.ts keeps them the same)
+appId: ai.lynote.notetaker
+productName: Lynote NoteTaker
+# a fork of Yogurt (MIT): Frigade's copyright stays, with the people who changed it since
+copyright: Copyright © 2026 Frigade and the Lynote NoteTaker contributors
 # GitHub Releases: every v* tag builds Mac, Windows and Linux (.github/workflows/release.yml).
-# Fixed file names, so releases/latest/download/Yogurt-mac-arm64.dmg (and the Windows and Linux ones) point at the newest.
+# Fixed file names, so releases/latest/download/Lynote-NoteTaker-mac-arm64.dmg (and the Windows and Linux ones) point at the newest.
 # Installed copies update from the same release (latest-mac.yml, latest.yml, latest-linux.yml; src/main/updates.ts).
 publish:
   provider: github
-  owner: FrigadeHQ
-  repo: yogurt
+  owner: molly554
+  repo: local-ai-note-taker
   releaseType: release
+# the package's name: the Windows install folder (%LOCALAPPDATA%\Programs\lynote-notetaker) and the updater's cache
 extraMetadata:
-  name: yogurt
+  name: lynote-notetaker
 directories:
   # dist/ only: with another output folder electron-builder packs the whole project
   output: dist
@@ -47,7 +50,7 @@ electronFuses:
   enableNodeCliInspectArguments: false
   onlyLoadAppFromAsar: true
   enableEmbeddedAsarIntegrityValidation: true
-# Linux: `yogurt` becomes a launcher that starts Electron on X11 on a Wayland desktop (build/linux-launcher.sh)
+# Linux: `lynote-notetaker` becomes a launcher that starts Electron on X11 on a Wayland desktop (build/linux-launcher.sh)
 afterPack: scripts/linux-launcher.cjs
 asarUnpack:
   # the notes model's engine loads native binaries; they can't run from inside the asar archive
@@ -61,11 +64,11 @@ mac:
     # this Mac build only needs the Apple Silicon engine binaries
     - "!**/node_modules/@node-llama-cpp/{linux,win,mac-x64}*/**"
     - "!**/node_modules/node-llama-cpp/bins/{linux,win,mac-x64}*/**"
-  artifactName: Yogurt-mac-${arch}.${ext}
+  artifactName: Lynote-NoteTaker-mac-${arch}.${ext}
   target:
     - target: dmg
       arch: [arm64]
-    # what an installed Yogurt downloads to update itself (src/main/updates.ts)
+    # what an installed copy downloads to update itself (src/main/updates.ts)
     - target: zip
       arch: [arm64]
   icon: build/icon.icns
@@ -80,15 +83,16 @@ mac:
   extendInfo:
     # a Dock app, with its menu bar icon too
     LSUIElement: false
-    NSMicrophoneUsageDescription: Yogurt records your voice in meetings so it can write the transcript and your notes. Nothing leaves your Mac.
-    NSAudioCaptureUsageDescription: Yogurt records the sound of your calls so it can write down what others say. Nothing leaves your Mac.
-    NSCalendarsFullAccessUsageDescription: Yogurt reads your calendar to name your notes after the meeting and to know who is in it. Nothing leaves your Mac.
-    NSCalendarsUsageDescription: Yogurt reads your calendar to name your notes after the meeting and to know who is in it. Nothing leaves your Mac.
-    NSAppleEventsUsageDescription: Yogurt checks the browser tab's name to tell when you're in a call, and pauses your music while it records.
-    # Electron's own defaults ("This app needs access to..."): Yogurt never asks for these, so plain words instead
-    NSCameraUsageDescription: Yogurt doesn't use the camera.
-    NSBluetoothAlwaysUsageDescription: Yogurt doesn't use Bluetooth.
-    NSBluetoothPeripheralUsageDescription: Yogurt doesn't use Bluetooth.
+    NSMicrophoneUsageDescription: Lynote NoteTaker records your voice in meetings so it can write the transcript and your notes. The recording stays on your Mac.
+    NSAudioCaptureUsageDescription: Lynote NoteTaker records the sound of your calls so it can write down what others say. The recording stays on your Mac.
+    NSCalendarsFullAccessUsageDescription: Lynote NoteTaker reads your calendar to name your notes after the meeting and to know who is in it. It stays on your Mac unless you turn on Cloud AI.
+    NSCalendarsUsageDescription: Lynote NoteTaker reads your calendar to name your notes after the meeting and to know who is in it. It stays on your Mac unless you turn on Cloud AI.
+    NSAppleEventsUsageDescription: Lynote NoteTaker checks the browser tab's name to tell when you're in a call, and pauses your music while it records.
+    # the recording never leaves the Mac; with Cloud AI on (Settings, off by default) the transcript's text does, so these don't say "nothing"
+    # Electron's own defaults ("This app needs access to..."): the app never asks for these, so plain words instead
+    NSCameraUsageDescription: Lynote NoteTaker doesn't use the camera.
+    NSBluetoothAlwaysUsageDescription: Lynote NoteTaker doesn't use Bluetooth.
+    NSBluetoothPeripheralUsageDescription: Lynote NoteTaker doesn't use Bluetooth.
   # signs with the Developer ID certificate in the keychain (or CSC_LINK on CI); notarized by scripts/release-mac.sh or CI
 # Windows and Linux: unsigned, built by .github/workflows/preview.yml (by hand, or for a release from release.yml).
 win:
@@ -106,7 +110,7 @@ win:
     - { from: resources/speed, to: speed }
     # the tray's colour icons (tray.ts; @2x next to them), a Mac uses its template tray.png
     - { from: resources, to: ., filter: ["tray-color*.png", "tray-recording*.png"] }
-  artifactName: Yogurt-windows-${arch}.${ext}
+  artifactName: Lynote-NoteTaker-windows-${arch}.${ext}
   target:
     - target: nsis
       arch: [x64]
@@ -124,7 +128,7 @@ linux:
     - "!**/node_modules/@node-llama-cpp/{mac,win,linux-arm,linux-riscv}*/**"
     - "!**/node_modules/node-llama-cpp/bins/{mac,win,linux-arm,linux-riscv}*/**"
   # the default comes from the package name, which isn't a good file name
-  executableName: yogurt
+  executableName: lynote-notetaker
   # added to the extra resources above (unlike files, these merge): the word list for lowercase respelling (scripts/native.mjs; a Mac has its own)
   extraResources:
     - { from: resources/dict, to: dict }
@@ -132,14 +136,14 @@ linux:
     - { from: resources/speed, to: speed }
     # the tray's colour icons (tray.ts; @2x next to them), a Mac uses its template tray.png
     - { from: resources, to: ., filter: ["tray-color*.png", "tray-recording*.png"] }
-  artifactName: Yogurt-linux-${arch}.${ext}
+  artifactName: Lynote-NoteTaker-linux-${arch}.${ext}
   target:
     - target: AppImage
       arch: [x64]
   icon: build/icon.png
   category: Office
 dmg:
-  title: Yogurt
+  title: Lynote NoteTaker
   # build/background.png (+ @2x), from build/dmg-background.svg
   background: build/background.png
   iconSize: 96

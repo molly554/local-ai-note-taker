@@ -1,4 +1,4 @@
-// electron-builder afterPack: on Linux, `yogurt` becomes build/linux-launcher.sh and Electron moves to yogurt-bin (#8)
+// electron-builder afterPack: on Linux, the program (linux.executableName) becomes build/linux-launcher.sh and Electron moves to <program>-bin (#8)
 const { chmodSync, copyFileSync, existsSync, renameSync } = require('node:fs')
 const { join } = require('node:path')
 
@@ -14,7 +14,7 @@ module.exports = async (context) => {
   if (context.electronPlatformName !== 'linux') return
   const { packager, appOutDir } = context
   wrapLinuxBinary(appOutDir, packager.executableName)
-  // electron-builder flips the fuses after this hook, on `yogurt`: they belong on the Electron the launcher starts
+  // electron-builder flips the fuses after this hook, on the program: they belong on the Electron the launcher starts
   const { flipFuses } = require(require.resolve('@electron/fuses', { paths: [require.resolve('app-builder-lib')] }))
   packager.addElectronFuses = (ctx, fuses) => flipFuses(join(ctx.appOutDir, `${packager.executableName}-bin`), fuses)
 }

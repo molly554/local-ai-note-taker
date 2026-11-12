@@ -1,21 +1,25 @@
 #!/bin/sh
-# Signed (+ notarized) Mac installer to share: app/dist/Yogurt-mac-arm64.dmg
-# Needs the Developer ID certificate in the keychain and, to notarize, a notarytool profile:
-#   xcrun notarytool store-credentials yogurt-notary --apple-id <Apple ID> --team-id 2JNSQVN3N8
+# Signed (+ notarized) Mac installer to share: app/dist/Lynote-NoteTaker-mac-arm64.dmg
+# Needs your Developer ID certificate in the keychain, named in YOGURT_SIGN_ID ("Name (TEAMID)"), and, to notarize,
+# a notarytool profile:
+#   xcrun notarytool store-credentials yogurt-notary --apple-id <Apple ID> --team-id <TEAMID>
 # YOGURT_NOTARIZE=0 signs and checks without sending anything to Apple (a build to try on this Mac).
 # YOGURT_FUSES=0 leaves Electron's fuses as they come (the inspector on), for the local debugging only: never share it.
 # Builds into dist/ only: with another output folder electron-builder packs the whole project.
 # To build while a copy from dist/ is running, run this in a separate checkout (git worktree).
 set -e
-ID="${YOGURT_SIGN_ID:-Christian Mathiesen (2JNSQVN3N8)}"
+ID="${YOGURT_SIGN_ID:?set YOGURT_SIGN_ID to your Developer ID identity, like 'Name (TEAMID)', or to 'Yogurt Local'}"
+# the team every program inside must be signed by: given, or the one in brackets at the end of the identity
+TEAM="${YOGURT_TEAM_ID:-$(printf %s "$ID" | sed -n 's/.*(\([A-Z0-9]*\))$/\1/p')}"
 LOCAL=0
 if [ "$ID" = 'Yogurt Local' ]; then
   [ "${YOGURT_NOTARIZE:-1}" = 0 ] || { echo 'Yogurt Local requires YOGURT_NOTARIZE=0' >&2; exit 1; }
   LOCAL=1
 fi
+[ "$LOCAL" = 1 ] || [ -n "$TEAM" ] || { echo 'YOGURT_SIGN_ID has no team id in brackets: set YOGURT_TEAM_ID' >&2; exit 1; }
 cd "$(dirname "$0")/.."
 PROFILE="${YOGURT_NOTARY_PROFILE:-yogurt-notary}"
-APP=dist/mac-arm64/Yogurt.app
+APP="dist/mac-arm64/Lynote NoteTaker.app"
 set --
 if [ "$LOCAL" = 1 ]; then
   # Pin the exact certificate; never silently fall back to ad-hoc or a different signer.
@@ -56,7 +60,7 @@ verify_identity() {
     echo "$dr" | grep -q 'designated =>' || { echo "$1 has no designated requirement" >&2; exit 1; }
     echo "$dr" | grep -q 'cdhash' && { echo "$1 has an unstable ad-hoc requirement" >&2; exit 1; }
   else
-    codesign -dv "$1" 2>&1 | grep -q 'TeamIdentifier=2JNSQVN3N8' || { echo "$1 isn't signed with the Developer ID" >&2; exit 1; }
+    codesign -dv "$1" 2>&1 | grep -q "TeamIdentifier=$TEAM" || { echo "$1 isn't signed with the Developer ID" >&2; exit 1; }
   fi
   return 0
 }
@@ -70,12 +74,12 @@ codesign -d --entitlements - "$APP/Contents/Resources/bin/yogurt-audio" 2>/dev/n
 if [ "${YOGURT_FUSES:-1}" != 0 ]; then
   pnpm exec electron-fuses read --app "$APP" | grep -q "RunAsNode is Disabled" || { echo "Electron's fuses aren't set" >&2; exit 1; }
 fi
-DMG=dist/Yogurt-mac-arm64.dmg
+DMG=dist/Lynote-NoteTaker-mac-arm64.dmg
 # electron-builder signed the disk image too (dmg.sign); signing it again here would change it after latest-mac.yml
 verify_identity "$DMG"
 if [ "$LOCAL" = 1 ]; then
   [ ! -e "$APP/Contents/Resources/app-update.yml" ] || { echo 'Local builds must not have a release feed' >&2; exit 1; }
-  [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")" = so.yogurt.app ] || exit 1
+  [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")" = ai.lynote.notetaker ] || exit 1
 
 fi
 if [ "${YOGURT_NOTARIZE:-1}" = 0 ]; then

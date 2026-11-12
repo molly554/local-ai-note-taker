@@ -19,7 +19,7 @@ import { logToFile } from './log'
 import { cloudSetting, loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
 import { CALL_GONE_MS, useCallApps } from './detect'
 import { systemLocale } from './locale'
-import { PRODUCT } from '../shared/brand'
+import { APP_ID, PRODUCT } from '../shared/brand'
 import { onLanguage, setLanguage, t } from '../shared/i18n'
 import bundledCatalog from '../../../catalog/catalog.json'
 import licenses from '../../../catalog/licenses.json'
@@ -84,7 +84,7 @@ protocol.registerSchemesAsPrivileged([{ scheme: AUDIO_SCHEME, privileges: { stan
 
 app.setName(PRODUCT)
 // Windows shows notifications only for an app with this id (the installer's shortcut carries the same one, electron-builder appId)
-if (process.platform === 'win32') app.setAppUserModelId('so.yogurt.app')
+if (process.platform === 'win32') app.setAppUserModelId(APP_ID)
 app.setPath('userData', userDataDir())
 mkdirSync(userDataDir(), { recursive: true })
 logToFile(join(userDataDir(), 'logs', 'main.log'))

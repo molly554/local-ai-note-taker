@@ -1,3 +1,4 @@
+import { PRODUCT, PROGRAM } from '../../shared/brand'
 import type { Meeting, Store } from '../store'
 
 /**
@@ -114,7 +115,7 @@ export function createMcp(d: McpDeps): Mcp {
         return ok(msgId, {
           protocolVersion: VERSIONS.includes(String(asked)) ? asked : VERSIONS[0],
           capabilities: { tools: {} },
-          serverInfo: { name: 'yogurt', title: 'Lynote NoteTaker', version: d.version },
+          serverInfo: { name: PROGRAM, title: PRODUCT, version: d.version },
           instructions: `Lynote NoteTaker holds the person's meeting notes, transcripts and recordings on this ${mac ? 'Mac' : 'computer'}. Use list_meetings or search to find a meeting, then get_meeting, get_transcript or get_audio.`,
         })
       }

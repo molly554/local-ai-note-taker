@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-  <key>CFBundleIdentifier</key><string>so.yogurt.audio-helper</string>
-  <key>CFBundleName</key><string>Yogurt</string>
-  <key>NSMicrophoneUsageDescription</key><string>Yogurt records your voice in meetings so it can write the transcript and your notes. Nothing leaves your Mac.</string>
-  <key>NSAudioCaptureUsageDescription</key><string>Yogurt records the sound of your calls so it can write down what others say. Nothing leaves your Mac.</string>
+  <key>CFBundleIdentifier</key><string>ai.lynote.notetaker.audio-helper</string>
+  <key>CFBundleName</key><string>Lynote NoteTaker</string>
+  <key>NSMicrophoneUsageDescription</key><string>Lynote NoteTaker records your voice in meetings so it can write the transcript and your notes. The recording stays on your Mac.</string>
+  <key>NSAudioCaptureUsageDescription</key><string>Lynote NoteTaker records the sound of your calls so it can write down what others say. The recording stays on your Mac.</string>
 </dict></plist>

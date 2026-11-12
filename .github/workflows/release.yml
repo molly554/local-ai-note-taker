@@ -1,8 +1,10 @@
-# A release: `sh app/scripts/release.sh 0.3.0` sets the version, tags v0.3.0 and pushes; this builds Yogurt for Mac
+# A release: `sh app/scripts/release.sh 0.3.0` sets the version, tags v0.3.0 and pushes; this builds Lynote NoteTaker for Mac
 # (Apple Silicon), Windows (x64, unsigned) and Linux (x86_64 AppImage) and publishes one GitHub release with all
 # three, only once every build and its checks have worked.
-# Download links point at releases/latest/download/Yogurt-mac-arm64.dmg, Yogurt-windows-x64.exe and
-# Yogurt-linux-x86_64.AppImage, and installed copies update themselves from the same release
+# The Mac is only released signed and notarized. A repository without the signing secrets (MAC_CERT_P12_BASE64,
+# MAC_CERT_PASSWORD, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID) releases Windows and Linux alone.
+# Download links point at releases/latest/download/Lynote-NoteTaker-mac-arm64.dmg, Lynote-NoteTaker-windows-x64.exe and
+# Lynote-NoteTaker-linux-x86_64.AppImage, and installed copies update themselves from the same release
 # (latest-mac.yml, latest.yml, latest-linux.yml; app/src/main/updates.ts).
 # Running it by hand (Actions → Release → Run workflow) only builds: the files are attached to the run, nothing is published.
 # Windows and Linux are built by preview.yml, with the same checks (helpers run from the install folder, whisper-server
@@ -36,6 +38,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           DRAFT: ${{ inputs.draft }}
+          # secrets can't be read in a job's `if`, so the plan says whether a Mac can be signed
+          SIGNED: ${{ secrets.MAC_CERT_P12_BASE64 != '' }}
         run: |
           # every release, drafts too (a tag lookup doesn't find drafts)
           release() { gh api "repos/$REPO/releases" --paginate --jq ".[] | select(.tag_name == \"$1\")"; }
@@ -44,7 +48,8 @@ jobs:
               echo "::notice::$GITHUB_REF_NAME already has a release (published from a draft): nothing to build"
               echo build=false >> "$GITHUB_OUTPUT"; exit 0
             fi
-            echo "build=true" >> "$GITHUB_OUTPUT"; echo "mac=true" >> "$GITHUB_OUTPUT"; echo "ref=" >> "$GITHUB_OUTPUT"; exit 0
+            [ "$SIGNED" = true ] || echo "::notice::No Mac signing certificate in this repository: releasing Windows and Linux only"
+            echo "build=true" >> "$GITHUB_OUTPUT"; echo "mac=$SIGNED" >> "$GITHUB_OUTPUT"; echo "ref=" >> "$GITHUB_OUTPUT"; exit 0
           fi
           if [ -z "$DRAFT" ]; then
             echo "build=true" >> "$GITHUB_OUTPUT"; echo "mac=true" >> "$GITHUB_OUTPUT"; echo "ref=" >> "$GITHUB_OUTPUT"; exit 0
@@ -58,10 +63,10 @@ jobs:
           version=$(gh api "repos/$REPO/contents/app/package.json?ref=$sha" --jq .content | base64 -d | jq -r .version)
           [ "v$version" = "$DRAFT" ] || { echo "::error::The app at $sha is $version, not ${DRAFT#v}"; exit 1; }
           assets=$(echo "$r" | jq -r '.assets[].name')
-          for f in Yogurt-mac-arm64.dmg Yogurt-mac-arm64.zip latest-mac.yml; do
+          for f in Lynote-NoteTaker-mac-arm64.dmg Lynote-NoteTaker-mac-arm64.zip latest-mac.yml; do
             echo "$assets" | grep -qx "$f" || { echo "::error::$DRAFT has no $f: add the Mac built by hand first"; exit 1; }
           done
-          echo "$assets" | grep -qE '^(Yogurt-windows-|Yogurt-linux-|latest\.yml|latest-linux\.yml)' && { echo "::error::$DRAFT has Windows or Linux files already"; exit 1; }
+          echo "$assets" | grep -qE '^(Lynote-NoteTaker-windows-|Lynote-NoteTaker-linux-|latest\.yml|latest-linux\.yml)' && { echo "::error::$DRAFT has Windows or Linux files already"; exit 1; }
           echo "::notice::Building Windows and Linux for $DRAFT at $sha"
           echo "build=true" >> "$GITHUB_OUTPUT"; echo "mac=false" >> "$GITHUB_OUTPUT"; echo "ref=$sha" >> "$GITHUB_OUTPUT"
 
@@ -119,9 +124,9 @@ jobs:
         env:
           SIGNED: ${{ secrets.MAC_CERT_P12_BASE64 != '' }}
         run: |
-          node app/scripts/asar-check.mjs app/dist/mac-arm64/Yogurt.app/Contents/Resources/app.asar
-          pnpm -C app exec electron scripts/engine-smoke.cjs dist/mac-arm64/Yogurt.app/Contents/Resources/app.asar
-          if [ "$SIGNED" = true ]; then codesign --verify --deep --strict app/dist/mac-arm64/Yogurt.app; fi
+          node app/scripts/asar-check.mjs "app/dist/mac-arm64/Lynote NoteTaker.app/Contents/Resources/app.asar"
+          pnpm -C app exec electron scripts/engine-smoke.cjs "dist/mac-arm64/Lynote NoteTaker.app/Contents/Resources/app.asar"
+          if [ "$SIGNED" = true ]; then codesign --verify --deep --strict "app/dist/mac-arm64/Lynote NoteTaker.app"; fi
       # the app inside is notarized by electron-builder; the disk image is checked when downloaded too
       - name: Notarize the disk image
         env:
@@ -130,14 +135,14 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           [ -n "$APPLE_ID" ] || exit 0
-          xcrun notarytool submit app/dist/Yogurt-mac-arm64.dmg --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
-          xcrun stapler staple app/dist/Yogurt-mac-arm64.dmg
-          spctl -a -t open --context context:primary-signature -v app/dist/Yogurt-mac-arm64.dmg
+          xcrun notarytool submit app/dist/Lynote-NoteTaker-mac-arm64.dmg --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
+          xcrun stapler staple app/dist/Lynote-NoteTaker-mac-arm64.dmg
+          spctl -a -t open --context context:primary-signature -v app/dist/Lynote-NoteTaker-mac-arm64.dmg
           # stapling changed the disk image: its checksum in latest-mac.yml again
           node app/scripts/refresh-latest.mjs app/dist/latest-mac.yml
       - uses: actions/upload-artifact@v4
         with:
-          name: yogurt-mac
+          name: notetaker-mac
           path: |
             app/dist/*.dmg
             app/dist/*.zip
@@ -154,10 +159,14 @@ jobs:
       ref: ${{ needs.plan.outputs.ref }}
       release: true
 
-  # only a pushed tag publishes, and only once all three built; a run by hand never does
+  # only a pushed tag publishes, and only once everything planned built (the Mac's job is skipped when it can't be
+  # signed, and a skipped job would skip this one without !cancelled()); a run by hand never does
   publish:
     needs: [plan, build, other]
-    if: github.event_name == 'push' && github.ref_type == 'tag' && needs.plan.outputs.build == 'true'
+    if: >-
+      !cancelled() && github.event_name == 'push' && github.ref_type == 'tag' && needs.plan.outputs.build == 'true'
+      && needs.other.result == 'success'
+      && (needs.build.result == 'success' || (needs.build.result == 'skipped' && needs.plan.outputs.mac != 'true'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -169,7 +178,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ls -la files
-          gh release create "${{ github.ref_name }}" files/* --repo "${{ github.repository }}" --title "Yogurt ${GITHUB_REF_NAME#v}" --generate-notes --latest
+          gh release create "${{ github.ref_name }}" files/* --repo "${{ github.repository }}" --title "Lynote NoteTaker ${GITHUB_REF_NAME#v}" --generate-notes --latest
 
   # a draft with a Mac built by hand gets the Windows and Linux files; it stays a draft
   draft:
