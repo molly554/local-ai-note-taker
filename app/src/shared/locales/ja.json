@@ -596,5 +596,12 @@
   "You can restart once the recording stops.": "録音が止まったら再起動できます。",
   "Check now": "今すぐ確認",
   "Eject the Yogurt installer?": "Yogurt インストーラを取り出しますか？",
-  "Eject": "取り出す"
+  "Eject": "取り出す",
+  "Cloud AI": "クラウド AI",
+  "Write with a cloud model": "クラウドのモデルで書く",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "オンにすると、文字起こし、あなたのノート、あなたの質問が下のサービスに送信され、そのサービスがノートと回答を書きます。録音が送信されることはありません。",
+  "Server address": "サーバーのアドレス",
+  "Model": "モデル",
+  "API key": "API キー",
+  "Saved. Type a new key to replace it.": "保存済みです。置き換えるには新しいキーを入力してください。"
 }

@@ -661,5 +661,12 @@
   "You can restart once the recording stops.": "Перезапустить можно после остановки записи.",
   "Check now": "Проверить",
   "Eject the Yogurt installer?": "Извлечь установщик Yogurt?",
-  "Eject": "Извлечь"
+  "Eject": "Извлечь",
+  "Cloud AI": "Облачный ИИ",
+  "Write with a cloud model": "Писать с помощью облачной модели",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Когда эта настройка включена, ваши расшифровки, ваши собственные заметки и ваши вопросы отправляются в указанный ниже сервис, который пишет заметки и ответы. Записи не отправляются никогда.",
+  "Server address": "Адрес сервера",
+  "Model": "Модель",
+  "API key": "Ключ API",
+  "Saved. Type a new key to replace it.": "Сохранён. Введите новый ключ, чтобы заменить его."
 }

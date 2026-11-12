@@ -635,5 +635,12 @@
   "You can restart once the recording stops.": "Du kan starta om när inspelningen har stoppat.",
   "Check now": "Sök nu",
   "Eject the Yogurt installer?": "Mata ut installationsprogrammet för Yogurt?",
-  "Eject": "Mata ut"
+  "Eject": "Mata ut",
+  "Cloud AI": "Moln-AI",
+  "Write with a cloud model": "Skriv med en molnmodell",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "När detta är på skickas dina transkriptioner, dina egna anteckningar och dina frågor till tjänsten nedan, som skriver anteckningarna och svaren. Inspelningar skickas aldrig.",
+  "Server address": "Serveradress",
+  "Model": "Modell",
+  "API key": "API-nyckel",
+  "Saved. Type a new key to replace it.": "Sparad. Skriv en ny nyckel för att ersätta den."
 }

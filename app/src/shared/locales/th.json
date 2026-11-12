@@ -596,5 +596,12 @@
   "You can restart once the recording stops.": "คุณรีสตาร์ทได้เมื่อการบันทึกหยุดแล้ว",
   "Check now": "ตรวจสอบเลย",
   "Eject the Yogurt installer?": "นำตัวติดตั้ง Yogurt ออกไหม",
-  "Eject": "นำออก"
+  "Eject": "นำออก",
+  "Cloud AI": "AI บนคลาวด์",
+  "Write with a cloud model": "เขียนด้วยโมเดลบนคลาวด์",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "เมื่อเปิดใช้งาน ข้อความถอดเสียง บันทึกของคุณเอง และคำถามของคุณจะถูกส่งไปยังบริการด้านล่าง ซึ่งจะเขียนบันทึกและคำตอบ ไฟล์บันทึกเสียงจะไม่ถูกส่งออกไปเด็ดขาด",
+  "Server address": "ที่อยู่เซิร์ฟเวอร์",
+  "Model": "โมเดล",
+  "API key": "คีย์ API",
+  "Saved. Type a new key to replace it.": "บันทึกแล้ว พิมพ์คีย์ใหม่เพื่อแทนที่"
 }

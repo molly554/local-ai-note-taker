@@ -661,5 +661,12 @@
   "You can restart once the recording stops.": "Restartovat můžete, až nahrávání skončí.",
   "Check now": "Zkontrolovat",
   "Eject the Yogurt installer?": "Vysunout instalátor Yogurt?",
-  "Eject": "Vysunout"
+  "Eject": "Vysunout",
+  "Cloud AI": "Cloudová AI",
+  "Write with a cloud model": "Psát cloudovým modelem",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Když je tato volba zapnutá, vaše přepisy, vlastní poznámky a otázky se odesílají službě uvedené níže, která píše poznámky a odpovědi. Nahrávky se neodesílají nikdy.",
+  "Server address": "Adresa serveru",
+  "Model": "Model",
+  "API key": "Klíč API",
+  "Saved. Type a new key to replace it.": "Uloženo. Chcete-li ho nahradit, zadejte nový klíč."
 }

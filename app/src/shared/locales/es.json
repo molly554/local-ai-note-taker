@@ -648,5 +648,12 @@
   "You can restart once the recording stops.": "Puedes reiniciar cuando termine la grabación.",
   "Check now": "Buscar ahora",
   "Eject the Yogurt installer?": "¿Expulsar el instalador de Yogurt?",
-  "Eject": "Expulsar"
+  "Eject": "Expulsar",
+  "Cloud AI": "IA en la nube",
+  "Write with a cloud model": "Escribir con un modelo en la nube",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Cuando está activado, tus transcripciones, tus propias notas y tus preguntas se envían al servicio indicado abajo, que escribe las notas y las respuestas. Las grabaciones nunca se envían.",
+  "Server address": "Dirección del servidor",
+  "Model": "Modelo",
+  "API key": "Clave de API",
+  "Saved. Type a new key to replace it.": "Guardada. Escribe una clave nueva para reemplazarla."
 }

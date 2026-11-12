@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain, nativeTheme } from 'electron'
-import { loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import { cloudView, loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import type { CloudPatch } from '../shared/cloud'
 import { systemLocale } from './locale'
 import { PERMISSION_KINDS, type PermissionKind, type Permissions } from './permissions'
 import { firstRunPlan, missing, nudge } from '../shared/onboarding'
@@ -21,6 +22,8 @@ export function hookPreferences(d: { file: string; permissions: Permissions; ask
   slowStartMs?: number
   /** the spoken language changed: the meeting being recorded follows it where it can */
   onSpoken?: (v: Spoken) => void
+  /** seals a secret for the settings file (the cloud model's key); null when this computer can't keep one */
+  seal?: (plain: string) => string | null
   /** the permissions this computer has (supportedKinds in platform.ts); a Mac has them all */
   kinds?: readonly PermissionKind[] }) {
   const kinds = d.kinds ?? PERMISSION_KINDS
@@ -49,7 +52,7 @@ export function hookPreferences(d: { file: string; permissions: Permissions; ask
     // what the Mac says, so a change in System Settings shows here
     // locale: every window (main, card, widget) shows the interface language
     // language: the one picked ('' is the Mac's); locale: the one in use; systemLocale: the Mac's, for the picker
-    return { theme: s.theme ?? 'system', openAtLogin: d.loginOn(s.openAtLogin), showInMenuBar: s.showInMenuBar !== false, language: isLocale(s.language) ? s.language : '', locale: localeOf(s, systemLocale()), systemLocale: systemLocale(), myName: s.myName?.trim() || d.macName(), macName: d.macName(), stopWhenCallEnds: stopsWhenCallEnds(s), recordingReminder: recordingReminderOn(s), jargon: cleanJargon(s.jargon), spoken: spokenSetting(s, systemLocale()), notesLanguage: notesLanguageSetting(s) ?? '' }
+    return { theme: s.theme ?? 'system', openAtLogin: d.loginOn(s.openAtLogin), showInMenuBar: s.showInMenuBar !== false, language: isLocale(s.language) ? s.language : '', locale: localeOf(s, systemLocale()), systemLocale: systemLocale(), myName: s.myName?.trim() || d.macName(), macName: d.macName(), stopWhenCallEnds: stopsWhenCallEnds(s), recordingReminder: recordingReminderOn(s), jargon: cleanJargon(s.jargon), spoken: spokenSetting(s, systemLocale()), notesLanguage: notesLanguageSetting(s) ?? '', cloud: cloudView(s) }
   })
   // what the person is called in meetings (who "You" is when naming voices); blank: the Mac's full name again
   ipcMain.handle('settings:name', (_e, v: unknown) => {
@@ -95,6 +98,18 @@ export function hookPreferences(d: { file: string; permissions: Permissions; ask
   ipcMain.handle('settings:notes-language', (_e, v: unknown) => {
     if (v !== '' && !isNotesLanguage(v)) return
     updateSettings(d.file, { notesLanguage: v === '' ? undefined : v })
+  })
+  // The cloud model: on or off, its address, its model and its key. The key is sealed before it is written down
+  // and never sent back to the window; on a computer that cannot seal one it is not kept at all.
+  ipcMain.handle('settings:cloud', (_e, v: unknown) => {
+    if (!v || typeof v !== 'object') return
+    const p = v as CloudPatch, cloud = { ...loadSettings(d.file).cloud }
+    if (typeof p.on === 'boolean') cloud.on = p.on || undefined
+    if (typeof p.url === 'string') cloud.url = p.url.trim().slice(0, 500) || undefined
+    if (typeof p.model === 'string') cloud.model = p.model.trim().slice(0, 200) || undefined
+    if (typeof p.key === 'string') cloud.key = (p.key.trim() && d.seal?.(p.key.trim())) || undefined
+    const s = updateSettings(d.file, { cloud: Object.values(cloud).some((x) => x !== undefined) ? cloud : undefined })
+    return cloudView(s)
   })
   ipcMain.handle('settings:menu-bar', (_e, on: unknown) => {
     if (typeof on !== 'boolean') return

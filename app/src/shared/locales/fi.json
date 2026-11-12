@@ -638,5 +638,12 @@
   "You can restart once the recording stops.": "Voit käynnistää uudelleen, kun tallennus päättyy.",
   "Check now": "Tarkista nyt",
   "Eject the Yogurt installer?": "Poistetaanko Yogurtin asennusohjelma?",
-  "Eject": "Poista"
+  "Eject": "Poista",
+  "Cloud AI": "Pilvitekoäly",
+  "Write with a cloud model": "Kirjoita pilvimallilla",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Kun tämä on päällä, litterointisi, omat muistiinpanosi ja kysymyksesi lähetetään alla olevaan palveluun, joka kirjoittaa muistiinpanot ja vastaukset. Tallenteita ei lähetetä koskaan.",
+  "Server address": "Palvelimen osoite",
+  "Model": "Malli",
+  "API key": "API-avain",
+  "Saved. Type a new key to replace it.": "Tallennettu. Korvaa kirjoittamalla uusi avain."
 }

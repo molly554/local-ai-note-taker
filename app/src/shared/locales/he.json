@@ -648,5 +648,12 @@
   "You can restart once the recording stops.": "אפשר להפעיל מחדש אחרי שההקלטה תיפסק.",
   "Check now": "בדיקה עכשיו",
   "Eject the Yogurt installer?": "להוציא את תוכנית ההתקנה של Yogurt?",
-  "Eject": "הוצא"
+  "Eject": "הוצא",
+  "Cloud AI": "בינה מלאכותית בענן",
+  "Write with a cloud model": "כתיבה באמצעות מודל ענן",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "כשהאפשרות פועלת, התמלולים, ההערות שלכם והשאלות שלכם נשלחים לשירות שלמטה, והוא כותב את ההערות והתשובות. ההקלטות לעולם אינן נשלחות.",
+  "Server address": "כתובת השרת",
+  "Model": "מודל",
+  "API key": "מפתח API",
+  "Saved. Type a new key to replace it.": "נשמר. הקלידו מפתח חדש כדי להחליף אותו."
 }

@@ -9,6 +9,7 @@ import { applyLanguage } from '../i18n'
 import { flushOpenNotes } from '../noteAutosave'
 import { Jargon } from '../components/Jargon'
 import { NotesLanguageSetting, SpokenSetting } from '../components/SpokenSetting'
+import type { CloudPatch, CloudView } from '../../../shared/cloud'
 import { useScrollMemory } from '../useScrollMemory'
 import { appShortcuts } from '../components/Shortcuts'
 import { CalendarSettings } from '../components/CalendarSettings'
@@ -137,6 +138,8 @@ export function Settings({ revision = 0 }: { revision?: number }) {
           </div>
 
           <Backup />
+
+          <CloudAi />
 
           <AiApps />
 
@@ -278,6 +281,45 @@ function Backup() {
           )}
         </div>
       </div>
+    </>
+  )
+}
+
+/** Settings → Cloud AI: a model somewhere else for the writing, off until turned on, saying what is sent to it */
+function CloudAi() {
+  const [cloud, setCloud] = useState<CloudView>()
+  const [key, setKey] = useState('')
+  useEffect(() => { void window.yogurt.settings.get().then((p) => setCloud(p.cloud)) }, [])
+  const save = (patch: CloudPatch) => void window.yogurt.settings.setCloud(patch).then((next) => { if (next) setCloud(next) })
+  const field = 'min-w-0 flex-1 rounded-md border border-line bg-bg px-2.5 py-1.5 text-[13px] text-ink placeholder:text-muted'
+  const name = 'w-32 shrink-0 text-[13px] text-muted'
+  return (
+    <>
+      <h2 className="settings-section-heading">{t('Cloud AI')}</h2>
+      <LoadingContent pending={!cloud} testId="cloud-ai-loading"><div data-testid="cloud-ai" className="settings-group">
+        <div className="settings-row">
+          <div className="settings-row-copy">
+            <p className="settings-label">{t('Write with a cloud model')}</p>
+            <p className="settings-description">{t('When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.')}</p>
+          </div>
+          <button data-testid="cloud-toggle" role="switch" aria-checked={!!cloud?.on} aria-label={t('Write with a cloud model')} className="settings-toggle"
+            onClick={() => { if (cloud) { setCloud({ ...cloud, on: !cloud.on }); save({ on: !cloud.on }) } }}>
+            <span className="settings-toggle-knob" />
+          </button>
+        </div>
+        {cloud?.on &&
+          <div className="settings-row">
+            <div className="settings-row-copy flex flex-col gap-2.5">
+              <label className="flex items-center gap-3"><span className={name}>{t('Server address')}</span>
+                <input data-testid="cloud-url" dir="ltr" spellCheck={false} defaultValue={cloud.url} placeholder="https://api.example.com/v1" onBlur={(e) => save({ url: e.target.value })} className={field} /></label>
+              <label className="flex items-center gap-3"><span className={name}>{t('Model')}</span>
+                <input data-testid="cloud-model" dir="ltr" spellCheck={false} defaultValue={cloud.model} onBlur={(e) => save({ model: e.target.value })} className={field} /></label>
+              <label className="flex items-center gap-3"><span className={name}>{t('API key')}</span>
+                <input data-testid="cloud-key" type="password" autoComplete="off" dir="ltr" value={key} placeholder={cloud.hasKey ? t('Saved. Type a new key to replace it.') : ''}
+                  onChange={(e) => setKey(e.target.value)} onBlur={() => { if (key) { save({ key }); setKey('') } }} className={field} /></label>
+            </div>
+          </div>}
+      </div></LoadingContent>
     </>
   )
 }

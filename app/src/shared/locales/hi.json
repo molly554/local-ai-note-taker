@@ -635,5 +635,12 @@
   "You can restart once the recording stops.": "रिकॉर्डिंग रुकने के बाद आप रीस्टार्ट कर सकते हैं।",
   "Check now": "अभी देखें",
   "Eject the Yogurt installer?": "Yogurt इंस्टॉलर निकालें?",
-  "Eject": "निकालें"
+  "Eject": "निकालें",
+  "Cloud AI": "क्लाउड AI",
+  "Write with a cloud model": "क्लाउड मॉडल से लिखें",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "इसे चालू करने पर आपकी ट्रांसक्रिप्ट, आपके अपने नोट्स और आपके सवाल नीचे दी गई सेवा को भेजे जाते हैं, जो नोट्स और जवाब लिखती है। रिकॉर्डिंग कभी नहीं भेजी जाती।",
+  "Server address": "सर्वर का पता",
+  "Model": "मॉडल",
+  "API key": "API कुंजी",
+  "Saved. Type a new key to replace it.": "सहेज ली गई। बदलने के लिए नई कुंजी टाइप करें।"
 }

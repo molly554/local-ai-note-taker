@@ -16,7 +16,7 @@ import { basename, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { isFake, userDataDir } from './paths'
 import { logToFile } from './log'
-import { loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import { cloudSetting, loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
 import { CALL_GONE_MS, useCallApps } from './detect'
 import { systemLocale } from './locale'
 import { PRODUCT } from '../shared/brand'
@@ -58,6 +58,8 @@ import { setGenericTitles } from './titles'
 import { installAppMenu } from './appMenu'
 import { UtilityEngine } from './engine'
 import { createNotesModel } from './notes/model'
+import { withCloud } from './notes/cloud'
+import { open as openSecret, seal as sealSecret } from './secret'
 import { FakeEngine } from './notes/fake'
 import { hookNotes } from './notes'
 import { hookReadAhead, readAheadAllowed } from './notes/readAhead'
@@ -447,6 +449,7 @@ app.whenReady().then(() => {
   // a moved or reinstalled Yogurt loses its login item: put it back if the person wanted it
   if (!isFake()) syncLoginItem(settings.openAtLogin)
   hookPreferences({
+    seal: sealSecret,
     file: join(userDataDir(), 'settings.json'), permissions, kinds: supportedKinds(caps),
     // fake mode asks the first-run questions only when a test sets the permissions
     ask: !isFake() || !!process.env.YOGURT_FAKE_PERMISSIONS,
@@ -546,7 +549,8 @@ app.whenReady().then(() => {
   }, (e) => { console.warn("couldn't check the graphics", e); return null })
   // fake mode: the fixed Mac (a bigger one) unless a test asks for a 16 GB one
   const smallMac = isFake() ? process.env.YOGURT_FAKE_SMALL_MAC === '1' : isSmallMac(os.totalmem())
-  const model = createNotesModel({ engine, modelPath: () => { const p = setup.installed(); return p?.recommendedLlm ?? p?.llm } })
+  // the model on this computer, or the cloud one while Settings → Cloud AI is on and filled in (read each time, so a change counts at once)
+  const model = withCloud(createNotesModel({ engine, modelPath: () => { const p = setup.installed(); return p?.recommendedLlm ?? p?.llm } }), () => cloudSetting(loadSettings(settingsFile), openSecret))
   // first run: the notes model lands after recording already works; jobs wait in the queue for it
   // the embedding model (meaning search across meetings) runs in the same worker and is let go with the notes model
   const embedder = createEmbedder({ engine, modelPath: () => setup.installed()?.embed, id: bundledCatalog.embedding.id, dims: bundledCatalog.embedding.dims })

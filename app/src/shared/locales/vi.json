@@ -596,5 +596,12 @@
   "You can restart once the recording stops.": "Bạn có thể khởi động lại khi bản ghi dừng.",
   "Check now": "Kiểm tra ngay",
   "Eject the Yogurt installer?": "Đẩy trình cài đặt Yogurt ra?",
-  "Eject": "Đẩy ra"
+  "Eject": "Đẩy ra",
+  "Cloud AI": "AI đám mây",
+  "Write with a cloud model": "Viết bằng mô hình đám mây",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Khi bật, bản ghi lời, ghi chú của riêng bạn và câu hỏi của bạn sẽ được gửi tới dịch vụ bên dưới để viết ghi chú và câu trả lời. Bản ghi âm không bao giờ được gửi đi.",
+  "Server address": "Địa chỉ máy chủ",
+  "Model": "Mô hình",
+  "API key": "Khóa API",
+  "Saved. Type a new key to replace it.": "Đã lưu. Nhập khóa mới để thay thế."
 }

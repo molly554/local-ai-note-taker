@@ -635,5 +635,12 @@
   "You can restart once the recording stops.": "Je kunt opnieuw starten zodra de opname stopt.",
   "Check now": "Nu zoeken",
   "Eject the Yogurt installer?": "Yogurt-installatieprogramma verwijderen?",
-  "Eject": "Verwijder"
+  "Eject": "Verwijder",
+  "Cloud AI": "Cloud-AI",
+  "Write with a cloud model": "Schrijven met een cloudmodel",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Als dit aanstaat, worden je transcripties, je eigen notities en je vragen naar de onderstaande dienst gestuurd, die de notities en antwoorden schrijft. Opnamen worden nooit verstuurd.",
+  "Server address": "Serveradres",
+  "Model": "Model",
+  "API key": "API-sleutel",
+  "Saved. Type a new key to replace it.": "Opgeslagen. Typ een nieuwe sleutel om deze te vervangen."
 }

@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { isLocale } from '../shared/i18n'
 import { isNotesLanguage, spokenOf, type NotesLanguage, type Spoken } from '../shared/spoken'
+import { cloudAddress, type Cloud, type CloudView } from '../shared/cloud'
 
 /** theme: light or dark regardless of the system; follows the system when left out. language: the interface's, the computer's when left out */
 export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what the person is called in their meetings; their Mac's full name when left out */ myName?: string
@@ -36,6 +37,8 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
   spoken?: Spoken
   /** the language notes are written in (shared/spoken.ts); the meeting's own when left out */
   notesLanguage?: NotesLanguage
+  /** a cloud model for the writing (shared/cloud.ts): off unless turned on. key: as the system's store sealed it, never the key itself */
+  cloud?: { on?: boolean; url?: string; model?: string; key?: string }
   /** new versions download by themselves; on unless turned off */
   autoUpdate?: boolean }
 
@@ -43,6 +46,15 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
 export const spokenSetting = (s: Settings, system = ''): Spoken => spokenOf(s.spoken, system)
 /** the language notes are to be written in; null: each meeting's own */
 export const notesLanguageSetting = (s: Settings): NotesLanguage | null => (isNotesLanguage(s.notesLanguage) ? s.notesLanguage : null)
+/** the cloud model to write with: only when it is turned on, its address can be sent to, and its model and key are there. open: unseals the key */
+export const cloudSetting = (s: Settings, open: (kept: string) => string | null): Cloud | null => {
+  const c = s.cloud, url = cloudAddress(c?.url), model = c?.model?.trim()
+  if (!c?.on || !url || !model || !c.key) return null
+  const key = open(c.key)
+  return key ? { url, model, key } : null
+}
+/** what Settings shows of it: never the key */
+export const cloudView = (s: Settings): CloudView => ({ on: !!s.cloud?.on, url: s.cloud?.url ?? '', model: s.cloud?.model ?? '', hasKey: !!s.cloud?.key })
 
 /** "Finish recording when the call ends": on by default */
 export const stopsWhenCallEnds = (s: Settings): boolean => s.stopWhenCallEnds !== false

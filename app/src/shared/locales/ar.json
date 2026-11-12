@@ -691,5 +691,12 @@
   "You can restart once the recording stops.": "يمكنك إعادة التشغيل بعد توقف التسجيل.",
   "Check now": "تحقّق الآن",
   "Eject the Yogurt installer?": "إخراج مثبّت Yogurt؟",
-  "Eject": "إخراج"
+  "Eject": "إخراج",
+  "Cloud AI": "الذكاء الاصطناعي السحابي",
+  "Write with a cloud model": "الكتابة بنموذج سحابي",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "عند تفعيل هذا الخيار، تُرسَل نصوص اجتماعاتك وملاحظاتك وأسئلتك إلى الخدمة أدناه لتكتب الملاحظات والإجابات. التسجيلات لا تُرسَل أبدًا.",
+  "Server address": "عنوان الخادم",
+  "Model": "النموذج",
+  "API key": "مفتاح API",
+  "Saved. Type a new key to replace it.": "تم الحفظ. اكتب مفتاحًا جديدًا لاستبداله."
 }

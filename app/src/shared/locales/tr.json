@@ -635,5 +635,12 @@
   "You can restart once the recording stops.": "Kayıt durduğunda yeniden başlatabilirsiniz.",
   "Check now": "Şimdi denetle",
   "Eject the Yogurt installer?": "Yogurt yükleyicisi çıkarılsın mı?",
-  "Eject": "Çıkar"
+  "Eject": "Çıkar",
+  "Cloud AI": "Bulut yapay zekâsı",
+  "Write with a cloud model": "Bulut modeliyle yaz",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Bu açıkken dökümleriniz, kendi notlarınız ve sorularınız aşağıdaki hizmete gönderilir; notları ve yanıtları o hizmet yazar. Kayıtlar hiçbir zaman gönderilmez.",
+  "Server address": "Sunucu adresi",
+  "Model": "Model",
+  "API key": "API anahtarı",
+  "Saved. Type a new key to replace it.": "Kaydedildi. Değiştirmek için yeni bir anahtar yazın."
 }

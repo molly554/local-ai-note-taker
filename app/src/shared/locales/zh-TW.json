@@ -596,5 +596,12 @@
   "You can restart once the recording stops.": "錄音停止後即可重新啟動。",
   "Check now": "立即檢查",
   "Eject the Yogurt installer?": "要退出 Yogurt 安裝程式嗎？",
-  "Eject": "退出"
+  "Eject": "退出",
+  "Cloud AI": "雲端 AI",
+  "Write with a cloud model": "用雲端模型來寫",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "開啟後，會議的文字記錄、你自己的筆記和你的提問會傳送到下面填寫的服務，由它來寫筆記和回答。錄音不會傳送。",
+  "Server address": "服務位址",
+  "Model": "模型",
+  "API key": "API 金鑰",
+  "Saved. Type a new key to replace it.": "已儲存。輸入新的金鑰即可取代。"
 }

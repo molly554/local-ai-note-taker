@@ -635,5 +635,12 @@
   "You can restart once the recording stops.": "Puwede kang mag-restart kapag huminto na ang recording.",
   "Check now": "Tingnan ngayon",
   "Eject the Yogurt installer?": "I-eject ang installer ng Yogurt?",
-  "Eject": "I-eject"
+  "Eject": "I-eject",
+  "Cloud AI": "Cloud AI",
+  "Write with a cloud model": "Sumulat gamit ang cloud model",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Kapag naka-on ito, ipinapadala ang iyong mga transcript, sarili mong mga tala, at mga tanong mo sa serbisyo sa ibaba, na siyang sumusulat ng mga tala at sagot. Hindi kailanman ipinapadala ang mga recording.",
+  "Server address": "Address ng server",
+  "Model": "Model",
+  "API key": "API key",
+  "Saved. Type a new key to replace it.": "Na-save. Mag-type ng bagong key para palitan ito."
 }

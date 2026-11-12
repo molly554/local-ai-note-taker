@@ -238,7 +238,7 @@ export type YogurtApi = {
   }
   settings: {
     /** myName: what the person is called in meetings (their Mac's full name, macName, when they never changed it) */
-    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken; /** the language notes are written in; '' is each meeting's own */ notesLanguage: import('./spoken').NotesLanguage | '' }>
+    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken; /** the language notes are written in; '' is each meeting's own */ notesLanguage: import('./spoken').NotesLanguage | ''; /** the cloud model, without its key */ cloud: import('./cloud').CloudView }>
     /** blank goes back to the Mac's full name */
     setName(name: string): Promise<void>
     setTheme(v: Theme): Promise<void>
@@ -256,6 +256,8 @@ export type YogurtApi = {
     setSpoken(v: import('./spoken').Spoken): Promise<void>
     /** '' for each meeting's own language */
     setNotesLanguage(v: import('./spoken').NotesLanguage | ''): Promise<void>
+    /** turns the cloud model on or off, or changes its address, model or key; answers what is now saved */
+    setCloud(v: import('./cloud').CloudPatch): Promise<import('./cloud').CloudView | undefined>
   }
   /** finds meetings by title, transcript and notes; nothing typed: the latest. folder: only the meetings in it */
   search: { query(q: string, folder?: string): Promise<SearchResult[]> }

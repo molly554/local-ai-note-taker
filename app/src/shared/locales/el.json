@@ -635,5 +635,12 @@
   "You can restart once the recording stops.": "Μπορείς να κάνεις επανεκκίνηση όταν σταματήσει η εγγραφή.",
   "Check now": "Έλεγχος τώρα",
   "Eject the Yogurt installer?": "Εξαγωγή του προγράμματος εγκατάστασης του Yogurt;",
-  "Eject": "Εξαγωγή"
+  "Eject": "Εξαγωγή",
+  "Cloud AI": "AI στο cloud",
+  "Write with a cloud model": "Γραφή με μοντέλο cloud",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Όταν είναι ενεργό, οι μεταγραφές σας, οι δικές σας σημειώσεις και οι ερωτήσεις σας αποστέλλονται στην παρακάτω υπηρεσία, η οποία γράφει τις σημειώσεις και τις απαντήσεις. Οι ηχογραφήσεις δεν αποστέλλονται ποτέ.",
+  "Server address": "Διεύθυνση διακομιστή",
+  "Model": "Μοντέλο",
+  "API key": "Κλειδί API",
+  "Saved. Type a new key to replace it.": "Αποθηκεύτηκε. Πληκτρολογήστε νέο κλειδί για να το αντικαταστήσετε."
 }

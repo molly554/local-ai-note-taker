@@ -661,5 +661,12 @@
   "You can restart once the recording stops.": "Перезапустити можна після зупинки запису.",
   "Check now": "Перевірити",
   "Eject the Yogurt installer?": "Витягти інсталятор Yogurt?",
-  "Eject": "Витягти"
+  "Eject": "Витягти",
+  "Cloud AI": "Хмарний ШІ",
+  "Write with a cloud model": "Писати за допомогою хмарної моделі",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Коли це ввімкнено, ваші розшифровки, ваші власні нотатки й запитання надсилаються до вказаного нижче сервісу, який пише нотатки та відповіді. Записи не надсилаються ніколи.",
+  "Server address": "Адреса сервера",
+  "Model": "Модель",
+  "API key": "Ключ API",
+  "Saved. Type a new key to replace it.": "Збережено. Введіть новий ключ, щоб замінити його."
 }

@@ -635,5 +635,12 @@
   "You can restart once the recording stops.": "Du kan starte på nytt når opptaket stopper.",
   "Check now": "Se etter nå",
   "Eject the Yogurt installer?": "Løse ut Yogurt-installasjonsprogrammet?",
-  "Eject": "Løs ut"
+  "Eject": "Løs ut",
+  "Cloud AI": "Sky-KI",
+  "Write with a cloud model": "Skriv med en skymodell",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Når dette er på, sendes transkripsjonene dine, dine egne notater og spørsmålene dine til tjenesten nedenfor, som skriver notatene og svarene. Opptak sendes aldri.",
+  "Server address": "Serveradresse",
+  "Model": "Modell",
+  "API key": "API-nøkkel",
+  "Saved. Type a new key to replace it.": "Lagret. Skriv inn en ny nøkkel for å erstatte den."
 }

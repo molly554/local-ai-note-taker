@@ -596,5 +596,12 @@
   "You can restart once the recording stops.": "Anda boleh mula semula selepas rakaman berhenti.",
   "Check now": "Semak sekarang",
   "Eject the Yogurt installer?": "Keluarkan pemasang Yogurt?",
-  "Eject": "Keluarkan"
+  "Eject": "Keluarkan",
+  "Cloud AI": "AI awan",
+  "Write with a cloud model": "Tulis dengan model awan",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Apabila ini dihidupkan, transkrip, nota anda sendiri dan soalan anda dihantar ke perkhidmatan di bawah, yang menulis nota dan jawapan. Rakaman tidak pernah dihantar.",
+  "Server address": "Alamat pelayan",
+  "Model": "Model",
+  "API key": "Kunci API",
+  "Saved. Type a new key to replace it.": "Disimpan. Taip kunci baharu untuk menggantikannya."
 }

@@ -648,5 +648,12 @@
   "You can restart once the recording stops.": "Poți reporni după ce se oprește înregistrarea.",
   "Check now": "Verifică acum",
   "Eject the Yogurt installer?": "Scoți programul de instalare Yogurt?",
-  "Eject": "Scoate"
+  "Eject": "Scoate",
+  "Cloud AI": "AI în cloud",
+  "Write with a cloud model": "Scrieți cu un model din cloud",
+  "When this is on, your transcripts, your own notes and your questions are sent to the service below, which writes the notes and answers. Recordings are never sent.": "Când opțiunea este activată, transcrierile, notițele dvs. și întrebările dvs. sunt trimise serviciului de mai jos, care scrie notițele și răspunsurile. Înregistrările nu sunt trimise niciodată.",
+  "Server address": "Adresa serverului",
+  "Model": "Model",
+  "API key": "Cheie API",
+  "Saved. Type a new key to replace it.": "Salvată. Introduceți o cheie nouă pentru a o înlocui."
 }
