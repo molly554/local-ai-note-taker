@@ -57,14 +57,13 @@ test('the spoken language picker: English only by default, Multi-language for th
     // Settings → Language shows the same choice, and changes it back
     await page.getByTestId('note-stop').click()
     await page.getByTestId('settings-open').click()
-    await expect(page.getByTestId('settings-spoken-multi')).toHaveAttribute('aria-checked', 'true')
-    await page.getByTestId('settings-spoken-en').click()
-    await expect(page.getByTestId('settings-spoken-en')).toHaveAttribute('aria-checked', 'true')
-    // English only is the default, so it is not written down
-    await expect.poll(() => saved(a.userData)).toBeUndefined()
-    await page.getByTestId('settings-spoken-en').press('ArrowRight')
-    await expect(page.getByTestId('settings-spoken-multi')).toHaveAttribute('aria-checked', 'true')
-    await expect.poll(focused).toBe('settings-spoken-multi')
+    await expect(page.getByTestId('settings-spoken')).toHaveValue('multi')
+    await page.getByTestId('settings-spoken').selectOption('en')
+    await expect(page.getByTestId('settings-spoken')).toHaveValue('en')
+    // whatever is picked is written down: nothing written means "follow the computer's language"
+    await expect.poll(() => saved(a.userData)).toBe('en')
+    await page.getByTestId('settings-spoken').selectOption('multi')
+    await expect(page.getByTestId('settings-spoken')).toHaveValue('multi')
     await expect.poll(() => saved(a.userData)).toBe('multi')
   } finally { await app.close() }
 
@@ -76,4 +75,45 @@ test('the spoken language picker: English only by default, Multi-language for th
     await expect.poll(async () => (await languages(b.app)).length, { timeout: 30_000 }).toBeGreaterThan(0)
     expect(new Set(await languages(b.app))).toEqual(new Set(['auto']))
   } finally { await b.app.close() }
+})
+
+test('a computer in Chinese starts in Chinese; a language picked by name is what whisper is told; notes can be asked for in another language', async () => {
+  const userData = mkdtempSync(join(tmpdir(), 'yogurt-spoken-zh-'))
+  const app = await electron.launch({ args: [main], env: { ...process.env, YOGURT_FAKE: '1', YOGURT_USER_DATA: userData, YOGURT_SYSTEM_LANGUAGES: 'zh-CN' } })
+  const page = await app.firstWindow()
+  const settings = () => JSON.parse(readFileSync(join(userData, 'settings.json'), 'utf8'))
+  try {
+    await expect(page.getByTestId('home')).toBeVisible()
+    // the notes are to be in English, whatever is spoken
+    await page.evaluate(() => window.yogurt.settings.setNotesLanguage('en'))
+    await expect.poll(() => settings().notesLanguage).toBe('en')
+
+    await page.getByTestId('new-note').click()
+    await expect(page.getByTestId('note-state')).toHaveAttribute('data-state', 'recording')
+    // nothing was picked: the computer is in Chinese, so whisper is told Chinese
+    await expect(page.getByTestId('spoken-name')).toHaveText('中文')
+    await expect.poll(async () => (await languages(app)).length, { timeout: 30_000 }).toBeGreaterThan(0)
+    expect(new Set(await languages(app))).toEqual(new Set(['zh']))
+
+    // the menu lists the languages by their own names; picking one counts from the next words on
+    await page.getByTestId('spoken-chip').click()
+    await expect(page.getByTestId('spoken-zh')).toHaveAttribute('aria-checked', 'true')
+    await expect(page.getByTestId('spoken-ja')).toHaveText('日本語')
+    const told = (await languages(app)).length
+    await page.getByTestId('spoken-ja').click()
+    await expect(page.getByTestId('spoken-name')).toHaveText('日本語')
+    await expect.poll(() => settings().spoken).toBe('ja')
+    await expect.poll(async () => (await languages(app)).slice(told), { timeout: 30_000 }).toContain('ja')
+
+    // the notes prompt asks for English
+    await page.getByTestId('note-stop').click()
+    await expect.poll(async () => (await fake<{ notes: string[] }>(app, 'prompts')).notes.some((p) => p.includes('Write in English, headings too.')), { timeout: 60_000 }).toBe(true)
+
+    // Settings shows both choices
+    await page.getByTestId('settings-open').click()
+    await expect(page.getByTestId('settings-spoken')).toHaveValue('ja')
+    await expect(page.getByTestId('settings-notes-language')).toHaveValue('en')
+    await page.getByTestId('settings-notes-language').selectOption('')
+    await expect.poll(() => settings().notesLanguage).toBeUndefined()
+  } finally { await app.close() }
 })

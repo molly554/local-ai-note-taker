@@ -31,6 +31,8 @@ export function hookNotes(p: {
   named?: (id: string) => Promise<void>
   /** the language most of the meeting was in, when the transcription knows it */
   language: (id: string) => string | null
+  /** the language picked for notes in Settings; null (or left out): each meeting's own */
+  notesLanguage?: () => string | null
   onStop: (fn: (m: Meeting) => void) => unknown
   /** a meeting's notes changed: status, draft or saved text */
   send: (v: NoteView) => void
@@ -125,7 +127,7 @@ export function hookNotes(p: {
     // the people the prompt is built with: a change while writing then still marks these notes as out of date
     const used = { stamp: stamp(m.attendees) }
     writingPeople.set(id, used)
-    const language = m.language ?? p.language(id)
+    const language = p.notesLanguage?.() ?? m.language ?? p.language(id)
     let draft = '', last = 0, timer: NodeJS.Timeout | undefined
     // blank lines would show as empty paragraphs while streaming, then vanish once tidied: never shown
     const flush = () => { timer = undefined; last = Date.now(); if (!signal.aborted) set(id, 'writing', draft.replace(/\n[ \t]*(?=\n)/g, '')) }

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { isLocale } from '../shared/i18n'
-import { spokenOf, type Spoken } from '../shared/spoken'
+import { isNotesLanguage, spokenOf, type NotesLanguage, type Spoken } from '../shared/spoken'
 
 /** theme: light or dark regardless of the system; follows the system when left out. language: the interface's, the computer's when left out */
 export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what the person is called in their meetings; their Mac's full name when left out */ myName?: string
@@ -32,13 +32,17 @@ export type Settings = { theme?: 'light' | 'dark'; language?: string; /** what t
   hiddenCalendarIds?: string[]
   /** names, products and acronyms to spell right in transcripts and notes (shared/jargon.ts) */
   jargon?: string[]
-  /** the language people speak in meetings: English only unless 'multi' (shared/spoken.ts) */
+  /** the language people speak in meetings (shared/spoken.ts); left out, the computer's own when it can be picked, else English only */
   spoken?: Spoken
+  /** the language notes are written in (shared/spoken.ts); the meeting's own when left out */
+  notesLanguage?: NotesLanguage
   /** new versions download by themselves; on unless turned off */
   autoUpdate?: boolean }
 
-/** "English only" unless Multi-language was picked */
-export const spokenSetting = (s: Settings): Spoken => spokenOf(s.spoken)
+/** the spoken language picked; with none, the computer's own (system: its locale) when it can be picked, else "English only" */
+export const spokenSetting = (s: Settings, system = ''): Spoken => spokenOf(s.spoken, system)
+/** the language notes are to be written in; null: each meeting's own */
+export const notesLanguageSetting = (s: Settings): NotesLanguage | null => (isNotesLanguage(s.notesLanguage) ? s.notesLanguage : null)
 
 /** "Finish recording when the call ends": on by default */
 export const stopsWhenCallEnds = (s: Settings): boolean => s.stopWhenCallEnds !== false

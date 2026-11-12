@@ -238,7 +238,7 @@ export type YogurtApi = {
   }
   settings: {
     /** myName: what the person is called in meetings (their Mac's full name, macName, when they never changed it) */
-    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken }>
+    get(): Promise<{ theme: Theme; openAtLogin: boolean; showInMenuBar: boolean; /** the language picked; '' follows the Mac */ language: string; /** the language in use */ locale: string; /** the Mac's language, among Yogurt's */ systemLocale: string; myName: string; macName: string; /** a recording stops by itself when its call ends (off: ask first) */ stopWhenCallEnds: boolean; recordingReminder: boolean; /** personal jargon, spelled as typed */ jargon: string[]; /** the language people speak in meetings */ spoken: import('./spoken').Spoken; /** the language notes are written in; '' is each meeting's own */ notesLanguage: import('./spoken').NotesLanguage | '' }>
     /** blank goes back to the Mac's full name */
     setName(name: string): Promise<void>
     setTheme(v: Theme): Promise<void>
@@ -254,6 +254,8 @@ export type YogurtApi = {
     onLanguage(cb: (locale: string) => void): () => void
     /** English only or Multi-language: the meeting being recorded and the next ones */
     setSpoken(v: import('./spoken').Spoken): Promise<void>
+    /** '' for each meeting's own language */
+    setNotesLanguage(v: import('./spoken').NotesLanguage | ''): Promise<void>
   }
   /** finds meetings by title, transcript and notes; nothing typed: the latest. folder: only the meetings in it */
   search: { query(q: string, folder?: string): Promise<SearchResult[]> }

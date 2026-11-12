@@ -16,7 +16,7 @@ import { basename, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { isFake, userDataDir } from './paths'
 import { logToFile } from './log'
-import { loadSettings, localeOf, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
+import { loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
 import { CALL_GONE_MS, useCallApps } from './detect'
 import { systemLocale } from './locale'
 import { onLanguage, setLanguage, t } from '../shared/i18n'
@@ -503,8 +503,8 @@ app.whenReady().then(() => {
     refresh: (id) => { win?.webContents.send('transcript:speakers', id); sendWidgetTranscript('transcript:speakers', id) },
     sendPartial: (part) => { win?.webContents.send('transcript:partial', part); sendWidgetTranscript('transcript:partial', part) },
     warn: (code) => tell({ t: 'warn', code }), pidFile: join(userDataDir(), 'whisper-server.pid'),
-    // English only (the default) or Multi-language, read on each chunk so the footer's picker counts at once
-    spoken: () => spokenSetting(loadSettings(settingsFile)),
+    // the spoken language picked (with none, the computer's own or English only), read on each chunk so the footer's picker counts at once
+    spoken: () => spokenSetting(loadSettings(settingsFile), systemLocale()),
     // Apple's on-device speech for the live words (macOS 26, Apple Silicon); fake mode has a stand-in when a test asks
     speech: {
       host: { platform: process.platform, arch: process.arch, osRelease: isFake() ? (process.env.YOGURT_FAKE_SPEECH === '1' ? '25.4.0' : '24.0.0') : os.release() }, binary: audioHelperPath(),
@@ -569,6 +569,8 @@ app.whenReady().then(() => {
     // Windows and Linux: a note waiting while the model loads says so (a Mac shows what it always did)
     showLoading: platform !== 'darwin',
     store, queue, model, language: meetingLanguage, onStop: onMeetingStopSaved, named: (id) => callNames.finished(id), earlier: (id) => readAhead.parts(id), me,
+    // Settings → Language → Notes language, read when the notes are written
+    notesLanguage: () => notesLanguageSetting(loadSettings(settingsFile)),
     transcribed: async (id) => { await recordingFinished(id); await transcriptFinished(id) },
     send: (v) => win?.webContents.send('notes:changed', v),
     // the notes are written: the meeting goes into the library for chat across meetings

@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { Check, ChevronDown, Info, Languages } from 'lucide-react'
-import { WHISPER_LANGUAGES, type Spoken } from '../../../shared/spoken'
+import { SPOKEN_LANGUAGES, WHISPER_LANGUAGES, autonym, type Spoken } from '../../../shared/spoken'
 import { t } from '../../../shared/i18n'
 
 /** the names shown on the chip and in Settings */
-export const spokenName = (s: Spoken): string => (s === 'en' ? t('English') : t('Multi-language'))
+export const spokenName = (s: Spoken): string => (s === 'en' ? t('English') : s === 'multi' ? t('Multi-language') : autonym(s))
 
 /**
- * The spoken language under the note's bar, beside the mic, as a menu: English only (faster, nothing guessed) or
- * Multi-language. Choosing counts for the recording going on from its next words, and is remembered for the next ones.
+ * The spoken language under the note's bar, beside the mic, as a menu: English only (faster, nothing guessed),
+ * Multi-language, or one of the other languages by name. Choosing counts for the recording going on from its next
+ * words, and is remembered for the next ones.
  */
 export function SpokenMenu() {
   const [spoken, setSpoken] = useState<Spoken>()
@@ -67,7 +68,7 @@ export function SpokenMenu() {
       </button>
       {open && (
         <div data-testid="spoken-menu" data-pointer={open === 'pointer'} data-anchor="bottom-start" role="menu" aria-label={t('Spoken language')} onKeyDown={onKey}
-          className="menu-entry absolute bottom-full start-0 z-30 mb-2 w-64 rounded-xl border border-line bg-float p-1.5 text-ink shadow-[var(--shadow)]">
+          className="menu-entry absolute bottom-full start-0 z-30 mb-2 max-h-[70vh] w-64 overflow-y-auto rounded-xl border border-line bg-float p-1.5 text-ink shadow-[var(--shadow)]">
           <button role="menuitemradio" aria-checked={spoken === 'en'} data-testid="spoken-en" onClick={() => choose('en')} className={row}>
             <span className="flex min-w-0 flex-col">
               <span>{t('English only')}</span>
@@ -85,6 +86,13 @@ export function SpokenMenu() {
             </span>
             {tick(spoken === 'multi')}
           </button>
+          {/* each in its own name: told which language it is, whisper guesses nothing */}
+          {SPOKEN_LANGUAGES.map((code) => (
+            <button key={code} role="menuitemradio" aria-checked={spoken === code} data-testid={`spoken-${code}`} lang={code} onClick={() => choose(code)} className={row}>
+              <span>{autonym(code)}</span>
+              {tick(spoken === code)}
+            </button>
+          ))}
         </div>
       )}
     </div>

@@ -8,7 +8,7 @@ import { osWords } from '../keys'
 import { applyLanguage } from '../i18n'
 import { flushOpenNotes } from '../noteAutosave'
 import { Jargon } from '../components/Jargon'
-import { SpokenSetting } from '../components/SpokenSetting'
+import { NotesLanguageSetting, SpokenSetting } from '../components/SpokenSetting'
 import { useScrollMemory } from '../useScrollMemory'
 import { appShortcuts } from '../components/Shortcuts'
 import { CalendarSettings } from '../components/CalendarSettings'
@@ -132,6 +132,7 @@ export function Settings({ revision = 0 }: { revision?: number }) {
           <div data-testid="settings-language" className="settings-group">
             <AppLanguage />
             <SpokenSetting />
+            <NotesLanguageSetting />
             <Jargon />
           </div>
 

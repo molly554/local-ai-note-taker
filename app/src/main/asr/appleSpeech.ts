@@ -52,16 +52,16 @@ export function pickSpeechLocale(o: { supported: string[]; detected?: string | n
 }
 
 /**
- * The locale for a new meeting under the spoken language picked: English only listens in English (the interface's region
- * when it is English, else the biggest), or not at all when the Mac has no English model; Multi-language is pickSpeechLocale.
+ * The locale for a new meeting under the spoken language picked: one language listens in it (the interface's region
+ * when the interface is in it, else the biggest), or not at all when the Mac has no model for it; Multi-language is pickSpeechLocale.
  */
 export function wantedSpeechLocale(o: { spoken: Spoken; supported: string[]; last?: string | null; ui: string }): string | null {
   if (o.spoken === 'multi') return pickSpeechLocale(o)
-  return pickSpeechLocale({ supported: o.supported.filter((l) => lang(l) === 'en'), detected: 'english', ui: o.ui })
+  return pickSpeechLocale({ supported: o.supported.filter((l) => lang(l) === o.spoken), detected: o.spoken, ui: o.ui })
 }
 
-/** Apple may keep listening in this locale under the spoken language picked (a recording switched to English only) */
-export const speechFits = (spoken: Spoken, locale: string): boolean => spoken === 'multi' || lang(locale) === 'en'
+/** Apple may keep listening in this locale under the spoken language picked (a recording switched to one language) */
+export const speechFits = (spoken: Spoken, locale: string): boolean => spoken === 'multi' || lang(locale) === spoken
 
 /** whisper heard another language than the one Apple listens in: its words are not to be trusted for this meeting */
 export const speechDisagrees = (locale: string, detected: string | null | undefined): boolean => {

@@ -63,4 +63,12 @@ describe('the spoken language picked in Yogurt', () => {
     expect(speechFits('en', 'es-ES')).toBe(false)
     expect(speechFits('multi', 'es-ES')).toBe(true)
   })
+  it('a language picked outright listens in it, in the interface region when the interface is in it, or not at all when the Mac has no model for it', () => {
+    const more = ['en-US', 'zh-CN', 'zh-TW', 'ja-JP']
+    expect(wantedSpeechLocale({ spoken: 'zh', supported: more, last: 'english', ui: 'en-US' })).toBe('zh-CN')
+    expect(wantedSpeechLocale({ spoken: 'zh', supported: more, last: null, ui: 'zh-TW' })).toBe('zh-TW')
+    expect(wantedSpeechLocale({ spoken: 'ko', supported: more, last: null, ui: 'en-US' })).toBeNull()
+    expect(speechFits('zh', 'zh-CN')).toBe(true)
+    expect(speechFits('zh', 'en-US')).toBe(false)
+  })
 })
