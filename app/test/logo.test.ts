@@ -2,32 +2,37 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { MARK, WORD } from '../src/shared/logo'
+import * as logo from '../src/shared/logo'
+import { MARK } from '../src/shared/logo'
 
 const svg = (name: string) => readFileSync(join(import.meta.dirname, '../build', name), 'utf8')
 const paths = (text: string) => [...text.matchAll(/ d="([^"]+)"/g)].map((m) => m[1])
 
-// The app draws the logo from shared/logo.ts; the icons are rendered from build/*.svg. They must stay one drawing.
+// The app draws the mark from shared/logo.ts; the icons are rendered from build/*.svg. One script writes them all
+// from the same numbers, and they must stay one drawing.
 describe('logo', () => {
-  it('retains the approved organic quotation contours exactly', () => {
-    expect(createHash('sha256').update(MARK).digest('hex')).toBe('0fc9bdced4f92d52e61dd66ef66c45034ef3d8d88292a419d8551b5d674cd028')
+  it('is the sheet of notes whose first line is a voice: one outline with five bars and two lines cut out of it', () => {
+    expect(MARK.match(/M/g)).toHaveLength(8)
+    expect(createHash('sha256').update(MARK).digest('hex')).toBe('b650784543d1f994c005a8f5f8a69f8b986b703754b8f6f97283b93751ec9f9f')
+  })
+  it("carries nothing of upstream's logo: no second drawing for a wordmark", () => {
+    expect(Object.keys(logo)).toEqual(['MARK'])
   })
   it('matches build/logo.svg', () => {
     expect(paths(svg('logo.svg'))).toEqual([MARK])
   })
-  it('matches build/wordmark.svg', () => {
-    expect(paths(svg('wordmark.svg'))).toEqual([MARK, WORD])
-  })
-  it('matches the original quotation in build/icon.svg', () => {
-    expect(paths(svg('icon.svg')).join('')).toBe(MARK)
-  })
-  it('fills 58% of the Mac tile and centres the original 100-unit mark canvas', () => {
+  it("build/icon.svg has the same five bars and two lines on the violet-to-blue square, with the Mac's room around it", () => {
     const icon = svg('icon.svg')
-    const mark = icon.match(/<path[^>]*transform="translate\(([^ ]+) ([^)]+)\) scale\(([^)]+)\)"/)!
-    expect(mark).not.toBeNull()
-    const [, x, y, scale] = mark.map(Number)
-    expect(90.17375 * scale / 236).toBeCloseTo(.58, 6)
-    expect(x + 50 * scale).toBeCloseTo(128, 6)
-    expect(y + 50 * scale).toBeCloseTo(128, 6)
+    expect(icon).toContain('stop-color="#AE7BFF"')
+    expect(icon).toContain('stop-color="#5785FA"')
+    expect(icon.match(/<rect x=/g)).toHaveLength(7)
+    // 100 of 1024 left on every side, as upstream's icon had
+    expect(icon).toContain('viewBox="0 0 256 256"')
+    expect(icon).toContain('transform="translate(25 25) scale(0.805)"')
+  })
+  it('build/wordmark.svg is the icon with the name beside it, as text', () => {
+    const wordmark = svg('wordmark.svg')
+    expect(wordmark).toContain('>Lynote <tspan')
+    expect(wordmark).toContain('NoteTaker</tspan>')
   })
 })

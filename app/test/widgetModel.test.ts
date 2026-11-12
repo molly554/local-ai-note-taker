@@ -19,14 +19,14 @@ describe('recording hints on Windows and Linux', () => {
     return w.view(2000)?.note
   }
   it('a Mac keeps its words', () => {
-    expect(hint('darwin', 'no-mic')?.text).toBe("Yogurt can't hear your mic. Allow it in System Settings.")
+    expect(hint('darwin', 'no-mic')?.text).toBe("Lynote NoteTaker can't hear your mic. Allow it in System Settings.")
     expect(new WidgetModel().view(0)).toBeNull()
   })
   it("Windows points to its own microphone setting, Linux to the sound settings, and neither speaks of System Settings", () => {
-    expect(hint('win32', 'no-mic')).toMatchObject({ code: 'no-mic', text: "Yogurt can't hear your mic. Turn on microphone access for desktop apps in Windows Settings." })
-    expect(hint('linux', 'no-mic')).toMatchObject({ code: 'no-mic', text: "Yogurt can't hear your mic. Check your sound settings." })
+    expect(hint('win32', 'no-mic')).toMatchObject({ code: 'no-mic', text: "Lynote NoteTaker can't hear your mic. Turn on microphone access for desktop apps in Windows Settings." })
+    expect(hint('linux', 'no-mic')).toMatchObject({ code: 'no-mic', text: "Lynote NoteTaker can't hear your mic. Check your sound settings." })
     for (const os of ['win32', 'linux']) {
-      expect(hint(os, 'no-system-audio')).toMatchObject({ code: 'no-system-audio', text: "Yogurt can't hear the call audio on this computer." })
+      expect(hint(os, 'no-system-audio')).toMatchObject({ code: 'no-system-audio', text: "Lynote NoteTaker can't hear the call audio on this computer." })
       expect(hint(os, 'no-mic', 'no-system-audio')?.text).not.toMatch(/System Settings/)
       expect(hint(os, 'no-mic', 'no-system-audio')?.missingAudio).toEqual(['mic', 'systemAudio'])
     }
@@ -63,7 +63,7 @@ describe('widget model', () => {
     w.warn('device-changed')
     expect(w.view(2000)?.note).toBeNull()
     w.warn('no-system-audio')
-    expect(w.view(2000)?.note).toMatchObject({ tone: 'hint', text: "Yogurt can't hear the call audio. Allow it in System Settings." })
+    expect(w.view(2000)?.note).toMatchObject({ tone: 'hint', text: "Lynote NoteTaker can't hear the call audio. Allow it in System Settings." })
     w.warn('no-mic')
     expect(w.view(2000)?.note?.text).toContain("can't hear your microphone or the call")
   })
@@ -78,7 +78,7 @@ describe('widget model', () => {
   it.each([['no-mic', 'no-system-audio'], ['no-system-audio', 'no-mic']] as const)('keeps both unavailable inputs regardless of warning order: %s then %s', (first, second) => {
     const w = new WidgetModel()
     w.start(m); w.warn(first); w.warn(second)
-    expect(w.view(2000)?.note).toMatchObject({ code: 'no-mic', missingAudio: ['mic', 'systemAudio'], text: "Yogurt can't hear your microphone or the call. Turn on microphone and call audio in System Settings." })
+    expect(w.view(2000)?.note).toMatchObject({ code: 'no-mic', missingAudio: ['mic', 'systemAudio'], text: "Lynote NoteTaker can't hear your microphone or the call. Turn on microphone and call audio in System Settings." })
     w.start(m)
     expect(w.view(2000)?.note).toBeNull()
   })
@@ -96,7 +96,7 @@ describe('widget model', () => {
   it('a stopped meeting with unsaved metadata asks for action until saving succeeds', () => {
     const w = new WidgetModel()
     w.start(m); w.stop(5000); w.stopSavePending(true)
-    expect(w.view(10000)).toMatchObject({ kind: 'captured', note: { text: 'Recording stopped. Open Yogurt to finish saving.' } })
+    expect(w.view(10000)).toMatchObject({ kind: 'captured', note: { text: 'Recording stopped. Open Lynote NoteTaker to finish saving.' } })
     w.stopSavePending(false)
     expect(w.view(10000)?.note).toBeNull()
     w.start(m)
@@ -114,7 +114,7 @@ describe('transcription hints', () => {
     w.warn('no-speech-model')
     expect(hintAt(w)).toBe("The speech model isn't ready yet, so only audio is being saved.")
     w.warn('falling-behind')
-    expect(hintAt(w)).toBe('Yogurt is falling behind. Some lines may be missing.')
+    expect(hintAt(w)).toBe('Lynote NoteTaker is falling behind. Some lines may be missing.')
     expect(w.view(2000)!.note?.tone).toBe('hint')
     w.warn('no-mic')
     expect(w.view(2000)!.note?.code).toBe('no-mic')

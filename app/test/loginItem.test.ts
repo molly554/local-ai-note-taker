@@ -14,7 +14,7 @@ it('Linux: an XDG autostart entry that starts the AppImage hidden, quoted for an
   expect(autostartFile({ XDG_CONFIG_HOME: '/cfg' }, '/home/sam')).toBe('/cfg/autostart/yogurt.desktop')
   expect(autostartFile({}, '/home/sam')).toBe('/home/sam/.config/autostart/yogurt.desktop')
   const entry = autostartEntry('/home/sam/My Apps/Yogurt 100%.AppImage')
-  expect(entry).toContain('[Desktop Entry]\nType=Application\nName=Yogurt\n')
+  expect(entry).toContain('[Desktop Entry]\nType=Application\nName=Lynote NoteTaker\n')
   expect(entry).toContain('Exec="/home/sam/My Apps/Yogurt 100%%.AppImage" --hidden\n')
   expect(autostartEntry('/a/$x"y.AppImage')).toContain('Exec="/a/\\\\$x\\\\"y.AppImage" --hidden\n')
 })

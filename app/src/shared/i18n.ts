@@ -3,6 +3,8 @@
  * language's table and falls back to the English. Tables live in shared/locales/<id>.json; en.json
  * holds only the English plural forms. Blanks are {name}; a value with plural forms picks one by {count}.
  */
+import { named } from './brand'
+
 export type Locale = { id: string; name: string; english: string; rtl?: boolean }
 export type Entry = string | Partial<Record<Intl.LDMLPluralRule, string>>
 export type Table = Record<string, Entry>
@@ -76,6 +78,8 @@ export function translate(source: Record<string, Table>, lang: string, text: str
     const n = typeof vars?.count === 'number' ? vars.count : 0
     entry = entry[new Intl.PluralRules(lang).select(n)] ?? entry.other ?? text
   }
+  // upstream's texts say "Yogurt": this app's name goes in before the blanks are filled, so a meeting called Yogurt keeps its title
+  entry = named(entry, lang)
   if (!vars) return entry
   return entry.replace(/\{(\w+)\}/g, (all, k: string) => {
     const v = vars[k]

@@ -11,8 +11,8 @@ describe('userDataDir', () => {
     process.env.YOGURT_USER_DATA = '/tmp/profile'
     expect(userDataDir()).toBe('/tmp/profile')
   })
-  it('is a Yogurt folder in app data otherwise', () => {
-    expect(userDataDir()).toBe(join('/fake/appData', 'Yogurt'))
+  it("is a folder named after the app in app data otherwise, apart from Yogurt's own", () => {
+    expect(userDataDir()).toBe(join('/fake/appData', 'Lynote NoteTaker'))
   })
 })
 

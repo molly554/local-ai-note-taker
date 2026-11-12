@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import { MARK } from '../../../shared/logo'
+import { PRODUCT } from '../../../shared/brand'
 import { BOOT } from '../../../shared/onboarding'
 
 /**
@@ -10,7 +11,7 @@ export function BootScreen() {
   const id = useId().replace(/:/g, '')
   const delay = Math.max(0, BOOT.showAfterMs - performance.now())
   return (
-    <div data-testid="boot-screen" className="boot-screen" style={{ animationDelay: `${delay}ms` }} role="status" aria-label="Yogurt">
+    <div data-testid="boot-screen" className="boot-screen" style={{ animationDelay: `${delay}ms` }} role="status" aria-label={PRODUCT}>
       <svg width={52} height={52} viewBox="0 0 100 100" aria-hidden="true" className="boot-mark">
         <defs>
           <clipPath id={`${id}-mark`}><path d={MARK} /></clipPath>

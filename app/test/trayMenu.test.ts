@@ -53,14 +53,14 @@ describe('Windows and Linux tray', () => {
     expect([settings(), settings('darwin'), settings('win32'), settings('linux')]).toEqual(['Command+,', 'Command+,', 'Ctrl+,', 'Ctrl+,'])
   })
   it('a Mac keeps its template icon and timer title', () => {
-    expect(trayLook('darwin', null, 0)).toEqual({ icon: 'tray', template: true, title: '', tooltip: 'Yogurt' })
-    expect(trayLook('darwin', { paused: false }, 723000)).toEqual({ icon: 'tray', template: true, title: '● 12:03', tooltip: 'Yogurt is recording' })
+    expect(trayLook('darwin', null, 0)).toEqual({ icon: 'tray', template: true, title: '', tooltip: 'Lynote NoteTaker' })
+    expect(trayLook('darwin', { paused: false }, 723000)).toEqual({ icon: 'tray', template: true, title: '● 12:03', tooltip: 'Lynote NoteTaker is recording' })
     expect(trayLook('darwin', { paused: true }, 723000)).toEqual({ icon: 'tray', template: true, title: '12:03', tooltip: 'Recording paused' })
   })
   it('elsewhere a colour icon, a recording one while it records, and the time in the tooltip (no title there)', () => {
     for (const os of ['win32', 'linux']) {
-      expect(trayLook(os, null, 0)).toEqual({ icon: 'tray-color', template: false, title: null, tooltip: 'Yogurt' })
-      expect(trayLook(os, { paused: false }, 723000)).toEqual({ icon: 'tray-recording', template: false, title: null, tooltip: 'Yogurt is recording · 12:03' })
+      expect(trayLook(os, null, 0)).toEqual({ icon: 'tray-color', template: false, title: null, tooltip: 'Lynote NoteTaker' })
+      expect(trayLook(os, { paused: false }, 723000)).toEqual({ icon: 'tray-recording', template: false, title: null, tooltip: 'Lynote NoteTaker is recording · 12:03' })
       expect(trayLook(os, { paused: true }, 723000)).toEqual({ icon: 'tray-color', template: false, title: null, tooltip: 'Recording paused · 12:03' })
     }
   })

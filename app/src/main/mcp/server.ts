@@ -28,9 +28,9 @@ const id = { type: 'string', description: 'The meeting id, from list_meetings or
 const readOnly = { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
 /** The tools, in this computer's words: a Mac records AAC in .m4a, Windows and Linux Ogg Opus (a backup can bring either) */
 export const mcpTools = (platform: string) => [
-  { name: 'list_meetings', description: 'Meetings recorded in Yogurt, newest first: id, title, start and end (ISO times), people invited, call app. Optional query finds meetings by words in their title, transcript or notes.',
+  { name: 'list_meetings', description: 'Meetings recorded in Lynote NoteTaker, newest first: id, title, start and end (ISO times), people invited, call app. Optional query finds meetings by words in their title, transcript or notes.',
     inputSchema: { type: 'object', properties: { query: { type: 'string' }, limit: { type: 'number', description: 'Most to return (default 20, at most 100)' }, before: { type: 'string', description: 'Only meetings that started before this ISO time, to page back' } } } },
-  { name: 'get_meeting', description: "One meeting: its details, the notes the person typed (myNotes) and Yogurt's written summary (Markdown).",
+  { name: 'get_meeting', description: "One meeting: its details, the notes the person typed (myNotes) and Lynote NoteTaker's written summary (Markdown).",
     inputSchema: { type: 'object', properties: { id }, required: ['id'] } },
   { name: 'get_transcript', description: 'What was said in a meeting, line by line with who said it. format "text" (default): "[mm:ss] Name: words" lines. format "lines": JSON with start_ms, end_ms, speaker, is_me and text. "Them" is the other side of the call when the call app gave no name.',
     inputSchema: { type: 'object', properties: { id, format: { type: 'string', enum: ['text', 'lines'] } }, required: ['id'] } },
@@ -114,8 +114,8 @@ export function createMcp(d: McpDeps): Mcp {
         return ok(msgId, {
           protocolVersion: VERSIONS.includes(String(asked)) ? asked : VERSIONS[0],
           capabilities: { tools: {} },
-          serverInfo: { name: 'yogurt', title: 'Yogurt', version: d.version },
-          instructions: `Yogurt holds the person's meeting notes, transcripts and recordings on this ${mac ? 'Mac' : 'computer'}. Use list_meetings or search to find a meeting, then get_meeting, get_transcript or get_audio.`,
+          serverInfo: { name: 'yogurt', title: 'Lynote NoteTaker', version: d.version },
+          instructions: `Lynote NoteTaker holds the person's meeting notes, transcripts and recordings on this ${mac ? 'Mac' : 'computer'}. Use list_meetings or search to find a meeting, then get_meeting, get_transcript or get_audio.`,
         })
       }
       if (method === 'ping') return ok(msgId, {})
@@ -123,15 +123,15 @@ export function createMcp(d: McpDeps): Mcp {
       if (method === 'tools/call') {
         const name = String(params?.name ?? '')
         const tool = tools[name]
-        if (!tool) return said(msgId, `Yogurt has no tool called ${name}.`, true)
-        if (!d.enabled()) return said(msgId, 'Yogurt has connecting AI apps turned off. The person can turn it on in Yogurt: Settings, AI apps.', true)
+        if (!tool) return said(msgId, `Lynote NoteTaker has no tool called ${name}.`, true)
+        if (!d.enabled()) return said(msgId, 'Lynote NoteTaker has connecting AI apps turned off. The person can turn it on in Lynote NoteTaker: Settings, AI apps.', true)
         try { return said(msgId, await tool((params?.arguments as Record<string, unknown>) ?? {})) } catch (e) {
           if (e instanceof Refusal) return said(msgId, e.message, true)
           console.error(`mcp: ${name} failed`, e)
-          return said(msgId, `Yogurt couldn't do that (${name}). Try again.`, true)
+          return said(msgId, `Lynote NoteTaker couldn't do that (${name}). Try again.`, true)
         }
       }
-      return fail(msgId, -32601, `Yogurt doesn't do ${method}`)
+      return fail(msgId, -32601, `Lynote NoteTaker doesn't do ${method}`)
     },
   }
 }

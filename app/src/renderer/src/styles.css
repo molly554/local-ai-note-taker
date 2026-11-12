@@ -12,12 +12,12 @@
 :root {
   --bg: #FFFFFF;
   --card: #F6F6F8;
-  --ink: #23242A;
-  --muted: #6E6F7B;
-  --line: #E6E6EC;
-  --accent: #7142E8;
+  --ink: #1C1F23;
+  --muted: #5A6068;
+  --line: #E6E8EA;
+  --accent: #865EFF;
   --accent-ink: #FFFFFF;
-  --accent-soft: #EDE6FC;
+  --accent-soft: #F0EBFF;
   --status-live: #416D48;
   --danger: #C13E51;
   --danger-ink: #FFFFFF;
@@ -58,38 +58,39 @@
   }
 }
 
-/* The recorder keeps its own palette while the application adopts quiet neutral layers. */
+/* The recorder keeps its own palette while the application adopts quiet neutral layers.
+   Light colours: the app's violet #865EFF (hover #744FE6) on quiet greys. */
 :root:not(.widget) {
   --bg: #FFFFFF;
-  --chrome: #F3F3F3;
-  --card: #F6F6F6;
+  --chrome: #F9FAFB;
+  --card: #F2F3F5;
   --row-hover: color-mix(in srgb, var(--ink) 5%, transparent);
   --float: #FFFFFF;
-  --ink: #29292C;
-  --muted: #606066;
-  --heading: #29292C;
-  --written: #54545A;
-  --line: #E6E6E8;
-  --accent: #6F00FF;
+  --ink: #1C1F23;
+  --muted: #5A6068;
+  --heading: #1C1F23;
+  --written: #33373D;
+  --line: #E6E8EA;
+  --accent: #865EFF;
   --accent-ink: #FFFFFF;
-  --accent-soft: #F1E6FF;
+  --accent-soft: #F0EBFF;
   --playback-bg: #E5D4FF;
   --playback-ink: #35105F;
-  --primary: #6F00FF;
-  --primary-hover: #6200E0;
-  --control: #ECECEE;
-  --control-hover: #E4E4E7;
-  --control-pressed: #DCDCE1;
+  --primary: #865EFF;
+  --primary-hover: #744FE6;
+  --control: #F2F3F5;
+  --control-hover: #E6E8EA;
+  --control-pressed: #DADDE0;
   --control-border: transparent;
-  --selected: #E4E2E8;
-  --focus: #6F00FF;
+  --selected: #EDE8FF;
+  --focus: #865EFF;
   --danger: #B63C4D;
   --danger-ink: #FFFFFF;
   --danger-soft: #F4E5E8;
   --danger-control-ink: #A13041;
   --scrim: #16161938;
-  --shadow: 0 16px 44px #17171A1A, 0 2px 6px #17171A0D;
-  --shadow-soft: 0 1px 2px #17171A08;
+  --shadow: 0 8px 20px rgba(0, 0, 0, .10);
+  --shadow-soft: 0 1px 2px rgba(28, 31, 35, .05);
 }
 @media (prefers-color-scheme: dark) {
   :root:not(.widget) {
@@ -107,8 +108,8 @@
     --accent-soft: #2C164A;
     --playback-bg: #7040AF;
     --playback-ink: #FFFFFF;
-    --primary: #6F00FF;
-    --primary-hover: #7D1AFF;
+    --primary: #865EFF;
+    --primary-hover: #9675FF;
     --control: #333335;
     --control-hover: #3B3B3E;
     --control-pressed: #434347;
@@ -124,9 +125,13 @@
   }
 }
 
+/* the icon with the name beside it (Logo.tsx) */
+.wordmark { display:inline-flex;flex:none;align-items:center;gap:.55em;white-space:nowrap;line-height:1;font-weight:650;letter-spacing:-.01em;color:var(--ink); }
+.wordmark-name span { font-weight:500;color:var(--muted); }
+
 @theme inline {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-brand: "Bricolage Grotesque", -apple-system, system-ui, sans-serif;
+  --font-brand: var(--font-sans);
   --color-bg: var(--bg);
   --color-card: var(--card);
   --color-ink: var(--ink);

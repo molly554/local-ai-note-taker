@@ -2,6 +2,7 @@ import { app } from 'electron'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, posix } from 'node:path'
+import { PRODUCT } from '../shared/brand'
 
 type MacStatus = 'not-registered' | 'enabled' | 'requires-approval' | 'not-found'
 
@@ -32,7 +33,7 @@ export const autostartFile = (env: Record<string, string | undefined>, home: str
 /** The entry: the AppImage, quoted the Desktop Entry way (any path, spaces and % included), started hidden */
 export function autostartEntry(appImage: string): string {
   const quoted = `"${appImage.replace(/(["`$\\])/g, '\\$1')}"`.replace(/\\/g, '\\\\').replace(/%/g, '%%')
-  return `[Desktop Entry]\nType=Application\nName=Yogurt\nExec=${quoted} --hidden\nX-GNOME-Autostart-enabled=true\n`
+  return `[Desktop Entry]\nType=Application\nName=${PRODUCT}\nExec=${quoted} --hidden\nX-GNOME-Autostart-enabled=true\n`
 }
 
 /** on when the entry is there and not hidden (a desktop's startup settings may hide it instead of removing it) */

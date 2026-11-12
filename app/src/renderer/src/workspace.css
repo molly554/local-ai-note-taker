@@ -32,7 +32,7 @@
 .sidebar-collapsed .workspace-search { padding-inline:9px;gap:0; }
 .sidebar-collapsed .workspace-folder-more { display:none; }
 .sidebar-collapsed .workspace-brand { padding-inline:17px; }
-.workspace-wordmark { direction:ltr;display:flex;flex:none;width:90px;overflow:hidden; }
+.workspace-wordmark { direction:ltr;display:flex;flex:none;width:156px;overflow:hidden; }
 .sidebar-collapsed .workspace-wordmark { width:22px; }
 .workspace[data-sidebar-motion=true] .workspace-wordmark { transition:width 200ms cubic-bezier(.22,1,.36,1); }
 .workspace[data-sidebar-motion=true] .workspace-brand { transition:padding-inline 200ms cubic-bezier(.22,1,.36,1); }

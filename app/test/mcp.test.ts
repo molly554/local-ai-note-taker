@@ -70,7 +70,7 @@ describe('the MCP server', () => {
       return [init.result.instructions, list.result.tools.find((t) => t.name === 'get_audio')!.description]
     }
     const mac = "A meeting's recording as files on this Mac: one per side (track me: the person's microphone; them: the other side of the call), AAC in .m4a. Gives paths, which apps on this Mac can open."
-    expect(await audioText()).toEqual(["Yogurt holds the person's meeting notes, transcripts and recordings on this Mac. Use list_meetings or search to find a meeting, then get_meeting, get_transcript or get_audio.", mac])
+    expect(await audioText()).toEqual(["Lynote NoteTaker holds the person's meeting notes, transcripts and recordings on this Mac. Use list_meetings or search to find a meeting, then get_meeting, get_transcript or get_audio.", mac])
     expect(await audioText('darwin')).toEqual(await audioText())
     for (const p of ['win32', 'linux']) {
       const [instructions, audio] = await audioText(p)

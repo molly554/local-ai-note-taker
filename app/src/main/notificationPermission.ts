@@ -1,3 +1,4 @@
+import { PRODUCT } from '../shared/brand'
 import { execFile } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { Notification } from 'electron'
@@ -37,7 +38,7 @@ export function createNotificationPermission(settingsPath: string) {
     if (askedFor().includes(key)) return 'asked'
     if (!Notification.isSupported()) return 'unknown'
     return new Promise<Access>((done) => {
-      const notice = new Notification({ title: 'Yogurt', body: t("You'll see a note here when a call starts."), silent: true })
+      const notice = new Notification({ title: PRODUCT, body: t("You'll see a note here when a call starts."), silent: true })
       const finish = (access: Access) => {
         clearTimeout(timeout)
         notice.removeAllListeners()

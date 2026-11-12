@@ -19,6 +19,7 @@ import { logToFile } from './log'
 import { loadSettings, localeOf, notesLanguageSetting, recordingReminderOn, spokenSetting, stopsWhenCallEnds, updateSettings } from './settings'
 import { CALL_GONE_MS, useCallApps } from './detect'
 import { systemLocale } from './locale'
+import { PRODUCT } from '../shared/brand'
 import { onLanguage, setLanguage, t } from '../shared/i18n'
 import bundledCatalog from '../../../catalog/catalog.json'
 import licenses from '../../../catalog/licenses.json'
@@ -79,7 +80,7 @@ import type { NoteSaveResult, StartResult } from '../shared/types'
 // the transcript's player streams each meeting's audio from here; seeking needs stream support (before ready)
 protocol.registerSchemesAsPrivileged([{ scheme: AUDIO_SCHEME, privileges: { standard: true, secure: true, stream: true } }])
 
-app.setName('Yogurt')
+app.setName(PRODUCT)
 // Windows shows notifications only for an app with this id (the installer's shortcut carries the same one, electron-builder appId)
 if (process.platform === 'win32') app.setAppUserModelId('so.yogurt.app')
 app.setPath('userData', userDataDir())
@@ -116,7 +117,7 @@ let sendWidgetTranscript = (_channel: string, _value: unknown) => {}
 function createWindow() {
   win = new BrowserWindow({
     width: 1100, height: 760, minWidth: 720, minHeight: 520,
-    title: 'Yogurt',
+    title: PRODUCT,
     ...windowChrome(process.platform, nativeTheme.shouldUseDarkColors),
     show: false,
     // hidden pages would otherwise pause timers and animations

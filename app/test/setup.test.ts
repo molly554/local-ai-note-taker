@@ -235,7 +235,7 @@ describe('SetupController', () => {
   it('a Mac too small for any notes model says so, as it always did', async () => {
     const { c, rec } = setup({ getHardware: async () => ({ ...mac8, totalRamGB: 4 }) })
     await c.start(); await c.idle()
-    expect(c.state).toMatchObject({ phase: 'error', message: 'Yogurt needs a Mac with at least 8 GB of memory.' })
+    expect(c.state).toMatchObject({ phase: 'error', message: 'Lynote NoteTaker needs a Mac with at least 8 GB of memory.' })
     expect(rec.asked).toEqual([])
   })
 
@@ -244,7 +244,7 @@ describe('SetupController', () => {
       const pc: Hardware = { os, arch: 'x64', cpuModel: 'Intel Core i3', totalRamGB: 4, freeDiskGB: 500, gpu: { kind: 'none', name: '', vramGB: 0 } }
       const { c, rec } = setup({ getHardware: async () => pc })
       await c.start(); await c.idle()
-      expect(c.state).toMatchObject({ phase: 'error', message: "Yogurt runs entirely on your computer, and this one isn't strong enough. It needs at least 8 GB of memory." })
+      expect(c.state).toMatchObject({ phase: 'error', message: "Lynote NoteTaker runs entirely on your computer, and this one isn't strong enough. It needs at least 8 GB of memory." })
       expect(rec.asked).toEqual([])
     }
   })

@@ -1,3 +1,4 @@
+import { PRODUCT } from '../shared/brand'
 import { app, ipcMain, Menu, type BrowserWindow, type MenuItemConstructorOptions } from 'electron'
 import { onLanguage, t } from '../shared/i18n'
 
@@ -65,7 +66,7 @@ function pcMenuTemplate(sidebar?: { open: boolean | null; toggle(): void }): Men
   return [
     { label: t('File'), submenu: [
       { role: 'close', label: t('Close Window'), accelerator: 'Ctrl+W' },
-      { role: 'quit', label: t('Quit {app}', { app: 'Yogurt' }), accelerator: 'Ctrl+Q' },
+      { role: 'quit', label: t('Quit {app}', { app: PRODUCT }), accelerator: 'Ctrl+Q' },
     ] },
     { label: t('Edit'), submenu: [
       { role: 'undo', label: t('Undo') },

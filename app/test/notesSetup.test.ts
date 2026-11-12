@@ -50,7 +50,7 @@ describe('footer download details', () => {
   const progress = { ...downloading, notesTotalBytes: 5e9, notesEtaSec: 240 }
   it('uses the model size and measured ETA, with a shorter native hover title', () => {
     expect(notesDownloadText(progress)).toEqual({
-      title: "Downloading Yogurt's AI: 2.1 of 5.0 GB",
+      title: "Downloading Lynote NoteTaker's AI: 2.1 of 5.0 GB",
       detail: '2.1 of 5.0 GB · about 4 min left',
     })
   })
@@ -62,15 +62,15 @@ describe('footer download details', () => {
     expect(notesDownloadText({ ...progress, notesFraction: 1 }).detail).toBe('5.0 of 5.0 GB')
   })
   it.each([undefined, 0, -1, NaN, Infinity])('never fabricates a model size (%s)', bytes => {
-    expect(notesDownloadText({ ...progress, notesTotalBytes: bytes })).toEqual({ title: "Downloading Yogurt's AI", detail: "Downloading Yogurt's AI" })
+    expect(notesDownloadText({ ...progress, notesTotalBytes: bytes })).toEqual({ title: "Downloading Lynote NoteTaker's AI", detail: "Downloading Lynote NoteTaker's AI" })
   })
   it('bounds downloaded GB and falls back when the fraction is missing', () => {
     expect(notesDownloadText({ ...progress, notesFraction: 2 }).detail).toBe('5.0 of 5.0 GB')
     expect(notesDownloadText({ ...progress, notesFraction: -1, notesEtaSec: undefined }).detail).toBe('0.0 of 5.0 GB')
-    expect(notesDownloadText({ ...progress, notesFraction: undefined }).detail).toBe("Downloading Yogurt's AI")
+    expect(notesDownloadText({ ...progress, notesFraction: undefined }).detail).toBe("Downloading Lynote NoteTaker's AI")
   })
   it('localizes the amounts and the whole detail line', () => {
     setLanguage('fr')
-    expect(notesDownloadText(progress)).toEqual({ title: 'Téléchargement de l’IA de Yogurt : 2,1 sur 5,0 Go', detail: '2,1 sur 5,0 Go · reste environ 4 min' })
+    expect(notesDownloadText(progress)).toEqual({ title: 'Téléchargement de l’IA de Lynote NoteTaker : 2,1 sur 5,0 Go', detail: '2,1 sur 5,0 Go · reste environ 4 min' })
   })
 })
